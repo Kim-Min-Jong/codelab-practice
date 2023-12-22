@@ -20,6 +20,8 @@ class MainActivity : ComponentActivity() {
             // 여기서는 따로 구현한 테마를 사용
             BasicsCodelabTheme {
                 // A surface container using the 'background' color from the theme
+                // Surface는 Material design 시스템에 기반한 Compose의 컨테이너, UI와 환경을 만드는데 기여함
+                // 일반적으로 카드 또는 패널과 같은 요소를 나타내는데 사용된다. 그림자, 경계선, 배경색 등과 같은 시각적 효과를 자동으로 처리하며, 표면에 콘텐츠를 배치하는데 사용됨
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
