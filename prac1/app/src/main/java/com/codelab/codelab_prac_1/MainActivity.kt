@@ -23,6 +23,10 @@ class MainActivity : ComponentActivity() {
                 // Surface는 Material design 시스템에 기반한 Compose의 컨테이너, UI와 환경을 만드는데 기여함
                 // 일반적으로 카드 또는 패널과 같은 요소를 나타내는데 사용된다. 그림자, 경계선, 배경색 등과 같은 시각적 효과를 자동으로 처리하며, 표면에 콘텐츠를 배치하는데 사용됨
                 Surface(
+                    // 해당 compose 컴포넌트의 수정자
+                    // 상위 요소 레이아웃 내에서 UI요소가 배치되고 동작하는 방식을 해당 요소에 전달
+                    // 여기서는 화면에 꽉차게하도록 만듦
+                    // 요소 목록 https://developer.android.com/jetpack/compose/modifiers-list?hl=ko
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
@@ -53,6 +57,21 @@ class MainActivity : ComponentActivity() {
             ) {
                 Greeting("Android")
             }
+        }
+    }
+
+    /**
+     * 함수는 기본적으로 빈 수정자가 할당되는 수정자 매개변수를 포함하는 것이 좋습니다.
+     * 함수 내에서 호출하는 첫 번째 컴포저블로 이 수정자를 전달합니다.
+     * 이렇게 하면 호출 사이트가 구성 가능한 함수 외부에서 레이아웃 안내와 동작을 조정할 수 있습니다.
+     */
+    @Composable
+    private fun MyApp(modifier: Modifier = Modifier) {
+        Surface(
+            modifier = modifier,
+            color = MaterialTheme.colorScheme.background
+        ) {
+            Greeting("Android")
         }
     }
 }
