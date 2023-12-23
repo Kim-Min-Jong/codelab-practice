@@ -54,9 +54,9 @@ class MainActivity : ComponentActivity() {
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
         ) {
             // 하나의 열 생성
-            // 열을 채우고 패딩 주기
+            // 너비를 채우고 패딩 주기
             Column(modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxWidth() // 너비(가로) 전체 채우기, 기본 값은 전체 채우기이며 비율 설정 가능
                 .padding(24.dp)) {
                 // 열 안의 내부 요소 생성 - 열 모양으로 생성됨
                 Text(text = "hello,")
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
         BasicsCodelabTheme {
             // A surface container using the 'background' color from the theme
             Surface(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize(), // 가로 세로 모두 전체 채우기, 비율로 설정도 가능
                 color = MaterialTheme.colorScheme.background
             ) {
                 Greeting("Android")
