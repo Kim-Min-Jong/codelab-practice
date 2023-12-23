@@ -3,6 +3,7 @@ package com.codelab.codelab_prac_1
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -41,7 +42,16 @@ class MainActivity : ComponentActivity() {
     // @Composable을 붙어야 Text 같이 선언형 UI를 구현할 수 있음
     @Composable
     fun Greeting(name: String) {
-        Text(text = "Hello $name!")
+//        Text(text = "Hello $name!")
+        // row, column - 행 열 만들기
+        Surface(color = MaterialTheme.colorScheme.primary) {
+            // 하나의 열 생성
+            Column {
+                // 열 안의 내부 요소 생성 - 열 모양으로 생성됨
+                Text(text = "hello,")
+                Text(text = name)
+            }
+        }
     }
 
     // @Preview는 Android Studio 미리보기를 사용할 수 있음
