@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,7 +34,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+//                    Greeting("Android")
+                    MyApp()
                 }
             }
         }
@@ -44,9 +48,16 @@ class MainActivity : ComponentActivity() {
     fun Greeting(name: String) {
 //        Text(text = "Hello $name!")
         // row, column - 행 열 만들기
-        Surface(color = MaterialTheme.colorScheme.primary) {
+        Surface(
+            color = MaterialTheme.colorScheme.primary,
+            // 전체에 수평 수직 패딩 주기
+            modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
+        ) {
             // 하나의 열 생성
-            Column {
+            // 열을 채우고 패딩 주기
+            Column(modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)) {
                 // 열 안의 내부 요소 생성 - 열 모양으로 생성됨
                 Text(text = "hello,")
                 Text(text = name)
@@ -82,7 +93,8 @@ class MainActivity : ComponentActivity() {
         names: List<String> = listOf("World", "Compose")
         ) {
         Surface(
-            modifier = modifier,
+            // 화면 전체에 패딩 지정
+            modifier = modifier.padding(vertical = 4.dp),
             color = MaterialTheme.colorScheme.background
         ) {
             Greeting("Android")
