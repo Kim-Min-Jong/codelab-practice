@@ -13,6 +13,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -64,6 +66,13 @@ class MainActivity : ComponentActivity() {
 //                Text(text = name)
 //            }
 
+            // 상태 기억
+            // remember는 리컴포지션을 방지하는데 사용됨
+            // 상태가 재설정 되지 않음
+            // 화면의 서로 다른 부분에서 동일한 컴포저블을 호출하는 경우, 호출하는 부분 자체적인 상태 버전을 가진 UI를 생성
+            // 살짝 livedata 느낌???
+            val expanded = remember { mutableStateOf(false) }
+
             // 버튼 연습
             Row(modifier = Modifier.padding(24.dp)) {
                 /**
@@ -80,9 +89,28 @@ class MainActivity : ComponentActivity() {
                 // 여기서는 Text를 ElevatedButton으로 래핑하는 Elevated Button을 사용
                 // https://m3.material.io/components/buttons/implementation/android
                 ElevatedButton(
-                    onClick = {}
+                    /**
+                     *  Recomposition(리컴포지션)
+                     *  Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환한다.
+                     *  데이터가 변경되면 Compose는 새 데이터로 이러한 함수를 다시 실행하여 업데이트된 UI를 만든다.
+                     *  이 과정을 리컴포지션이라고 한다.
+                     *
+                     *  Compose는 데이터가 변경된 요소만 다시 구성하고, 영향을 받지않은 요소는 건너뛴다.
+                     *
+                     *  @Composable에 내부 상태를 추가하려면 mutableStateOf를 통해 관리한다.
+                     *  이 함수를 사용하면 Compose가 State를 읽는 함수를 재구성한다.
+                     *
+                     *  State 및 MutableState는 어떤 값을 보유하고 그 값이 변경될 때마다 UI 업데이트(리컴포지션)를 트리거하는 인터페이스입니다.
+                     *
+                     *  하지만 @Composable 내의 변수에 mutableStateOf만 할당해서는 할 수 없다.
+                     *  변경가능한 새 상태로 상태를 재설정하여 컴포저블을 다시 호출할떄는 언제든 리컴포지션이 일어날 수 있기 떄문에
+                     *  여러 리컴포지션간에 상태를 유지하려면 remember를 사용하여 변경 가능한 상태를 *기억*해야한다.
+                     */
+                    onClick = {
+                        expanded.value = !expanded.value
+                    }
                 ) {
-                    Text(text = "Show more")
+                    Text(text = if(expanded.value) "Show less" else "Show more")
                 }
             }
         }
