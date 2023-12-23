@@ -66,6 +66,7 @@ class MainActivity : ComponentActivity() {
                 color = MaterialTheme.colorScheme.background
             ) {
                 Greeting("Android")
+                MyApp()
             }
         }
     }
@@ -76,12 +77,22 @@ class MainActivity : ComponentActivity() {
      * 이렇게 하면 호출 사이트가 구성 가능한 함수 외부에서 레이아웃 안내와 동작을 조정할 수 있습니다.
      */
     @Composable
-    private fun MyApp(modifier: Modifier = Modifier) {
+    private fun MyApp(
+        modifier: Modifier = Modifier,
+        names: List<String> = listOf("World", "Compose")
+        ) {
         Surface(
             modifier = modifier,
             color = MaterialTheme.colorScheme.background
         ) {
             Greeting("Android")
+
+            // Compose 와 Kotlin의 통합
+            Column(modifier) {
+                for (name in names) {
+                    Greeting(name = name)
+                }
+            }
         }
     }
 }
