@@ -38,7 +38,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    val names: List<String> = listOf("World", "Compose")
+                    // Compose 와 Kotlin의 통합
+                    Column {
+                        for (name in names) {
+                            Greeting(name = name)
+                        }
+                    }
 //                    MyApp()
                 }
             }
@@ -50,6 +56,16 @@ class MainActivity : ComponentActivity() {
     // @Composable을 붙어야 Text 같이 선언형 UI를 구현할 수 있음
     @Composable
     fun Greeting(name: String) {
+        // 상태 기억
+        // remember는 리컴포지션을 방지하는데 사용됨
+        // 상태가 재설정 되지 않음
+        // 화면의 서로 다른 부분에서 동일한 컴포저블을 호출하는 경우, 호출하는 부분 자체적인 상태 버전을 가진 UI를 생성
+        // 살짝 livedata 느낌???
+        val expanded = remember { mutableStateOf(false) }
+
+        // 버튼 클릭 시 UI 변화 주는 변수
+        val extraPadding = if (expanded.value) 48.dp else 0.dp
+
         // row, column - 행 열 만들기
         Surface(
             color = MaterialTheme.colorScheme.primary,
@@ -66,13 +82,6 @@ class MainActivity : ComponentActivity() {
 //                Text(text = name)
 //            }
 
-            // 상태 기억
-            // remember는 리컴포지션을 방지하는데 사용됨
-            // 상태가 재설정 되지 않음
-            // 화면의 서로 다른 부분에서 동일한 컴포저블을 호출하는 경우, 호출하는 부분 자체적인 상태 버전을 가진 UI를 생성
-            // 살짝 livedata 느낌???
-            val expanded = remember { mutableStateOf(false) }
-
             // 버튼 연습
             Row(modifier = Modifier.padding(24.dp)) {
                 /**
@@ -80,7 +89,7 @@ class MainActivity : ComponentActivity() {
                  * alignEnd 수정자가 없으므로 시작 시 컴포저블에 약간의 weight을 제공합.
                  * weight 수정자는 요소를 유연하게 만들기 위해 가중치가 없는 다른 요소(유연성 부족이라고 함)를 효과적으로 밀어내어 요소의 사용 가능한 모든 공간을 채움.
                  */
-                Column(modifier = Modifier.weight(1f)) {
+                Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
                     Text(text = "hello,")
                     Text(text = name)
                 }
