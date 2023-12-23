@@ -48,7 +48,6 @@ class MainActivity : ComponentActivity() {
     // @Composable을 붙어야 Text 같이 선언형 UI를 구현할 수 있음
     @Composable
     fun Greeting(name: String) {
-//        Text(text = "Hello $name!")
         // row, column - 행 열 만들기
         Surface(
             color = MaterialTheme.colorScheme.primary,
