@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,8 +36,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-//                    Greeting("Android")
-                    MyApp()
+                    Greeting("Android")
+//                    MyApp()
                 }
             }
         }
@@ -53,14 +55,36 @@ class MainActivity : ComponentActivity() {
             // 전체에 수평 수직 패딩 주기
             modifier = Modifier.padding(vertical = 4.dp, horizontal = 8.dp)
         ) {
-            // 하나의 열 생성
-            // 너비를 채우고 패딩 주기
-            Column(modifier = Modifier
-                .fillMaxWidth() // 너비(가로) 전체 채우기, 기본 값은 전체 채우기이며 비율 설정 가능
-                .padding(24.dp)) {
-                // 열 안의 내부 요소 생성 - 열 모양으로 생성됨
-                Text(text = "hello,")
-                Text(text = name)
+//            // 하나의 열 생성
+//            // 너비를 채우고 패딩 주기
+//            Column(modifier = Modifier
+//                .fillMaxWidth() // 너비(가로) 전체 채우기, 기본 값은 전체 채우기이며 비율 설정 가능
+//                .padding(24.dp)) {
+//                // 열 안의 내부 요소 생성 - 열 모양으로 생성됨
+//                Text(text = "hello,")
+//                Text(text = name)
+//            }
+
+            // 버튼 연습
+            Row(modifier = Modifier.padding(24.dp)) {
+                /**
+                 * 컴포저블을 행 끝에 배치하는 방법을 알아야함.
+                 * alignEnd 수정자가 없으므로 시작 시 컴포저블에 약간의 weight을 제공합.
+                 * weight 수정자는 요소를 유연하게 만들기 위해 가중치가 없는 다른 요소(유연성 부족이라고 함)를 효과적으로 밀어내어 요소의 사용 가능한 모든 공간을 채움.
+                 */
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = "hello,")
+                    Text(text = name)
+                }
+
+                // compose는 다양한 버튼 사양을 지원하는데
+                // 여기서는 Text를 ElevatedButton으로 래핑하는 Elevated Button을 사용
+                // https://m3.material.io/components/buttons/implementation/android
+                ElevatedButton(
+                    onClick = {}
+                ) {
+                    Text(text = "Show more")
+                }
             }
         }
     }
