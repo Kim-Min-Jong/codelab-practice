@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
@@ -181,10 +183,16 @@ class MainActivity : ComponentActivity() {
     private fun Greetings(
         modifier: Modifier = Modifier,
         // LazyColumn을 사용하기 위한 리스트 조정
+        // 1000개의 리스트가 생성 되고, 성능 지연이 발생함
         names: List<String> = List(1000) { "$it" }
     ) {
-        Column(modifier = modifier.padding(vertical = 4.dp)) {
-            for (name in names) {
+        // Column to LazyColumn
+        // 스크롤 가능한 열을 생성 (Column과 동일)
+        // LazyColumn은 화면에 보이는 항목만 렌데링 하므로 성능이 향상됨-Column은 목록을 한번에 렌더링하여 성능 이슈 발생 가능
+        // LazyColumn은 xml에 RecyclerView와 동일
+        LazyColumn(modifier = modifier.padding(vertical = 4.dp)) {
+            // 각 항목에 넣을 때, items라는 항목안에다가 넣어주어야함
+            items(items = names) { name ->
                 Greeting(name = name)
             }
         }
