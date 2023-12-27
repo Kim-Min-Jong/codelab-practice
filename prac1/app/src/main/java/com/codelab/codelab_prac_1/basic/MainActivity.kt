@@ -3,17 +3,22 @@ package com.codelab.codelab_prac_1.basic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -37,14 +42,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val names: List<String> = listOf("World", "Compose")
-                    // Compose 와 Kotlin의 통합
-                    Column {
-                        for (name in names) {
-                            Greeting(name = name)
-                        }
-                    }
-//                    MyApp()
+//                    val names: List<String> = listOf("World", "Compose")
+//                    // Compose 와 Kotlin의 통합
+//                    Column {
+//                        for (name in names) {
+//                            Greeting(name = name)
+//                        }
+//                    }
+                    MyApp(Modifier.fillMaxSize())
+
+                    // compose 에선 UI를 숨기지 않는다
+                    // 그런데 OnboardingScreen 함수를 어떻게 보여주는가 ???
+                    // --> OnboardingScreen에서 만든 상태를 MyApp 컴포저블과 공유해야한다.
+                    // 태 값을 상위 요소와 공유하는 대신 상태를 호이스팅한다.
+                    // 즉, 상태 값에 액세스해야 하는 공통 상위 요소로 상태 값을 이동하기만 하면 된다.
+
                 }
             }
         }
@@ -88,7 +100,11 @@ class MainActivity : ComponentActivity() {
                  * alignEnd 수정자가 없으므로 시작 시 컴포저블에 약간의 weight을 제공합.
                  * weight 수정자는 요소를 유연하게 만들기 위해 가중치가 없는 다른 요소(유연성 부족이라고 함)를 효과적으로 밀어내어 요소의 사용 가능한 모든 공간을 채움.
                  */
-                Column(modifier = Modifier.weight(1f).padding(bottom = extraPadding)) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = extraPadding)
+                ) {
                     Text(text = "hello,")
                     Text(text = name)
                 }
@@ -118,7 +134,7 @@ class MainActivity : ComponentActivity() {
                         expanded.value = !expanded.value
                     }
                 ) {
-                    Text(text = if(expanded.value) "Show less" else "Show more")
+                    Text(text = if (expanded.value) "Show less" else "Show more")
                 }
             }
         }
@@ -147,22 +163,58 @@ class MainActivity : ComponentActivity() {
      * 이렇게 하면 호출 사이트가 구성 가능한 함수 외부에서 레이아웃 안내와 동작을 조정할 수 있습니다.
      */
     @Composable
-    private fun MyApp(
+    private fun MyApp(modifier: Modifier = Modifier) {
+        // by 키워드를 통해 .value를 통해 접근이 아니라 바로 state에 접근할 수 있음
+        // 기존에 Onboarding 함수에 있던 상태를 추가하고 판단한다(호이스팅)
+        var shouldShowOnboarding by remember { mutableStateOf(true) }
+
+        Surface(modifier) {
+            if (shouldShowOnboarding) {
+                OnboardingScreen(onContinueClicked = { shouldShowOnboarding = false })
+            } else {
+                Greetings()
+            }
+        }
+    }
+
+    @Composable
+    private fun Greetings(
         modifier: Modifier = Modifier,
         names: List<String> = listOf("World", "Compose")
-        ) {
-        Surface(
-            // 화면 전체에 패딩 지정
-            modifier = modifier.padding(vertical = 4.dp),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Greeting("Android")
+    ) {
+        Column(modifier = modifier.padding(vertical = 4.dp)) {
+            for (name in names) {
+                Greeting(name = name)
+            }
+        }
+    }
 
-            // Compose 와 Kotlin의 통합
-            Column(modifier) {
-                for (name in names) {
-                    Greeting(name = name)
-                }
+    // 상태 호이스팅 (State Hoisting)
+    /**
+     * 컴포저블 함수에서 여러함수를 읽거나 수정하는 상태는 공통의 상위 항목에 위치해야한다.
+     * 이러한 과정을 상태 호이스팅이라고한다.
+     * 상태 호이스팅을 할 수 있게 하면 상태가 중복되지 않고 버그를 방지 할 수 있으며
+     * 컴포저블을 재사용, 테스트를 쉽게 할 수 있다.
+     *
+     * 컴포저블의 상위요소에서 제어할 필요가 없는 상태는 호이스팅이 되면 안된다.
+     */
+    @Composable
+    private fun OnboardingScreen(
+        onContinueClicked: () -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        Column(
+            modifier = modifier.fillMaxSize(),
+            // 수직 수평 정렬
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("Welcome to the Basics Codelab!")
+            Button(
+                modifier = Modifier.padding(vertical = 24.dp),
+                onClick = onContinueClicked
+            ) {
+                Text("Continue")
             }
         }
     }
