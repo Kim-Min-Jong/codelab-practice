@@ -26,6 +26,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
@@ -134,7 +135,15 @@ class MainActivity : ComponentActivity() {
                         .padding(bottom = extraPadding.coerceAtLeast(0.dp))
                 ) {
                     Text(text = "hello,")
-                    Text(text = name)
+                    Text(
+                        text = name,
+                        // 추가적인 텍스트 스타일 지정
+                        // displayLarge, headlineMedium, titleSmall, bodyLarge, labelMedium 등이있음
+                        // 기본적으로 MaterialTheme을 따라가지만 copy 메소드를 통해 원하는 속성을 다시 바꿔 줄 수 있음 - 커스텀
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    )
                 }
 
                 // compose는 다양한 버튼 사양을 지원하는데
