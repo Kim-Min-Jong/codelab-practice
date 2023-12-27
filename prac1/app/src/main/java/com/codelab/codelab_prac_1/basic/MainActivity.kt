@@ -99,6 +99,9 @@ class MainActivity : ComponentActivity() {
                 // 스프링의 강도 정도 - 스프링이 종료된 값으로 돌아오는 속도
                 stiffness = Spring.StiffnessLow
             )
+
+            // 다양한 사양(tween, repeatable), 다양한 함수(animateColorAsState 또는 다양한 유형의 Animation API)를 사용
+            // https://developer.android.com/jetpack/compose/animation?hl=ko
         )
 
         // row, column - 행 열 만들기
