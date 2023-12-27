@@ -180,7 +180,8 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun Greetings(
         modifier: Modifier = Modifier,
-        names: List<String> = listOf("World", "Compose")
+        // LazyColumn을 사용하기 위한 리스트 조정
+        names: List<String> = List(1000) { "$it" }
     ) {
         Column(modifier = modifier.padding(vertical = 4.dp)) {
             for (name in names) {
