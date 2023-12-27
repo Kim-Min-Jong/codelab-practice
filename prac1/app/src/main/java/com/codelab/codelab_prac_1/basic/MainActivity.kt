@@ -3,6 +3,7 @@ package com.codelab.codelab_prac_1.basic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -13,8 +14,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ExpandLess
+import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,9 +32,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.codelab.codelab_prac_1.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,6 +82,11 @@ class MainActivity : ComponentActivity() {
     // @Composable을 붙어야 Text 같이 선언형 UI를 구현할 수 있음
     @Composable
     fun Greeting(name: String) {
+        CardContent(name)
+    }
+
+    @Composable
+    private fun CardContent(name: String) {
         // 상태 기억
         // remember는 리컴포지션을 방지하는데 사용됨
         // 상태가 재설정 되지 않음
@@ -144,38 +157,60 @@ class MainActivity : ComponentActivity() {
                             fontWeight = FontWeight.ExtraBold
                         )
                     )
+                    if (expanded) {
+                        Text(
+                            text = ("Composem ipsum color sit lazy, " +
+                                    "padding theme elit, sed do bouncy. ").repeat(4),
+                        )
+                    }
                 }
 
+                // 기본 버튼에서 아이콘 버튼으로 전환
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                        contentDescription = if (expanded) {
+                            stringResource(R.string.show_less)
+                        } else {
+                            stringResource(R.string.show_more)
+                        }
+                    )
+                }
                 // compose는 다양한 버튼 사양을 지원하는데
                 // 여기서는 Text를 ElevatedButton으로 래핑하는 Elevated Button을 사용
                 // https://m3.material.io/components/buttons/implementation/android
-                ElevatedButton(
-                    /**
-                     *  Recomposition(리컴포지션)
-                     *  Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환한다.
-                     *  데이터가 변경되면 Compose는 새 데이터로 이러한 함수를 다시 실행하여 업데이트된 UI를 만든다.
-                     *  이 과정을 리컴포지션이라고 한다.
-                     *
-                     *  Compose는 데이터가 변경된 요소만 다시 구성하고, 영향을 받지않은 요소는 건너뛴다.
-                     *
-                     *  @Composable에 내부 상태를 추가하려면 mutableStateOf를 통해 관리한다.
-                     *  이 함수를 사용하면 Compose가 State를 읽는 함수를 재구성한다.
-                     *
-                     *  State 및 MutableState는 어떤 값을 보유하고 그 값이 변경될 때마다 UI 업데이트(리컴포지션)를 트리거하는 인터페이스입니다.
-                     *
-                     *  하지만 @Composable 내의 변수에 mutableStateOf만 할당해서는 할 수 없다.
-                     *  변경가능한 새 상태로 상태를 재설정하여 컴포저블을 다시 호출할떄는 언제든 리컴포지션이 일어날 수 있기 떄문에
-                     *  여러 리컴포지션간에 상태를 유지하려면 remember를 사용하여 변경 가능한 상태를 *기억*해야한다.
-                     */
-                    onClick = {
-                        expanded = !expanded
-                    }
-                ) {
-                    Text(text = if (expanded) "Show less" else "Show more")
-                }
+//                ElevatedButton(
+//                    /**
+//                     *  Recomposition(리컴포지션)
+//                     *  Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환한다.
+//                     *  데이터가 변경되면 Compose는 새 데이터로 이러한 함수를 다시 실행하여 업데이트된 UI를 만든다.
+//                     *  이 과정을 리컴포지션이라고 한다.
+//                     *
+//                     *  Compose는 데이터가 변경된 요소만 다시 구성하고, 영향을 받지않은 요소는 건너뛴다.
+//                     *
+//                     *  @Composable에 내부 상태를 추가하려면 mutableStateOf를 통해 관리한다.
+//                     *  이 함수를 사용하면 Compose가 State를 읽는 함수를 재구성한다.
+//                     *
+//                     *  State 및 MutableState는 어떤 값을 보유하고 그 값이 변경될 때마다 UI 업데이트(리컴포지션)를 트리거하는 인터페이스입니다.
+//                     *
+//                     *  하지만 @Composable 내의 변수에 mutableStateOf만 할당해서는 할 수 없다.
+//                     *  변경가능한 새 상태로 상태를 재설정하여 컴포저블을 다시 호출할떄는 언제든 리컴포지션이 일어날 수 있기 떄문에
+//                     *  여러 리컴포지션간에 상태를 유지하려면 remember를 사용하여 변경 가능한 상태를 *기억*해야한다.
+//                     */
+//                    onClick = {
+//                        expanded = !expanded
+//                    }
+//                ) {
+//                    Text(
+//                        text = if (expanded) stringResource(R.string.show_less) else stringResource(
+//                            R.string.show_more
+//                        )
+//                    )
+//                }
             }
         }
     }
+
 
     // @Preview는 Android Studio 미리보기를 사용할 수 있음
     // 이 역시 @Composable이 필요함
