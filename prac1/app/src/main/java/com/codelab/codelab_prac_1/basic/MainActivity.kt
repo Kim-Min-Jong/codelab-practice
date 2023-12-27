@@ -90,7 +90,9 @@ class MainActivity : ComponentActivity() {
 
             // 애니메이션 추가 설정
             // 스프링기반의 애니메이션 추가
-
+            // 주의 할 점 스프링 기반의 애니메이션을 줄 떄, 스프링 될 객체의 패딩 값이 음수가 되지 않도록 해야함
+            // 음수가 되면 앱이 종료
+            // 아이템의 Column 조정 필수
             animationSpec = spring(
                 // 스프링의 탄성 정도 - 얼마나 빠르게 원상태로 돌아오는지
                 dampingRatio = Spring.DampingRatioMediumBouncy,
@@ -125,7 +127,8 @@ class MainActivity : ComponentActivity() {
                 Column(
                     modifier = Modifier
                         .weight(1f)
-                        .padding(bottom = extraPadding)
+                        // 패딩 값이 음수가 되지 않도록, 최소값을 0dp로 설정
+                        .padding(bottom = extraPadding.coerceAtLeast(0.dp))
                 ) {
                     Text(text = "hello,")
                     Text(text = name)
