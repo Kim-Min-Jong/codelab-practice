@@ -1,4 +1,4 @@
-package com.codelab.codelab_prac_1
+package com.codelab.codelab_prac_1.basic
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

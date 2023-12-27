@@ -1,4 +1,4 @@
-package com.codelab.codelab_prac_1
+package com.codelab.codelab_prac_1.basic
 
 import android.app.Activity
 import android.os.Build
