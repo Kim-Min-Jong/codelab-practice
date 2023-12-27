@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -168,7 +169,12 @@ class MainActivity : ComponentActivity() {
     private fun MyApp(modifier: Modifier = Modifier) {
         // by 키워드를 통해 .value를 통해 접근이 아니라 바로 state에 접근할 수 있음
         // 기존에 Onboarding 함수에 있던 상태를 추가하고 판단한다(호이스팅)
-        var shouldShowOnboarding by remember { mutableStateOf(true) }
+
+        // remember는 한가지 문제를 갖고 있음
+        // 컴포저블이 컴포지션에 유지되는 동안만 작동됨, 즉, 화면회전등 액티비티가 재시작되는 경우 상태도 초기화가 됨
+        // 이러면 화면에서 유지되고 있는 데이터가 사라지기 떄문에 문제가 발생 할 수 있음
+        // 이럴 때는, remember가 아닌 rememberSavable로 교체해서 사용
+        var shouldShowOnboarding by rememberSaveable { mutableStateOf(true) }
 
         Surface(modifier) {
             if (shouldShowOnboarding) {
