@@ -3,7 +3,9 @@ package com.codelab.codelab_prac_1.basic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -83,7 +85,18 @@ class MainActivity : ComponentActivity() {
 
         // 버튼 클릭 시 UI 변화 주는 변수
         val extraPadding by animateDpAsState(
-            if (expanded) 48.dp else 0.dp, label = ""
+            if (expanded) 48.dp else 0.dp,
+            label = "",
+
+            // 애니메이션 추가 설정
+            // 스프링기반의 애니메이션 추가
+
+            animationSpec = spring(
+                // 스프링의 탄성 정도 - 얼마나 빠르게 원상태로 돌아오는지
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                // 스프링의 강도 정도 - 스프링이 종료된 값으로 돌아오는 속도
+                stiffness = Spring.StiffnessLow
+            )
         )
 
         // row, column - 행 열 만들기
