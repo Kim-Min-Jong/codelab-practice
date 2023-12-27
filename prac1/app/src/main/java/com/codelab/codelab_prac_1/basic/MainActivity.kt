@@ -3,6 +3,7 @@ package com.codelab.codelab_prac_1.basic
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -75,10 +76,15 @@ class MainActivity : ComponentActivity() {
         // 상태가 재설정 되지 않음
         // 화면의 서로 다른 부분에서 동일한 컴포저블을 호출하는 경우, 호출하는 부분 자체적인 상태 버전을 가진 UI를 생성
         // 살짝 livedata 느낌???
-        val expanded = remember { mutableStateOf(false) }
+        var expanded by remember { mutableStateOf(false) }
+
+        // 간단한 애니메이션 API 인 animateDpAsState 컴포저블 사용
+        // 이 컴포저블은 애니메이션이 완료될때 까지 애니메이션에 의해 객체의 value가 계속 업데이트 되는 상태 객체를 반환 (DP를 사용)
 
         // 버튼 클릭 시 UI 변화 주는 변수
-        val extraPadding = if (expanded.value) 48.dp else 0.dp
+        val extraPadding by animateDpAsState(
+            if (expanded) 48.dp else 0.dp, label = ""
+        )
 
         // row, column - 행 열 만들기
         Surface(
@@ -134,10 +140,10 @@ class MainActivity : ComponentActivity() {
                      *  여러 리컴포지션간에 상태를 유지하려면 remember를 사용하여 변경 가능한 상태를 *기억*해야한다.
                      */
                     onClick = {
-                        expanded.value = !expanded.value
+                        expanded = !expanded
                     }
                 ) {
-                    Text(text = if (expanded.value) "Show less" else "Show more")
+                    Text(text = if (expanded) "Show less" else "Show more")
                 }
             }
         }
