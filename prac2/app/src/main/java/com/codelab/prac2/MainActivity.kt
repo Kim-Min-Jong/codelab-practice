@@ -3,11 +3,14 @@ package com.codelab.prac2
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -41,6 +44,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     SearchBar()
+                    AlignYourBodyElement(drawable = R.drawable.ab1_inversions, text = R.string.ab1_inversions)
                 }
             }
         }
@@ -96,6 +100,8 @@ fun SearchBar(
 // 이미지를 포함한 Column 카드를 생성할 컴포저블
 @Composable
 fun AlignYourBodyElement(
+    @DrawableRes drawable: Int,
+    @StringRes text: Int,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -106,11 +112,12 @@ fun AlignYourBodyElement(
         // 이미지 추가
         Image(
             // 이미지 리소스등록
-            painter = painterResource(id = R.drawable.ab1_inversions),
+            painter = painterResource(id = drawable),
             contentDescription = null,
             // 이미지 크기 및 형태 조정
-            modifier = Modifier.
-                // 이미지 사이즈 변경
+            modifier = Modifier
+                .
+                    // 이미지 사이즈 변경
                 size(88.dp)
                 // clip 함수를 통해 이미지 형태 변경
                 // 단순히 형태만 변경하면 이미지가 잘릴 수 있음
@@ -118,7 +125,13 @@ fun AlignYourBodyElement(
             // contentScale 을 통해 scaleType을 지정하여 이미지 잘림 방지
             contentScale = ContentScale.Crop
         )
-        Text(text = stringResource(id = R.string.ab1_inversions))
+        Text(
+            text = stringResource(id = text),
+            // 텍스트의 기준선 (글자 바로 밑)으로 부터 여백(패딩 지정)
+            modifier = Modifier.paddingFromBaseline(top = 24.dp, bottom = 8.dp),
+            // style 지정 - 글씨 굵기
+            style = MaterialTheme.typography.bodyMedium
+        )
     }
 }
 
