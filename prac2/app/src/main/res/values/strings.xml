@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">prac2</string>
     <string name="placeholder_search">Search\n</string>
+    <string name="ab1_inversions">Inversions</string>
 </resources>
