@@ -12,12 +12,16 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -211,6 +215,34 @@ fun AlignYourBodyRow(
 
         items(alignYourBodyData) { item ->
             AlignYourBodyElement(item.drawable, item.text)
+        }
+    }
+}
+
+// 그리드 형태의 리사이클러뷰를 만들 컴포저블
+@Composable
+fun FavoriteCollectionsGrid(
+    modifier: Modifier = Modifier
+) {
+    val favoriteCollectionsData = listOf(
+        R.drawable.fc1_short_mantras to R.string.fc1_short_mantras,
+        R.drawable.fc2_nature_meditations to R.string.fc2_nature_meditations,
+        R.drawable.fc3_stress_and_anxiety to R.string.fc3_stress_and_anxiety,
+        R.drawable.fc4_self_massage to R.string.fc4_self_massage,
+        R.drawable.fc5_overwhelmed to R.string.fc5_overwhelmed,
+        R.drawable.fc6_nightly_wind_down to R.string.fc6_nightly_wind_down
+    ).map { MainActivity.DrawableStringPair(it.first, it.second) }
+    // 수평 그리드 형태의 리사이클러뷰
+    LazyHorizontalGrid(
+        // row의 갯수를 얼마만큼 할 것인지 지정
+        rows = GridCells.Fixed(2),
+        modifier = modifier,
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(favoriteCollectionsData) { item ->
+            FavoriteCollectionCard(item.drawable, item.text, modifier = Modifier.height(80.dp))
         }
     }
 }
