@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -18,7 +20,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -94,13 +99,24 @@ fun AlignYourBodyElement(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier
+        modifier = modifier,
+        // 열의 중앙 정렬을 통해 이미지 및 텍스트를 중앙으로 맞춤
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // 이미지 추가
         Image(
             // 이미지 리소스등록
             painter = painterResource(id = R.drawable.ab1_inversions),
-            contentDescription = null
+            contentDescription = null,
+            // 이미지 크기 및 형태 조정
+            modifier = Modifier.
+                // 이미지 사이즈 변경
+                size(88.dp)
+                // clip 함수를 통해 이미지 형태 변경
+                // 단순히 형태만 변경하면 이미지가 잘릴 수 있음
+                .clip(CircleShape),
+            // contentScale 을 통해 scaleType을 지정하여 이미지 잘림 방지
+            contentScale = ContentScale.Crop
         )
         Text(text = stringResource(id = R.string.ab1_inversions))
     }
