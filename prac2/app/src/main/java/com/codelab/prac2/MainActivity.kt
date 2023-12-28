@@ -7,11 +7,14 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -44,7 +47,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     SearchBar()
-                    AlignYourBodyElement(drawable = R.drawable.ab1_inversions, text = R.string.ab1_inversions)
+                    AlignYourBodyElement(
+                        drawable = R.drawable.ab1_inversions,
+                        text = R.string.ab1_inversions
+                    )
                 }
             }
         }
@@ -132,6 +138,40 @@ fun AlignYourBodyElement(
             // style 지정 - 글씨 굵기
             style = MaterialTheme.typography.bodyMedium
         )
+    }
+}
+
+@Composable
+fun FavoriteCollectionCard(
+    @DrawableRes drawable: Int,
+    @StringRes text: Int,
+    modifier: Modifier = Modifier
+) {
+    // 전체적으로 다른 배경색상을 주기 위해 Row를 Surface로 감쌈
+    Surface(
+        // Surface의 테두리를 둥글게 처리
+        shape = MaterialTheme.shapes.medium,
+        modifier = modifier
+    ) {
+        // 행 형태의 UI 생성
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.width(255.dp)
+        ) {
+            Image(
+                painter = painterResource(drawable),
+                contentDescription = null,
+                modifier = Modifier.size(80.dp),
+                contentScale = ContentScale.Crop
+            )
+
+            Text(
+                text = stringResource(text),
+                style = MaterialTheme.typography.titleMedium,
+                // 텍스트에 패딩 부여
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
     }
 }
 
