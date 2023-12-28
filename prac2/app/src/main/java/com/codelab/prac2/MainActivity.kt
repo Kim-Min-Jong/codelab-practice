@@ -6,7 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.paddingFromBaseline
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -37,6 +41,10 @@ import androidx.compose.ui.unit.dp
 import com.codelab.prac2.ui.theme.Prac2Theme
 
 class MainActivity : ComponentActivity() {
+    data class DrawableStringPair(
+        @DrawableRes val drawable: Int,
+        @StringRes val text: Int
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -171,6 +179,38 @@ fun FavoriteCollectionCard(
                 // 텍스트에 패딩 부여
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
+        }
+    }
+}
+
+// 리사이클러뷰를 만들 컴포저블
+@Composable
+fun AlignYourBodyRow(
+    modifier: Modifier = Modifier
+) {
+    // orientation: horizontal 인 리사이클러뷰 - LazyRow
+    // 단순히 수평으로 출력만 될 뿐, 상세 배치 형태는 없음
+    // 카드 사이의 간격 등으르 조정하려면 배치에 대해 알아야함
+    // Row, Column에 따라 가로축, 세로축에 대해 배치를 해볼수있음
+    // Equal Weight, Space Between, Space Around... 등이 있음
+    LazyRow(
+        // 각 항목 사이에 8dp의 간격을 추가하기 위해 spacedBy 메서드를 사용
+        horizontalArrangement =  Arrangement.spacedBy(8.dp),
+        // 각 항목 사이에 간격을 주었을 때, 맨 앞과 뒤에는 간격이 지정되지 않았음으로 부여
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        modifier = modifier
+    ) {
+        val alignYourBodyData = listOf(
+            R.drawable.ab1_inversions to R.string.ab1_inversions,
+            R.drawable.ab2_quick_yoga to R.string.ab2_quick_yoga,
+            R.drawable.ab3_stretching to R.string.ab3_stretching,
+            R.drawable.ab4_tabata to R.string.ab4_tabata,
+            R.drawable.ab5_hiit to R.string.ab5_hiit,
+            R.drawable.ab6_pre_natal_yoga to R.string.ab6_pre_natal_yoga
+        ).map { MainActivity.DrawableStringPair(it.first, it.second) }
+
+        items(alignYourBodyData) { item ->
+            AlignYourBodyElement(item.drawable, item.text)
         }
     }
 }
