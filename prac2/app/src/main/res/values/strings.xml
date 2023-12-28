@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">prac2</string>
+    <string name="placeholder_search">Search\n</string>
 </resources>
