@@ -247,6 +247,28 @@ fun FavoriteCollectionsGrid(
     }
 }
 
+// 컴포넌트를 배치하가 위해 컨테이너형식을 만들어 줄 필요가 있는데
+// 컴포즈에서는 슬롯 기반 레이아웃(슬롯 API)를 통해 구현해 볼 수 있다.
+// 슬롯 기반 레이아우슨 개발자가 원하느대로 채울 수 있도록 UI에 빈 공간을 남겨둔다. -> 유연한 레이아웃 만들 수 있음
+@Composable
+fun HomeSection(
+    @StringRes title: Int,
+    modifier: Modifier = Modifier,
+    // 컴포저블의 슬롯으로 content 매개변수를 사용 - 람다 활용
+    content: @Composable () -> Unit
+) {
+    Column(modifier) {
+        Text(
+            text = stringResource(title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.paddingFromBaseline(top = 40.dp, bottom = 16.dp)
+                .padding(horizontal = 16.dp)
+        )
+        // 이렇게 하면 content에 컴포저블을 넣어줌으로써 컨테이너처럼 컴포저블을 쌓을 수 있음
+        content()
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
