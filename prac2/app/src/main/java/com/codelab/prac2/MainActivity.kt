@@ -1,5 +1,6 @@
 package com.codelab.prac2
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.widget.Space
 import androidx.activity.ComponentActivity
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -37,6 +39,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -61,6 +65,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        newContent { MySootheAppPortrait() }
+    }
+
+    private fun newContent(
+        type: @Composable () -> Unit
+    ) {
         setContent {
             Prac2Theme {
                 // A surface container using the 'background' color from the theme
@@ -68,9 +78,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MySootheAppPortrait()
+                    type()
                 }
             }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {//세로 전환시        Log.d("onConfigurationChanged" , "Configuration.ORIENTATION_PORTRAIT");    }else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){ //가로전환시        Log.d("onConfigurationChanged", "Configuration.ORIENTATION_LANDSCAPE");    }else{            }
+            newContent { MySootheAppPortrait() }
+        } else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            newContent { MySootheAppLandScape() }
         }
     }
 }
@@ -373,6 +392,79 @@ fun MySootheAppPortrait() {
     }
 }
 
+// 가로모드 UI
+@Composable
+fun MySootheAppLandScape() {
+    Prac2Theme {
+        // Row를 통해 행 형식으로 배치
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Row {
+                SootheNavigationRail()
+                HomeScreen()
+            }
+        }
+    }
+}
+
+// 앱 레이아웃을 만들 때는 휴대전화의 가로 모드를 비롯한 여러 구성에서 앱이 어떻게 표시될지도 고려해야 한다.
+// 다음은 가로 모드의 앱 디자인이다.
+// Bottom Navigation 화면 콘텐츠 왼쪽의 레일로 전환되는 방식이다.
+// 이를 구현하려면 Compose Material 라이브러리의 일부이며 BottomNavigation 메뉴를 만드는 데 사용된 NavigationBar와 유사하게 구현되는 NavigationRail을 사용
+// NavigationRail 컴포저블 내에서 홈 및 프로필의 NavigationRailItem 요소를 추가한다.
+@Composable
+fun SootheNavigationRail(
+    modifier: Modifier = Modifier
+) {
+    // 상위 레일을 두고
+    NavigationRail(
+        // 양 옆 패딩을 주고
+        modifier = modifier.padding(start = 8.dp, end = 8.dp),
+        // 배경색을 변경
+        containerColor = MaterialTheme.colorScheme.background,
+    ) {
+        // 아래 열을 두고
+        Column(
+            // 높이를 열 전체 높이에 맞추고
+            modifier = modifier.fillMaxHeight(),
+            // 맨 위에 놓여 있는데 중앙에 배치
+            /**
+             * Arrangement -> 배치, gravity or chain style 처럼 생각
+             */
+            verticalArrangement = Arrangement.Center,
+            // 수평 중앙으로 정렬
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            // 그 아래 각 레일 아이템을 둠
+            NavigationRailItem(
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.Spa,
+                        contentDescription = null
+                    )
+                },
+                label = {
+                    Text(stringResource(R.string.bottom_navigation_home))
+                },
+                selected = true,
+                onClick = {}
+            )
+
+            NavigationRailItem(
+                icon = {
+                    Icon(
+                        imageVector = Icons.Default.AccountCircle,
+                        contentDescription = null
+                    )
+                },
+                label = {
+                    Text(stringResource(R.string.bottom_navigation_profile))
+                },
+                selected = false,
+                onClick = {}
+            )
+        }
+    }
+}
 
 @Preview(showBackground = true)
 @Composable
