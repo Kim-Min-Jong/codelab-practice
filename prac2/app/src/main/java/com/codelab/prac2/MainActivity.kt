@@ -2,7 +2,6 @@ package com.codelab.prac2
 
 import android.content.res.Configuration
 import android.os.Bundle
-import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
@@ -46,6 +45,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +59,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.codelab.prac2.ui.theme.Prac2Theme
+import java.net.PortUnreachableException
 
 class MainActivity : ComponentActivity() {
     data class DrawableStringPair(
@@ -63,9 +67,14 @@ class MainActivity : ComponentActivity() {
         @StringRes val text: Int
     )
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        newContent { MySootheAppPortrait() }
+        setContent {
+            val windowSize = calculateWindowSizeClass(this)
+            MySootheApp(windowSize = windowSize)
+        }
+//        newContent { MySootheAppPortrait() }
     }
 
     private fun newContent(
@@ -88,7 +97,7 @@ class MainActivity : ComponentActivity() {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {//세로 전환시        Log.d("onConfigurationChanged" , "Configuration.ORIENTATION_PORTRAIT");    }else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){ //가로전환시        Log.d("onConfigurationChanged", "Configuration.ORIENTATION_LANDSCAPE");    }else{            }
             newContent { MySootheAppPortrait() }
-        } else if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+        } else if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             newContent { MySootheAppLandScape() }
         }
     }
@@ -402,6 +411,25 @@ fun MySootheAppLandScape() {
                 SootheNavigationRail()
                 HomeScreen()
             }
+        }
+    }
+}
+
+// 가로모드를 만들었지만, 실제에서는 표시되지 않음
+// 언제 어떤 모드르 보여줄 지 알려줘야하기 때문에....
+// 이럴때 calculateWindowSizeClass()를 활용
+// 창 너비에는 소형, 중형, 확장형이 있음
+// 세로 모드인 경우 소형, 가로 모드인 경우 확장형임 이것을 통해 구분 (여기서 중형은 다루지않음)
+@Composable
+fun MySootheApp(
+    windowSize: WindowSizeClass
+) {
+    when(windowSize.widthSizeClass) {
+        WindowWidthSizeClass.Compact -> {
+            MySootheAppPortrait()
+        }
+        WindowWidthSizeClass.Expanded -> {
+            MySootheAppLandScape()
         }
     }
 }
