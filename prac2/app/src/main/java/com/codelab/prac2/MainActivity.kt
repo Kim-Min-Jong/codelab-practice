@@ -1,6 +1,7 @@
 package com.codelab.prac2
 
 import android.os.Bundle
+import android.widget.Space
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -23,7 +25,9 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +53,7 @@ class MainActivity : ComponentActivity() {
         @DrawableRes val drawable: Int,
         @StringRes val text: Int
     )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -58,11 +63,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    SearchBar()
-                    AlignYourBodyElement(
-                        drawable = R.drawable.ab1_inversions,
-                        text = R.string.ab1_inversions
-                    )
+                    HomeScreen()
                 }
             }
         }
@@ -199,7 +200,7 @@ fun AlignYourBodyRow(
     // Equal Weight, Space Between, Space Around... 등이 있음
     LazyRow(
         // 각 항목 사이에 8dp의 간격을 추가하기 위해 spacedBy 메서드를 사용
-        horizontalArrangement =  Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         // 각 항목 사이에 간격을 주었을 때, 맨 앞과 뒤에는 간격이 지정되지 않았음으로 부여
         contentPadding = PaddingValues(horizontal = 16.dp),
         modifier = modifier
@@ -236,7 +237,7 @@ fun FavoriteCollectionsGrid(
     LazyHorizontalGrid(
         // row의 갯수를 얼마만큼 할 것인지 지정
         rows = GridCells.Fixed(2),
-        modifier = modifier,
+        modifier = modifier.height(176.dp),
         contentPadding = PaddingValues(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -261,11 +262,39 @@ fun HomeSection(
         Text(
             text = stringResource(title),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.paddingFromBaseline(top = 40.dp, bottom = 16.dp)
+            modifier = Modifier
+                .paddingFromBaseline(top = 40.dp, bottom = 16.dp)
                 .padding(horizontal = 16.dp)
         )
         // 이렇게 하면 content에 컴포저블을 넣어줌으로써 컨테이너처럼 컴포저블을 쌓을 수 있음
         content()
+    }
+}
+
+// 전체적인 화면 구성
+@Composable
+fun HomeScreen(
+    modifier: Modifier = Modifier
+) {
+    // Column 내부에 컴포저블을 배치
+    // Lazy- 는 자동으로 스크롤을 추가하지만 일반적인 column, row는 스크롤이 없음
+    // verticalScroll or horizontalScroll을 통해 수동으로 추가해주어야함
+    // 이를 위해서는 스크롤의 현재 상태를 포함하며 외부에서 스크롤 상태를 수정하는 데 사용되는 ScrollState가 필요
+    // 여기서는 스크롤 상태를 수정할 필요가 없으므로 rememberScrollState를 사용하여 영구 ScrollState 인스턴스를 활용
+    Column(modifier.verticalScroll(rememberScrollState())) {
+        // Spacer를 통해 공백 생성
+        Spacer(Modifier.height(16.dp))
+        // 검색 창
+        SearchBar(Modifier.padding(horizontal = 16.dp))
+        // 첫번째 섹션
+        HomeSection(title = R.string.align_your_body) {
+            AlignYourBodyRow()
+        }
+        // 두번째 섹션
+        HomeSection(title = R.string.favorite_collection) {
+            FavoriteCollectionsGrid()
+        }
+        Spacer(Modifier.height(16.dp))
     }
 }
 
