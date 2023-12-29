@@ -29,10 +29,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -297,6 +301,60 @@ fun HomeScreen(
         Spacer(Modifier.height(16.dp))
     }
 }
+
+// 메뉴 탐색을 위한 bottom navigation view 생성
+@Composable
+fun SootheBottomNavigation(
+    modifier: Modifier = Modifier
+) {
+    // Navigation 틀 생성
+    NavigationBar(
+        modifier = modifier
+    ) {
+        // Navigation 아이템 (각 메뉴 생성
+        NavigationBarItem(
+            // 선택되었는지
+            selected = true,
+            // 클릭 했을 때의 동작 람다
+            // 아이콘 설정
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Spa,
+                    contentDescription = null
+                )
+            },
+            // 아이콘 아래 들어갈 메뉴 텍스트
+            label = {
+                Text(
+                    text = stringResource(R.string.bottom_navigation_home)
+                )
+            },
+            onClick = { }
+        )        // Navigation 아이템 (각 메뉴 생성
+        NavigationBarItem(
+            // 선택되었는지
+            selected = false,
+            // 클릭 했을 때의 동작 람다
+            // 아이콘 설정
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.AccountCircle,
+                    contentDescription = null
+                )
+            },
+            // 아이콘 아래 들어갈 메뉴 텍스트
+            label = {
+                Text(
+                    text = stringResource(R.string.bottom_navigation_profile)
+                )
+            },
+            onClick = { }
+        )
+
+
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
