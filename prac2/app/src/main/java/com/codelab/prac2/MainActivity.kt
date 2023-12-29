@@ -37,6 +37,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -67,8 +68,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    HomeScreen()
-
+                    MySootheAppPortrait()
                 }
             }
         }
@@ -353,6 +353,23 @@ fun SootheBottomNavigation(
             },
             onClick = { }
         )
+    }
+}
+
+// BottomNavigation을 포함하는 전체 화면 구성
+// Scaffold를 활용
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MySootheAppPortrait() {
+    Prac2Theme {
+        // Scaffold는 Material Design을 구현하는 앱을 위한 구성 가능한 최상위 수준 컴포저블을 제공
+        // Material 개념의 슬롯이 포함되어 있는데, 그중 하나가 BottomNavigation
+        Scaffold(
+            // BottomNavigation 지정 속성
+            bottomBar = { SootheBottomNavigation() }
+        ) { padding ->
+            HomeScreen(Modifier.padding(padding))
+        }
     }
 }
 
