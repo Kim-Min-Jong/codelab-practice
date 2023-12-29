@@ -68,6 +68,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     HomeScreen()
+
                 }
             }
         }
@@ -309,6 +310,8 @@ fun SootheBottomNavigation(
 ) {
     // Navigation 틀 생성
     NavigationBar(
+        // 바텀 네비게이션의 컨테이너 (배경색) 변경
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
         modifier = modifier
     ) {
         // Navigation 아이템 (각 메뉴 생성
@@ -350,8 +353,6 @@ fun SootheBottomNavigation(
             },
             onClick = { }
         )
-
-
     }
 }
 
