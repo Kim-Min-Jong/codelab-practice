@@ -33,12 +33,22 @@ class MainActivity : ComponentActivity() {
 
 // 하루 동안 마신 물잔 개수를 계산하는 워터 카운터 컴포저블
 @Composable
-fun WaterCounter(modifier: Modifier = Modifier) {
+fun WaterCounter(
+    modifier: Modifier = Modifier
+) {
     val count = 0
     Text(
         text = "You've had $count glasses.",
         modifier = modifier.padding(16.dp)
     )
+}
+
+// 워터 카운터를 호출하는 기본 컴포저블
+@Composable
+fun WellnessScreen(
+    modifier: Modifier = Modifier
+) {
+    WaterCounter(modifier)
 }
 
 @Composable
