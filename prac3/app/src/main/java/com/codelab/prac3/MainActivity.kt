@@ -170,6 +170,52 @@ fun WellnessTaskItem(
     }
 }
 
+/**
+ * remember를 사용해 객체를 저장하는 컴포저블 내부에 상태가 포함되어있어 컴포저블을 Stateful로 만든다.
+ * 이는 호출자가 상태를 제어할 필요가 없고 상태를 직접 관리하지 않아도 상태를 사용할 수 있는 경우에 유용하다. 그러나 내부 상태를 갖는 컴포저블은 재사용 가능성이 적고 테스트하기가 더 어려운 경향이 있다.
+ *
+ * 상태를 보유하지 않는 컴포저블을 Stateless 컴포저블이라고 한다. 상태 호이스팅을 사용하면S tateless 컴포저블을 쉽게 만들 수 있다.
+ * 상태 호이스팅은 컴포저블을 Stateless로 만들기 위해 상태를 컴포저블의 호출자로 옮기는 패턴이다.
+ * Jetpack Compose에서 상태 호이스팅을 위한 일반적 패턴은 상태 변수를 다음 두 개의 매개변수로 바꾸는 것이다.
+ *
+ * value: T - 표시할 현재 값
+ * onValueChange: (T) -> Unit - 값을 변경하도록 요청하는 이벤트, 여기서 T는 제안된 새 값
+ */
+
+// Stateless 한 컴포저블
+@Composable
+fun StatelessCounter(
+    count: Int,
+    // 상태 결과의 람다만 받고, 람다에 대한 동작만 할 뿐 상태를 저장하진 않음
+    onIncrement: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier.padding(16.dp)) {
+        if (count > 0) {
+            Text("You've had $count glasses.")
+        }
+        Button(onClick = onIncrement, Modifier.padding(top = 8.dp), enabled = count < 10) {
+            Text("Add one")
+        }
+    }
+}
+// Stateful 한 컴포저블
+@Composable
+fun StatefulCounter(modifier: Modifier = Modifier) {
+    // 상태를 관리하기 위한 rememberSaveable
+    var count by rememberSaveable { mutableStateOf(0) }
+    // stateless 컴포저블을 호이스팅하여 사용
+    StatelessCounter(count, { count++ }, modifier)
+}
+
+/** 상태 호이스팅에 있어서 중요한 사항
+ *  상태를 호이스팅을 할 때, 상태의 이동 위치를 쉽게 파악할 수 있는 세 가지 규칙
+ *  1. 상태는 적어도 그 상태를 사용하는 모든 컴포저블의 가장 낮은 공통 상위 요소로 끌어올려야 합니다(읽기).
+ *  2. 상태는 최소한 변경될 수 있는 가장 높은 수준으로 끌어올려야 합니다(쓰기).
+ *  3. 두 상태가 동일한 이벤트에 대한 응답으로 변경되는 경우 두 상태는 동일한 수준으로 끌어올려야 합니다.
+ *
+ *  여러 컴포저블 함수에 동일한 상태를 제공할 수는 있지만, 동일한 상태를 제공하고 싶지 않을 경우에는, 상태를 나누어주어야한다.
+ */
 
 @Preview(showBackground = true)
 @Composable
