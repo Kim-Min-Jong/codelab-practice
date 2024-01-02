@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.codelab.prac3.ui.theme.Prac3Theme
 
+// https://developer.android.com/codelabs/jetpack-compose-state?hl=ko#0
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,9 +80,17 @@ fun WaterCounter(
         // 참고:  이미 LiveData, StateFlow, Flow, RxJava의 Observable과 같은 다른 관찰 가능한 유형을 사용하여 상태를 앱에 저장하고 있을 수 있다.
         // Compose에서 이 상태를 사용하고 상태가 변경될 때 자동으로 재구성하도록 하려면 이를 State<T>에 매핑해야 한다
         var count by remember { mutableStateOf(0) }
-        Text(
-            text = "You've had $count glasses.",
-        )
+
+        if(count > 0) {
+            Text(
+                text = "You've had $count glasses.",
+            )
+        }
+        // Compose는 선언형 UI 프레임워크이다.
+        // 상태가 변경될 때 UI 구성요소를 삭제하거나 공개 상태를 변경하는 대신 특정 상태의 조건에서 UI가 어떻게 존재하는지 설명한다.
+        // 재구성이 호출되고 UI가 업데이트된 결과, 컴포저블이 결국 컴포지션을 시작하거나 종료할 수 있다.
+        // 이 접근 방식을 사용하면 뷰 시스템과 마찬가지로 뷰를 수동으로 업데이트하는 복잡성을 방지할 수 있다.
+        // 새 상태에 따라 뷰를 업데이트하는 일이 자동으로 발생하므로(개발자가 기억할 필요가 없음) 오류도 적게 발생한다.
         Button(
             // 현재 상태에서는 버튼을 클릭해도 아무 일도 일어나지 않음
             // 상태가 변경될 때 Compose에 화면을 다시 그려야 한다고 알리지 않았기 떄문 (리컴포지션)
@@ -97,7 +106,9 @@ fun WaterCounter(
             // State 및 MutableStateOf를 사용하여 상태를 관찰
 
             onClick = { count++ },
-            modifier = Modifier.padding(top = 8.dp)
+            modifier = Modifier.padding(top = 8.dp),
+            // 값의 조건에 따라 버튼 조작
+            enabled = count < 10
         ) {
             Text(text = "Add One")
         }
