@@ -189,7 +189,11 @@ fun WellnessTaskItem(
 // 상태 호이스팅을 통한 stateful 컴포저블 생성
 @Composable
 fun WellnessTaskItem(taskName: String, modifier: Modifier = Modifier) {
-    var checkedState by remember { mutableStateOf(false) }
+    // 현재 상태는 체크를 하고 lazy column 을 스크롤했다가 다시 올리면 상태가 사라짐
+    // 컴포지션이 종료되면서 사라지게 됨
+    // 이 문제를 해결하기 위해 rememberSaveable을 다시 사용
+    // 컴포지션이 종료되도 상태를 기억하기 때문에, 유지가 됨
+    var checkedState by rememberSaveable { mutableStateOf(false) }
 
     WellnessTaskItem(
         taskName = taskName,
@@ -207,6 +211,7 @@ fun WellnessTasksList(
     list: List<WellnessTask> = remember { getWellnessTasks() }
 ) {
     // recyclerview 생성
+    // Lazy Column은 기본적으로 rememberSaveableState를 받을 수 있으므로 Lazy Column을 사용할 때 상태를 부여해도 됨
     LazyColumn(
         modifier = modifier
     ) {
