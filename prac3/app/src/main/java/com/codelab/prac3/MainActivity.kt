@@ -21,6 +21,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -85,7 +86,8 @@ fun WaterCounter(
 
         // 참고:  이미 LiveData, StateFlow, Flow, RxJava의 Observable과 같은 다른 관찰 가능한 유형을 사용하여 상태를 앱에 저장하고 있을 수 있다.
         // Compose에서 이 상태를 사용하고 상태가 변경될 때 자동으로 재구성하도록 하려면 이를 State<T>에 매핑해야 한다
-        var count by remember { mutableStateOf(0) }
+        // rememberSaveable을 톻해 화면전환 등 데이터가 사라질 상황이 되도 데이터를 유지하도록함
+        var count by rememberSaveable { mutableStateOf(0) }
 
         if (count > 0) {
             // 추가 될 떄마다 Wellness 아이템을 추가
