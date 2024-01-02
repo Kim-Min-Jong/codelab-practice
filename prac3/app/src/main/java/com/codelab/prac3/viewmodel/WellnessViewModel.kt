@@ -20,7 +20,14 @@ class WellnessViewModel: ViewModel() {
     }
 
     // 체크 상태 처리 로직 뷰모델로 이관
-
+    fun changeTaskChecked(
+        item: WellnessTask,
+        checked: Boolean
+    ) {
+        tasks.find { it.id == item.id }?.let { task ->
+            task.checked = checked
+        }
+    }
 
     // 더미 테이터
     private fun getWellnessTasks() = List(30) { i -> WellnessTask(i, "Task # $i") }

@@ -72,6 +72,9 @@ fun WellnessScreen(
         WellnessTasksList(
             // 데이터 접근 및 로직 수행은 뷰모델에서 수행
             list = wellnessViewModel.tasks,
+            onCheckedTask = { task, checked ->
+                wellnessViewModel.changeTaskChecked(task, checked)
+            },
             onCloseTask = { task -> wellnessViewModel.remove(task) }
         )
     }
@@ -224,8 +227,9 @@ fun WellnessTaskItem(taskName: String, onClose: () -> Unit, modifier: Modifier =
 @Composable
 fun WellnessTasksList(
     modifier: Modifier = Modifier,
+    onCheckedTask: (WellnessTask, Boolean) -> Unit,
     onCloseTask: (WellnessTask) -> Unit,
-    list: List<WellnessTask> = remember { getWellnessTasks() }
+    list: List<WellnessTask>
 ) {
     // recyclerview 생성
     // Lazy Column은 기본적으로 rememberSaveableState를 받을 수 있으므로 Lazy Column을 사용할 때 상태를 부여해도 됨
@@ -235,7 +239,13 @@ fun WellnessTasksList(
         // 아이템 UI를 만듥고
         items(list) { task ->
             // 컴포저블을 아이템으로 생성
-            WellnessTaskItem(taskName = task.label, onClose = { onCloseTask(task) })
+            WellnessTaskItem(
+                taskName = task.label,
+                checked = task.checked,
+                onClose = { onCloseTask(task) },
+                onCheckedChange = { checked -> onCheckedTask(task, checked) },
+
+            )
         }
     }
 }
