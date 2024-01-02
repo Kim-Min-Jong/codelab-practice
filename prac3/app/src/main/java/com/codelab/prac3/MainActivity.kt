@@ -30,7 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.codelab.prac3.ui.theme.Prac3Theme
+import com.codelab.prac3.viewmodel.WellnessViewModel
 
 // https://developer.android.com/codelabs/jetpack-compose-state?hl=ko#0
 class MainActivity : ComponentActivity() {
@@ -53,7 +55,9 @@ class MainActivity : ComponentActivity() {
 // 워터 카운터를 호출하는 기본 컴포저블
 @Composable
 fun WellnessScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    // 뷰모델 적용
+    wellnessViewModel: WellnessViewModel = viewModel()
 ) {
 //    WaterCounter(modifier)
     Column(modifier = modifier) {
@@ -64,10 +68,11 @@ fun WellnessScreen(
         // 다른 API가 필요함
         // --> Compose에서 관찰할 수 있는 MutableList 인스턴스를 만들어야 함
         // MutableStateList()를 통해 해결할 수 있음
-        val list = remember { getWellnessTasks().toMutableStateList() }
+//        val list = remember { getWellnessTasks().toMutableStateList() }
         WellnessTasksList(
-            list = list,
-            onCloseTask = { task -> list.remove(task) }
+            // 데이터 접근 및 로직 수행은 뷰모델에서 수행
+            list = wellnessViewModel.tasks,
+            onCloseTask = { task -> wellnessViewModel.remove(task) }
         )
     }
 }
@@ -283,9 +288,6 @@ fun StatefulCounter(modifier: Modifier = Modifier) {
  *  여러 컴포저블 함수에 동일한 상태를 제공할 수는 있지만, 동일한 상태를 제공하고 싶지 않을 경우에는, 상태를 나누어주어야한다.
  */
 
-
-// 더미 테이터
-private fun getWellnessTasks() = List(30) { i -> WellnessTask(i, "Task # $i") }
 
 @Preview(showBackground = true)
 @Composable
