@@ -25,6 +25,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,7 +58,17 @@ fun WellnessScreen(
 //    WaterCounter(modifier)
     Column(modifier = modifier) {
         StatefulCounter()
-        WellnessTasksList()
+
+        // 삭제를 하기 위해서는 List가 mutable 하게 할 필요성이 있음
+        // 여기서 일반적인 ArrayList, MutableList로 형변환을 했을 때에는, Compose에서 항목이 변경되어 UI의 리컴포지션을 예약한다고 알리지 않음
+        // 다른 API가 필요함
+        // --> Compose에서 관찰할 수 있는 MutableList 인스턴스를 만들어야 함
+        // MutableStateList()를 통해 해결할 수 있음
+        val list = remember { getWellnessTasks().toMutableStateList() }
+        WellnessTasksList(
+            list = list,
+            onCloseTask = { task -> list.remove(task) }
+        )
     }
 }
 
@@ -101,12 +112,12 @@ fun WaterCounter(
                 mutableStateOf(true)
             }
             if (showTask) {
-                WellnessTaskItem(
-                    taskName = "Have you taken your 15 minute walk today?",
-                    // 닫기 번튼을 누르면 false 로 변경되어 작업이 더 이상 표시되지 않게 함
-//                    onClose = { showTask = false }
-                    modifier = modifier
-                )
+//                WellnessTaskItem(
+//                    taskName = "Have you taken your 15 minute walk today?",
+//                    // 닫기 번튼을 누르면 false 로 변경되어 작업이 더 이상 표시되지 않게 함
+////                    onClose = { showTask = false }
+//                    modifier = modifier
+//                )
             }
             Text(
                 text = "You've had $count glasses.",
@@ -188,7 +199,7 @@ fun WellnessTaskItem(
 
 // 상태 호이스팅을 통한 stateful 컴포저블 생성
 @Composable
-fun WellnessTaskItem(taskName: String, modifier: Modifier = Modifier) {
+fun WellnessTaskItem(taskName: String, onClose: () -> Unit, modifier: Modifier = Modifier) {
     // 현재 상태는 체크를 하고 lazy column 을 스크롤했다가 다시 올리면 상태가 사라짐
     // 컴포지션이 종료되면서 사라지게 됨
     // 이 문제를 해결하기 위해 rememberSaveable을 다시 사용
@@ -199,7 +210,7 @@ fun WellnessTaskItem(taskName: String, modifier: Modifier = Modifier) {
         taskName = taskName,
         checked = checkedState,
         onCheckedChange = { newValue -> checkedState = newValue },
-        onClose = {}, // we will implement this later!
+        onClose = onClose, // we will implement this later!
         modifier = modifier,
     )
 }
@@ -208,6 +219,7 @@ fun WellnessTaskItem(taskName: String, modifier: Modifier = Modifier) {
 @Composable
 fun WellnessTasksList(
     modifier: Modifier = Modifier,
+    onCloseTask: (WellnessTask) -> Unit,
     list: List<WellnessTask> = remember { getWellnessTasks() }
 ) {
     // recyclerview 생성
@@ -218,7 +230,7 @@ fun WellnessTasksList(
         // 아이템 UI를 만듥고
         items(list) { task ->
             // 컴포저블을 아이템으로 생성
-            WellnessTaskItem(taskName = task.label)
+            WellnessTaskItem(taskName = task.label, onClose = { onCloseTask(task) })
         }
     }
 }
