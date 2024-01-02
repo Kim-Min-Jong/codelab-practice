@@ -13,7 +13,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -69,9 +72,15 @@ fun WaterCounter(
 
     Column(modifier = modifier.padding(16.dp)) {
         // 관찰 될 상태 카운터 값
-        var count: MutableState<Int> = mutableStateOf(0)
+        // 하지만 여전히 동작하지 않음 --> Column안에 있기 때문에 리컴포지션이 발생하면 count가 다시 초기화 되기 때문에
+        // 이를 해결하기 위해 remember를 사용할 수 있음
+        // remember로 계산된 값은 초기 컴포지션 중에 컴포지션에 저장되고 리컴포지션간에 우지됨
+
+        // 참고:  이미 LiveData, StateFlow, Flow, RxJava의 Observable과 같은 다른 관찰 가능한 유형을 사용하여 상태를 앱에 저장하고 있을 수 있다.
+        // Compose에서 이 상태를 사용하고 상태가 변경될 때 자동으로 재구성하도록 하려면 이를 State<T>에 매핑해야 한다
+        var count by remember { mutableStateOf(0) }
         Text(
-            text = "You've had ${count.value} glasses.",
+            text = "You've had $count glasses.",
         )
         Button(
             // 현재 상태에서는 버튼을 클릭해도 아무 일도 일어나지 않음
@@ -87,7 +96,7 @@ fun WaterCounter(
 
             // State 및 MutableStateOf를 사용하여 상태를 관찰
 
-            onClick = { count.value++ },
+            onClick = { count++ },
             modifier = Modifier.padding(top = 8.dp)
         ) {
             Text(text = "Add One")
