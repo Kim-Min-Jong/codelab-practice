@@ -8,16 +8,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,7 +54,11 @@ class MainActivity : ComponentActivity() {
 fun WellnessScreen(
     modifier: Modifier = Modifier
 ) {
-    WaterCounter(modifier)
+//    WaterCounter(modifier)
+    Column(modifier = modifier) {
+        StatefulCounter()
+        WellnessTasksList()
+    }
 }
 
 /**
@@ -98,7 +104,8 @@ fun WaterCounter(
                 WellnessTaskItem(
                     taskName = "Have you taken your 15 minute walk today?",
                     // 닫기 번튼을 누르면 false 로 변경되어 작업이 더 이상 표시되지 않게 함
-                    onClose = { showTask = false }
+//                    onClose = { showTask = false }
+                    modifier = modifier
                 )
             }
             Text(
@@ -147,9 +154,13 @@ fun WaterCounter(
 
 // 사용자가 물 한 잔 이상 마셧을때, 표시를 하고, 닫을 컴포저블
 // remeber 활용 - 닫기 버튼...
+// stateless 컴포저블
 @Composable
 fun WellnessTaskItem(
     taskName: String,
+    // 체크박스 활용을 위한 불린 값과 람다
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
     // 닫기 아이콘 수신 콜백 람다
     onClose: () -> Unit,
     modifier: Modifier = Modifier
@@ -164,8 +175,45 @@ fun WellnessTaskItem(
                 .padding(start = 16.dp),
             text = taskName
         )
+        // 체크박스 UI
+        Checkbox(
+            checked = checked,
+            onCheckedChange = onCheckedChange
+        )
         IconButton(onClick = onClose) {
             Icon(Icons.Filled.Close, contentDescription = "Close")
+        }
+    }
+}
+
+// 상태 호이스팅을 통한 stateful 컴포저블 생성
+@Composable
+fun WellnessTaskItem(taskName: String, modifier: Modifier = Modifier) {
+    var checkedState by remember { mutableStateOf(false) }
+
+    WellnessTaskItem(
+        taskName = taskName,
+        checked = checkedState,
+        onCheckedChange = { newValue -> checkedState = newValue },
+        onClose = {}, // we will implement this later!
+        modifier = modifier,
+    )
+}
+
+// 만든 아이템으로 목록 생성
+@Composable
+fun WellnessTasksList(
+    modifier: Modifier = Modifier,
+    list: List<WellnessTask> = remember { getWellnessTasks() }
+) {
+    // recyclerview 생성
+    LazyColumn(
+        modifier = modifier
+    ) {
+        // 아이템 UI를 만듥고
+        items(list) { task ->
+            // 컴포저블을 아이템으로 생성
+            WellnessTaskItem(taskName = task.label)
         }
     }
 }
@@ -199,6 +247,7 @@ fun StatelessCounter(
         }
     }
 }
+
 // Stateful 한 컴포저블
 @Composable
 fun StatefulCounter(modifier: Modifier = Modifier) {
@@ -216,6 +265,10 @@ fun StatefulCounter(modifier: Modifier = Modifier) {
  *
  *  여러 컴포저블 함수에 동일한 상태를 제공할 수는 있지만, 동일한 상태를 제공하고 싶지 않을 경우에는, 상태를 나누어주어야한다.
  */
+
+
+// 더미 테이터
+private fun getWellnessTasks() = List(30) { i -> WellnessTask(i, "Task # $i") }
 
 @Preview(showBackground = true)
 @Composable
