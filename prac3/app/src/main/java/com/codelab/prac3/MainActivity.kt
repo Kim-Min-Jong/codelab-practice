@@ -88,6 +88,17 @@ fun WaterCounter(
         var count by remember { mutableStateOf(0) }
 
         if (count > 0) {
+            // 추가 될 떄마다 Wellness 아이템을 추가
+            var showTask by remember {
+                mutableStateOf(true)
+            }
+            if (showTask) {
+                WellnessTaskItem(
+                    taskName = "Have you taken your 15 minute walk today?",
+                    // 닫기 번튼을 누르면 false 로 변경되어 작업이 더 이상 표시되지 않게 함
+                    onClose = { showTask = false }
+                )
+            }
             Text(
                 text = "You've had $count glasses.",
             )
@@ -97,27 +108,38 @@ fun WaterCounter(
         // 재구성이 호출되고 UI가 업데이트된 결과, 컴포저블이 결국 컴포지션을 시작하거나 종료할 수 있다.
         // 이 접근 방식을 사용하면 뷰 시스템과 마찬가지로 뷰를 수동으로 업데이트하는 복잡성을 방지할 수 있다.
         // 새 상태에 따라 뷰를 업데이트하는 일이 자동으로 발생하므로(개발자가 기억할 필요가 없음) 오류도 적게 발생한다.
-        Button(
-            // 현재 상태에서는 버튼을 클릭해도 아무 일도 일어나지 않음
-            // 상태가 변경될 때 Compose에 화면을 다시 그려야 한다고 알리지 않았기 떄문 (리컴포지션)
+        Row(Modifier.padding(top = 8.dp)) {
+            Button(
+                // 현재 상태에서는 버튼을 클릭해도 아무 일도 일어나지 않음
+                // 상태가 변경될 때 Compose에 화면을 다시 그려야 한다고 알리지 않았기 떄문 (리컴포지션)
 
-            // Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환
-            // 컴포저블을 실행할 때 Compose에서 빌드한 UI에 관한 설명을 컴포지션이라 함
-            // 상태가 변경되면 Compose는 영향을 받는 컴포저블 함수를 새 상태로 다시 실행. 그러면 리컴포지션된 UI가 만들어 짐
+                // Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환
+                // 컴포저블을 실행할 때 Compose에서 빌드한 UI에 관한 설명을 컴포지션이라 함
+                // 상태가 변경되면 Compose는 영향을 받는 컴포저블 함수를 새 상태로 다시 실행. 그러면 리컴포지션된 UI가 만들어 짐
 
-            // 컴포지션: 컴포저블을 실행할 때 Jetpack Compose에서 빌드한 UI에 관한 설명입니다.
-            // 초기 컴포지션: 처음 컴포저블을 실행하여 컴포지션을 만듭니다.
-            // 리컴포지션: 데이터가 변경될 때 컴포지션을 업데이트하기 위해 컴포저블을 다시 실행하는 것을 말합니다.
+                // 컴포지션: 컴포저블을 실행할 때 Jetpack Compose에서 빌드한 UI에 관한 설명입니다.
+                // 초기 컴포지션: 처음 컴포저블을 실행하여 컴포지션을 만듭니다.
+                // 리컴포지션: 데이터가 변경될 때 컴포지션을 업데이트하기 위해 컴포저블을 다시 실행하는 것을 말합니다.
 
-            // State 및 MutableStateOf를 사용하여 상태를 관찰
+                // State 및 MutableStateOf를 사용하여 상태를 관찰
 
-            onClick = { count++ },
-            modifier = Modifier.padding(top = 8.dp),
-            // 값의 조건에 따라 버튼 조작
-            enabled = count < 10
-        ) {
-            Text(text = "Add One")
+                onClick = { count++ },
+                modifier = Modifier.padding(top = 8.dp),
+                // 값의 조건에 따라 버튼 조작
+                enabled = count < 10
+            ) {
+                Text(text = "Add One")
+            }
+
+            // 모든 아이템을 클리어하는 버튼
+            Button(
+                onClick = { count = 0 },
+                Modifier.padding(start = 8.dp, top = 8.dp)
+            ) {
+                Text("Clear water count")
+            }
         }
+
     }
 }
 
