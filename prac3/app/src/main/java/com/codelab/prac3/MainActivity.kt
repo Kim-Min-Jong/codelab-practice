@@ -1,5 +1,6 @@
 package com.codelab.prac3
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -58,18 +61,33 @@ fun WellnessScreen(
 
 
 // 하루 동안 마신 물잔 개수를 계산하는 워터 카운터 컴포저블
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun WaterCounter(
     modifier: Modifier = Modifier
 ) {
 
     Column(modifier = modifier.padding(16.dp)) {
-        var count = 0
+        // 관찰 될 상태 카운터 값
+        var count: MutableState<Int> = mutableStateOf(0)
         Text(
-            text = "You've had $count glasses.",
+            text = "You've had ${count.value} glasses.",
         )
         Button(
-            onClick = { count++ },
+            // 현재 상태에서는 버튼을 클릭해도 아무 일도 일어나지 않음
+            // 상태가 변경될 때 Compose에 화면을 다시 그려야 한다고 알리지 않았기 떄문 (리컴포지션)
+
+            // Compose 앱은 구성 가능한 함수를 호출하여 데이터를 UI로 변환
+            // 컴포저블을 실행할 때 Compose에서 빌드한 UI에 관한 설명을 컴포지션이라 함
+            // 상태가 변경되면 Compose는 영향을 받는 컴포저블 함수를 새 상태로 다시 실행. 그러면 리컴포지션된 UI가 만들어 짐
+
+            // 컴포지션: 컴포저블을 실행할 때 Jetpack Compose에서 빌드한 UI에 관한 설명입니다.
+            // 초기 컴포지션: 처음 컴포저블을 실행하여 컴포지션을 만듭니다.
+            // 리컴포지션: 데이터가 변경될 때 컴포지션을 업데이트하기 위해 컴포저블을 다시 실행하는 것을 말합니다.
+
+            // State 및 MutableStateOf를 사용하여 상태를 관찰
+
+            onClick = { count.value++ },
             modifier = Modifier.padding(top = 8.dp)
         ) {
             Text(text = "Add One")
