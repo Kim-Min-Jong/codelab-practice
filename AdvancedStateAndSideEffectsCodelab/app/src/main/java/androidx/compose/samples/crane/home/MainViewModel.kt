@@ -57,6 +57,7 @@ class MainViewModel @Inject constructor(
 
     // 뷰모델이 처음 호출 될 때, State의 변경
     init {
+        // TODO: UI 단에 데이터를 표시 해주어야함
         _suggestedDestination.value = destinationsRepository.destinations
     }
 
