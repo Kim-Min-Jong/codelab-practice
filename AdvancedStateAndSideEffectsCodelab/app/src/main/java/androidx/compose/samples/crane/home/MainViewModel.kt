@@ -55,6 +55,11 @@ class MainViewModel @Inject constructor(
     private val _suggestedDestination = MutableStateFlow<List<ExploreModel>>(emptyList())
     val suggestedDestinations: StateFlow<List<ExploreModel>> = _suggestedDestination.asStateFlow()
 
+    // 뷰모델이 처음 호출 될 때, State의 변경
+    init {
+        _suggestedDestination.value = destinationsRepository.destinations
+    }
+
     fun updatePeople(people: Int) {
         viewModelScope.launch {
             if (people > MAX_PEOPLE) {
