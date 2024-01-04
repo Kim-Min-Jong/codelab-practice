@@ -25,6 +25,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +37,7 @@ import androidx.compose.samples.crane.base.ExploreSection
 import androidx.compose.samples.crane.data.ExploreModel
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 
 typealias OnExploreItemClicked = (ExploreModel) -> Unit
@@ -76,9 +78,13 @@ fun CraneHomeContent(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel(),
 ) {
-    // TODO Codelab: collectAsStateWithLifecycle step - consume stream of data from the ViewModel
-    val suggestedDestinations: List<ExploreModel> = remember { emptyList() }
-
+    // Codelab: collectAsStateWithLifecycle step - consume stream of data from the ViewModel
+    // 데이터의 suggestedDestinations 스트림에 새 항목을 내보낼 때마다 CraneHomeContent 컴포저블의 UI가 업데이트되도록 하려고 한다.
+    // 그렇게 하려면 collectAsStateWithLifecycle() 함수를 사용하면 된다.
+    // collectAsStateWithLifecycle()는 StateFlow에서 값을 수집하고 수명주기를 인식하는 방식으로
+    // compose state의 최신 값을 나타낸다.
+    val suggestedDestinations by viewModel.suggestedDestinations.collectAsStateWithLifecycle()
+    // updatePeople 호출
     val onPeopleChanged: (Int) -> Unit = { viewModel.updatePeople(it) }
     var tabSelected by remember { mutableStateOf(CraneScreen.Fly) }
 
