@@ -24,6 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.ui.captionTextStyle
 import androidx.compose.ui.graphics.SolidColor
@@ -89,13 +92,35 @@ class EditableUserInputState(
         get() = text == hint
 
     // 로직이 추가되면 이 상태 관리하는 클래스에서만 변경을 하면 변경에 용이함
+
+    companion object {
+        // Saver 객체
+        // save - 원래 값을 저장 가능한 값으로 변환
+        // restore - 복원된 값을 원본 클래스의 인스턴스로 변환
+        val Saver: Saver<EditableUserInputState, *> = listSaver(
+            save = { listOf(it.hint, it.text) },
+            restore = {
+                EditableUserInputState(
+                    hint = it[0],
+                    initialText = it[1]
+                )
+            }
+        )
+    }
 }
 
 // 상태 홀더 기억하기
 // 상태 홀더가 항상 기억되어야 컴포지션에서 유지되고, 매번 만들 필요가없음
 // 그러기 위해 기억하는 객체를 만들 필요가 있음
+
+// remember로만 처리하면 화면이 재생성 될 떄 유지 되지않음
+// 이를 해결하기 위해 rememberSaveable API를 사용하는데
+// 이는 화면 뿐 아니라 프로세스 재생성시에도 유지됨 (내부적으로 저장된 인스턴스)
+// rememberSaveable은 Bundle 내에 저장할 수 있는 객체에 관한 추가 작업 없이 이 작업을 모두 실행
+// 이는 프로젝트에서 만든 EditableUserInputState 클래스에는 적용되지 않음
+// 따라서 Saver를 사용하여 이 클래스의 인스턴스를 저장 및 복원하는 방법을 rememberSaveable에 알려야 함.
 @Composable
 fun rememberEditableUserInputState(hint: String): EditableUserInputState =
-    remember(hint) {
+    rememberSaveable(hint, saver = EditableUserInputState.Saver) {
         EditableUserInputState(hint, hint)
     }
