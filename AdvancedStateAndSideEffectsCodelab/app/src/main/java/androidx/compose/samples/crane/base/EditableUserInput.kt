@@ -90,3 +90,12 @@ class EditableUserInputState(
 
     // 로직이 추가되면 이 상태 관리하는 클래스에서만 변경을 하면 변경에 용이함
 }
+
+// 상태 홀더 기억하기
+// 상태 홀더가 항상 기억되어야 컴포지션에서 유지되고, 매번 만들 필요가없음
+// 그러기 위해 기억하는 객체를 만들 필요가 있음
+@Composable
+fun rememberEditableUserInputState(hint: String): EditableUserInputState =
+    remember(hint) {
+        EditableUserInputState(hint, hint)
+    }
