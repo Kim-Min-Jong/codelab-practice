@@ -35,7 +35,9 @@ fun CraneEditableUserInput(
     @DrawableRes vectorImageId: Int? = null,
     onInputChanged: (String) -> Unit
 ) {
-    // TODO Codelab: Encapsulate this state in a state holder
+    // Codelab: Encapsulate this state in a state holder
+    // 컴포저블 내부에 상태가 있을 경우 TextField 값은 끌어올려지지 않아 외부에서 제어할 수 없으므로 테스트가 더 어렵다.
+    // 또한, 이 컴포저블의 논리가 더 복잡해지고 내부 상태가 더 쉽게 동기화되지 않을 수 있다.
     var textState by remember { mutableStateOf(hint) }
     val isHint = { textState == hint }
 
