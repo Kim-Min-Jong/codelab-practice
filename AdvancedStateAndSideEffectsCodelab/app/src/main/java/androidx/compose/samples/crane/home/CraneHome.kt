@@ -29,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.base.CraneDrawer
 import androidx.compose.samples.crane.base.CraneTabBar
@@ -39,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.launch
 
 typealias OnExploreItemClicked = (ExploreModel) -> Unit
 
@@ -51,6 +53,7 @@ fun CraneHome(
     onExploreItemClicked: OnExploreItemClicked,
     modifier: Modifier = Modifier,
 ) {
+    // 프로그래밍 적으로 탐색 창을 열고 닫기 위한 scaffold 상태
     val scaffoldState = rememberScaffoldState()
     Scaffold(
         scaffoldState = scaffoldState,
@@ -59,12 +62,23 @@ fun CraneHome(
             CraneDrawer()
         }
     ) { padding ->
+        val scope = rememberCoroutineScope()
         CraneHomeContent(
             modifier = modifier.padding(padding),
             onExploreItemClicked = onExploreItemClicked,
             openDrawer = {
-                // TODO Codelab: rememberCoroutineScope step - open the navigation drawer
+                // Codelab: rememberCoroutineScope step - open the navigation drawer
+                // open() 메소드는 코루틴 스크프 내에서만 쓰일 수 있음
                 // scaffoldState.drawerState.open()
+
+                // 일반 람다 내부는 코루틴 컨텍스트가 아니기에 코루틴 함수를 실행 할 수 없음
+                // 일반 람다 내부는 컴포저블도 호출할 수 없으므로 LaunchEffect도 사용 할 수 없음
+                // 호출 부의 수명주기를 따르는 Coroutine Scope를 사용해야함
+                // compose에서는 rememberCoroutineScope API를 지원해서, 컴포지션 호출 지점에 바인딩 된 Coroutine Scope를 반환
+                // 이 Scope에서는 컴포지션에 있지 않을 때 코루틴을 사용할 수 있음 (람다 내부 등..)
+                scope.launch {
+                    scaffoldState.drawerState.open()
+                }
             }
         )
     }
