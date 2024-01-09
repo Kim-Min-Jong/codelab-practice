@@ -31,32 +31,31 @@ import androidx.compose.runtime.setValue
 import androidx.compose.samples.crane.ui.captionTextStyle
 import androidx.compose.ui.graphics.SolidColor
 
+// 이제 text 및 isHint 대신 EditableUserState를 사용
 @Composable
 fun CraneEditableUserInput(
-    hint: String,
+    state: EditableUserInputState = rememberEditableUserInputState(hint = ""),
     caption: String? = null,
     @DrawableRes vectorImageId: Int? = null,
-    onInputChanged: (String) -> Unit
 ) {
     // Codelab: Encapsulate this state in a state holder
     // 컴포저블 내부에 상태가 있을 경우 TextField 값은 끌어올려지지 않아 외부에서 제어할 수 없으므로 테스트가 더 어렵다.
     // 또한, 이 컴포저블의 논리가 더 복잡해지고 내부 상태가 더 쉽게 동기화되지 않을 수 있다.
-    var textState by remember { mutableStateOf(hint) }
-    val isHint = { textState == hint }
+//    var textState by remember { mutableStateOf(hint) }
+//    val isHint = { textState == hint }
 
     CraneBaseUserInput(
         caption = caption,
-        tintIcon = { !isHint() },
-        showCaption = { !isHint() },
+        tintIcon = { !state.isHint },
+        showCaption = { !state.isHint },
         vectorImageId = vectorImageId
     ) {
         BasicTextField(
-            value = textState,
+            value = state.text,
             onValueChange = {
-                textState = it
-                if (!isHint()) onInputChanged(textState)
+                state.updateText(it)
             },
-            textStyle = if (isHint()) {
+            textStyle = if (state.isHint) {
                 captionTextStyle.copy(color = LocalContentColor.current)
             } else {
                 MaterialTheme.typography.body1.copy(color = LocalContentColor.current)
