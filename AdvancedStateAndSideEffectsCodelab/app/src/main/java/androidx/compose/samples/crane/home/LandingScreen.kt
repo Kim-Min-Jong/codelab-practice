@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.samples.crane.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,10 +45,19 @@ fun LandingScreen(onTimeout: () -> Unit, modifier: Modifier = Modifier) {
 
         // LaunchedEffect가 컴포지션을 시작하면 매개변수로 전달된 코드 블록으로 코루틴이 실행된다.
         // LaunchedEffect가 컴포지션을 종료하면 코루틴이 취소된다.
-        LaunchedEffect(onTimeout) {
+//        LaunchedEffect(onTimeout) {
+//            delay(SplashWaitTime)
+//            // 다시 시작하면서  delay가 다시 호출되는 현상이 발생한다.
+//            onTimeout
+//        }
+
+        // 컴포저블 수명 주기 동안 한번만 트러거 시켜주면 된다.
+        // 마지막 onTimeOut만 호출하도록 하려면
+        // rememberUpdatedState API를 사용하여 onTimeout을 저장합니다. 이 API는 다음과 같이 최신 값을 캡처하고 업데이트 한다.
+        val currentOnTimeOut by rememberUpdatedState(newValue = onTimeout)
+        LaunchedEffect(key1 = Unit) {
             delay(SplashWaitTime)
-            // 다시 시작하면서  delay가 다시 호출되는 현상이 발생한다.
-            onTimeout
+            currentOnTimeOut()
         }
 
         Image(painterResource(id = R.drawable.ic_crane_drawer), contentDescription = null)
