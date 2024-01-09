@@ -62,3 +62,31 @@ fun CraneEditableUserInput(
         )
     }
 }
+
+
+/**
+ * 내부 상태를 담당하는 상태 홀더를 만들어 모든 상태 변경사항을 한 곳으로 중앙화할 수 있다.
+ * 이렇게 하면 상태가 쉽게 동기화되고 관련 로직도 모두 단일 클래스로 그룹화된다.
+ * 또한 이 상태는 쉽게 끌어올릴 수 있으며 이 컴포저블의 호출자로부터 사용될 수 있다.
+ */
+class EditableUserInputState(
+    private val hint: String,
+    initialText: String
+) {
+    // CraneEditableUserInput에서와 같이 변경가능한 String State
+    // 상태 관리를 위해 사용
+    // 캡슐화를 위해 private set을 적용
+    var text by mutableStateOf(initialText)
+        private set
+
+    // text 변수에 접근을 위해 메소드를 통해 접근
+    fun updateText(newText: String) {
+        text = newText
+    }
+
+    // text 가 힌트인지 확인하는 변수
+    val isHint: Boolean
+        get() = text == hint
+
+    // 로직이 추가되면 이 상태 관리하는 클래스에서만 변경을 하면 변경에 용이함
+}
