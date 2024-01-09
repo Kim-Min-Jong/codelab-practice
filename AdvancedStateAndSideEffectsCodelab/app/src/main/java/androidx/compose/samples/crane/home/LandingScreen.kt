@@ -45,6 +45,7 @@ fun LandingScreen(onTimeout: () -> Unit, modifier: Modifier = Modifier) {
         // LaunchedEffect가 컴포지션을 종료하면 코루틴이 취소된다.
         LaunchedEffect(onTimeout) {
             delay(SplashWaitTime)
+            // 다시 시작하면서  delay가 다시 호출되는 현상이 발생한다.
             onTimeout
         }
 
