@@ -24,11 +24,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.samples.crane.R
 import androidx.compose.samples.crane.base.CraneEditableUserInput
 import androidx.compose.samples.crane.base.CraneUserInput
@@ -38,6 +41,8 @@ import androidx.compose.samples.crane.home.PeopleUserInputAnimationState.Valid
 import androidx.compose.samples.crane.ui.CraneTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
 
 enum class PeopleUserInputAnimationState { Valid, Invalid }
 
@@ -104,6 +109,20 @@ fun ToDestinationUserInput(onToDestinationChanged: (String) -> Unit) {
         caption = "To",
         vectorImageId = R.drawable.ic_plane,
     )
+    // 위 코드에는 입력이 변경되면 ToDestinationUserInput의 호출자에게 이를 알려주는 기능이 없다.
+    // ToDestinationUserInput에서 onToDestinationChanged 람다를 호출하고 이 구성 가능한 함수를 계속 재사용하려면 어떻게 해야 할까?
+    // 입력이 변경될 때마다 LaunchedEffect를 사용하여 부작용을 트리거하고 onToDestinationChanged 람다를 호출할 수 있다.
+
+    val currentOnDestinationChanged by rememberUpdatedState(newValue = onToDestinationChanged)
+    LaunchedEffect(key1 = editableUserInputState) {
+        // compose의 State<T> 객체를 Flow 객체로 변환한다.
+        // snapshot 내에서 읽은 상태가 변형되어 flow에 새 값을 보낸다.
+        snapshotFlow { editableUserInputState.text }
+            .filter { !editableUserInputState.isHint }
+            .collect{
+                currentOnDestinationChanged(editableUserInputState.text)
+            }
+    }
 }
 
 @Composable
