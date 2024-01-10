@@ -40,6 +40,9 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.samples.crane.R
 import androidx.compose.samples.crane.data.ExploreModel
 import androidx.compose.samples.crane.home.OnExploreItemClicked
@@ -72,9 +75,11 @@ fun ExploreSection(
                 style = MaterialTheme.typography.caption.copy(color = crane_caption)
             )
             Spacer(Modifier.height(8.dp))
-            // TODO Codelab: derivedStateOf step
-            // TODO: Show "Scroll to top" button when the first item of the list is not visible
+            // Codelab: derivedStateOf step
+            // Show "Scroll to top" button when the first item of the list is not visible
             val listState = rememberLazyListState()
+            // 스크롤 될 때마다 변경되기 떄문에 자주 바뀌어서 이 방식은 효율적이지 않음
+            val showButton = listState.firstVisibleItemIndex > 0
             ExploreList(exploreList, onItemClicked, listState = listState)
         }
     }
