@@ -25,6 +25,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScopeInstance.align
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -102,14 +103,24 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = viewModel()
 ) {
-    // TODO Codelab: produceState step - Show loading screen while fetching city details
+    // Codelab: produceState step - Show loading screen while fetching city details
+    // 현재 방식은 viewmodel에서 cityDetails를 동기적으로 가져오고
     val cityDetails = remember(viewModel) { viewModel.cityDetails }
+    // success가 되면 DetailsContent를 호출함
+    // cityDetails는 Ui스레드를 로드하는데 더 만ㅎ은 비용이 들수 있고, 코루틴을 사용해 개선해 볼 수 있음
     if (cityDetails is Result.Success<ExploreModel>) {
         DetailsContent(cityDetails.data, modifier.fillMaxSize())
     } else {
         onErrorLoading()
     }
 }
+// detail 상태 관리를 위한 state 클래스
+// collectAsStateWithLifecycle 에서 정보를 수집하여 StateFlow로 나타내 볼 수 있음
+data class DetailsUiState(
+    val cityDetails: ExploreModel? = null,
+    val isLoading: Boolean = false,
+    val throwError: Boolean = false
+)
 
 @Composable
 fun DetailsContent(
