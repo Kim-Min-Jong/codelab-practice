@@ -23,9 +23,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScopeInstance.align
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -41,6 +42,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -103,17 +105,51 @@ fun DetailsScreen(
     modifier: Modifier = Modifier,
     viewModel: DetailsViewModel = viewModel()
 ) {
-    // Codelab: produceState step - Show loading screen while fetching city details
-    // 현재 방식은 viewmodel에서 cityDetails를 동기적으로 가져오고
-    val cityDetails = remember(viewModel) { viewModel.cityDetails }
-    // success가 되면 DetailsContent를 호출함
-    // cityDetails는 Ui스레드를 로드하는데 더 만ㅎ은 비용이 들수 있고, 코루틴을 사용해 개선해 볼 수 있음
-    if (cityDetails is Result.Success<ExploreModel>) {
-        DetailsContent(cityDetails.data, modifier.fillMaxSize())
-    } else {
-        onErrorLoading()
+//    // Codelab: produceState step - Show loading screen while fetching city details
+//    // 현재 방식은 viewmodel에서 cityDetails를 동기적으로 가져오고
+//    val cityDetails = remember(viewModel) { viewModel.cityDetails }
+//    // success가 되면 DetailsContent를 호출함
+//    // cityDetails는 Ui스레드를 로드하는데 더 만ㅎ은 비용이 들수 있고, 코루틴을 사용해 개선해 볼 수 있음
+//    if (cityDetails is Result.Success<ExploreModel>) {
+//        DetailsContent(cityDetails.data, modifier.fillMaxSize())
+//    } else {
+//        onErrorLoading()
+//    }
+
+    // produceState를 사용
+    // produceState - compose 가 아닌 상태를 Compose 상태로 변환 할 수 있다.
+    // value 속성을 사용하여 반환된 State에 값을 가져올 수 있는 컴포지션으로 범위가 지정된 코루틴을 실행한다.
+    val uiState by produceState(initialValue = DetailsUiState(isLoading = true)) {
+        val cityDetailsResult = viewModel.cityDetails
+        // state의 값을 업데이트
+        value = if (cityDetailsResult is Result.Success<ExploreModel>) {
+            DetailsUiState(cityDetailsResult.data)
+        } else {
+            DetailsUiState(throwError = true)
+        }
+    }
+    // 상태에 따른 UI 분기 처리
+    when {
+        uiState.cityDetails != null -> {
+            DetailsContent(uiState.cityDetails!!, modifier.fillMaxSize())
+        }
+
+        uiState.isLoading -> {
+            // 프로그래스 바 생성
+            Box(modifier.fillMaxSize()) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+        }
+
+        else -> {
+            onErrorLoading()
+        }
     }
 }
+
 // detail 상태 관리를 위한 state 클래스
 // collectAsStateWithLifecycle 에서 정보를 수집하여 StateFlow로 나타내 볼 수 있음
 data class DetailsUiState(
