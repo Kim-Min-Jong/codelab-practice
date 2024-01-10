@@ -30,6 +30,7 @@ import com.google.android.libraries.maps.MapView
  */
 @Composable
 fun rememberMapViewWithLifecycle(): MapView {
+    // 현재 상태에서 실행은 되지만 MapView가 수명주기를 따르지 않아 문제가 발생할 수 있다.
     val context = LocalContext.current
     // TODO Codelab: DisposableEffect step. Make MapView follow the lifecycle
     return remember {
