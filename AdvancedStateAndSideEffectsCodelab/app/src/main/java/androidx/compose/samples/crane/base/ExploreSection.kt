@@ -79,7 +79,18 @@ fun ExploreSection(
             // Show "Scroll to top" button when the first item of the list is not visible
             val listState = rememberLazyListState()
             // 스크롤 될 때마다 변경되기 떄문에 자주 바뀌어서 이 방식은 효율적이지 않음
-            val showButton = listState.firstVisibleItemIndex > 0
+//            val showButton = listState.firstVisibleItemIndex > 0
+
+            // derivedState
+            // true - false 간에 조건이 변경될 때만 재구성을 실시함
+            // derivedState 내부 블럭은 내부 상태가 변경 될때마다 실행 되지만,
+            // 컴포저블 함수에서는 계산 결과가 마지막 결과와 다를 때만 재구성 (리컴포지션) 됨
+            // 따라서 ExploreSectiondl 재구성 되는 횟수가 최소화 되어 효율이 높아짐
+            val showButton by remember {
+                derivedStateOf {
+                    listState.firstVisibleItemIndex > 0
+                }
+            }
             ExploreList(exploreList, onItemClicked, listState = listState)
         }
     }
