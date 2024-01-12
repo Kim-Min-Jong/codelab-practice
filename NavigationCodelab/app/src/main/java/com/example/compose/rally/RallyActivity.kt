@@ -32,6 +32,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.theme.RallyTheme
@@ -57,7 +58,6 @@ class RallyActivity : ComponentActivity() {
 @Composable
 fun RallyApp() {
     RallyTheme {
-        var currentScreen: RallyDestination by remember { mutableStateOf(Overview) }
         // 내비게이션 컨트롤러 설정
         // NavController는 항상 컴포저블 계층 최상위 수준에서 만들고 배치해야함
         // 그래야 NavController를 참조해야하는 컴포저블이 접근할 수 있기 때문에
@@ -67,6 +67,20 @@ fun RallyApp() {
         // 경로는 컴포저블의 경로를 정의하는 문자열로 표현되고 올바른 위치로 이동할 수 있도록 navController가 안내한다.
         // 이를 암시적 딥링크라고 한다. (각 대상에는 고유 경로가 있어야한다.)
         val navController = rememberNavController()
+
+        // 81번 라인의 2번 문제
+        // 기존에는 currentScreen 이라는 변수로 탭 UI로 조정했지만
+        // navigation으로 바꾸면서 사용하지 않게 되어, 탭 Ui를 조정할 수 없게됨
+        // navigation을 통해 찾아야함 그렇기에 각 시점에 현재 표시되 대상이 무엇인지를 알아야함
+        // 그 후, 변경 될 떄마다 TabRow를 업데이트 해야함
+
+        // 각 시점에 현재 표시되 대상이 무엇인지를 알기 위해 State 형식의 실시간 상태를 알아야함
+        val currentBackStack by navController.currentBackStackEntryAsState()
+        // NavDestination 객체를 반환하는데 여기서 어느 컴포저블이 표시되어 있는 지 확인해야함
+        val currentDestination = currentBackStack?.destination
+        // 일종의 id 값으로 탭의 id와 비교해서 찾음
+        val currentScreen = rallyTabRowScreens.find { it.route == currentDestination?.route } ?: Overview
+
         Scaffold(
             topBar = {
                 RallyTabRow(
@@ -75,10 +89,9 @@ fun RallyApp() {
 //                    onTabSelected = { screen -> currentScreen = screen },
                     onTabSelected = { newScreen ->
                         // 이동을 하는데, 문제가 있음
-                        // 1. 같은 탭을 다시 탭하면 동일한 탭이 다시 실행 됨 -> 여러개의 사본이 만들어짐
+                        // 1. 같은 탭을 다시 탭하면 동일한 탭이 다시 실행 됨 -> 여러개의 사본이 만들어짐  해결 - navigateSingTopTo()
                         // 2. 탭의 UI와 화면이 일치하지 않음 -> 탭 펼치기 접기가 제대로 동작하기 않음
 
-                        // 해결
                         navController.navigateSingleTopTo(newScreen.route)
                     },
                     currentScreen = currentScreen
