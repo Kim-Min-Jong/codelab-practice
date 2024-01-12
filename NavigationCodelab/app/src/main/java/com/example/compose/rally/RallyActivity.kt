@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -75,7 +76,10 @@ fun RallyApp() {
                         // 이동을 하는데, 문제가 있음
                         // 1. 같은 탭을 다시 탭하면 동일한 탭이 다시 실행 됨 -> 여러개의 사본이 만들어짐
                         // 2. 탭의 UI와 화면이 일치하지 않음 -> 탭 펼치기 접기가 제대로 동작하기 않음
-                        navController.navigate(newScreen.route)
+                        navController.navigate(newScreen.route) {
+                            // 내비게이션의 옵션 중, 백스택에 사본이 최대 1개까지만 유지 될 수 있도록 설정
+                            launchSingleTop = true
+                        }
                     },
                     currentScreen = currentScreen
                 )
