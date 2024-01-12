@@ -69,7 +69,14 @@ fun RallyApp() {
             topBar = {
                 RallyTabRow(
                     allScreens = rallyTabRowScreens,
-                    onTabSelected = { screen -> currentScreen = screen },
+                    // 탭이 선택 될 떄, navigation 탐색 시작
+//                    onTabSelected = { screen -> currentScreen = screen },
+                    onTabSelected = { newScreen ->
+                        // 이동을 하는데, 문제가 있음
+                        // 1. 같은 탭을 다시 탭하면 동일한 탭이 다시 실행 됨 -> 여러개의 사본이 만들어짐
+                        // 2. 탭의 UI와 화면이 일치하지 않음 -> 탭 펼치기 접기가 제대로 동작하기 않음
+                        navController.navigate(newScreen.route)
+                    },
                     currentScreen = currentScreen
                 )
             }
