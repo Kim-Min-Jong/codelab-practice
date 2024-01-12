@@ -28,6 +28,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -77,7 +78,7 @@ fun RallyApp() {
                         // 1. 같은 탭을 다시 탭하면 동일한 탭이 다시 실행 됨 -> 여러개의 사본이 만들어짐
                         // 2. 탭의 UI와 화면이 일치하지 않음 -> 탭 펼치기 접기가 제대로 동작하기 않음
 
-                        // 내비게이션의 옵션 중, 백스택에 사본이 최대 1개까지만 유지 될 수 있도록 설정
+                        // 해결
                         navController.navigateSingleTopTo(newScreen.route)
                     },
                     currentScreen = currentScreen
@@ -118,4 +119,20 @@ fun RallyApp() {
 }
 
 fun NavHostController.navigateSingleTopTo(route: String) =
-    this.navigate(route) { launchSingleTop = true }
+    this.navigate(route) {
+        // 내비게이션의 옵션 중, 백스택에 사본이 최대 1개까지만 유지 될 수 있도록 설정
+        launchSingleTop = true
+
+        // 탭을 선택했을 때 백 스택에 대규모 대상 스택이 빌드되지 않도록 그래프의 시작 대상을 팝업으로 만듦
+        popUpTo(
+            // 그래프의 시작 대상의 id
+            this@navigateSingleTopTo.graph.findStartDestination().id
+        ) {
+            // 상태를 저장하면 뒤로 가기 클릭 시, 백스택 전체가 "Overview"로 팝업됨
+            saveState = true
+        }
+
+        // PopUpToBuilder.saveState 또는 popUpToSaveState 속성에 의해 저장된 상태를 복원하는지 여부를 결정
+        // 이동할 대상 ID를 사용하여 이전에 저장된 상태가 없다면 이 옵션은 효과가 없다.
+        restoreState = true
+    }
