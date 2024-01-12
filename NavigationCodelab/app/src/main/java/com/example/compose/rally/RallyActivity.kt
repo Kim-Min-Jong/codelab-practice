@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.theme.RallyTheme
@@ -86,7 +87,18 @@ fun RallyApp() {
                 startDestination = Overview.route,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                // TODO builder: NavGraphBuilder.() -> Unit - 탐색 그래프를 정의하고 만드는 일을 담당
+                // builder: NavGraphBuilder.() -> Unit - 탐색 그래프를 정의하고 만드는 일을 담당
+
+                // NavGraph에 3개의 컴포저블을 추가
+                composable(route = Overview.route) {
+                    Overview.screen()
+                }
+                composable(route = Accounts.route) {
+                    Accounts.screen()
+                }
+                composable(route = Bills.route) {
+                    Bills.screen()
+                }
             }
             Box(Modifier.padding(innerPadding)) {
                 currentScreen.screen()
