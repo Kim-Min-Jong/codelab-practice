@@ -85,7 +85,8 @@ fun RallyApp() {
         // NavDestination 객체를 반환하는데 여기서 어느 컴포저블이 표시되어 있는 지 확인해야함
         val currentDestination = currentBackStack?.destination
         // 일종의 id 값으로 탭의 id와 비교해서 찾음
-        val currentScreen = rallyTabRowScreens.find { it.route == currentDestination?.route } ?: Overview
+        val currentScreen =
+            rallyTabRowScreens.find { it.route == currentDestination?.route } ?: Overview
 
         Scaffold(
             topBar = {
@@ -130,17 +131,25 @@ fun RallyApp() {
                         },
                         onClickSeeAllBills = {
                             navController.navigateSingleTopTo(Bills.route)
+                        },
+                        onAccountClick = { accountType ->
+                            navController.navigateToSingleAccount(accountType)
                         }
                     )
                 }
                 composable(route = Accounts.route) {
-                    AccountsScreen()
+                    AccountsScreen(
+                        onAccountClick = { accountType ->
+                            navController.navigateToSingleAccount(accountType)
+                        }
+                    )
                 }
                 composable(route = Bills.route) {
                     BillsScreen()
                 }
                 // 개별 계좌 표시 탐색 컴포저블 생성
-                composable(route =
+                composable(
+                    route =
                     // 해당 루트의 타입으로 화면을 전환
                     // 내비게이션은 탐색시 / 패턴에 따라 경로를 추적
                     "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}",
@@ -159,14 +168,15 @@ fun RallyApp() {
                     // compose navigation에는 각 NavHost 컴포저블 함수는 백스택에 있는 항목의 현재 경로 및 전달된 arguments의 정보를 저장하는 클래스가 있음
                     // NavBackStackEntry
                     // NavBackStackEntry를 사용하여 arguments 목록을 가져온 후 필요한 argument를 찾고 컴포저블에 넘겨주면 됨
-                    navBackStackEntry ->
-                    val accountType = navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+                        navBackStackEntry ->
+                    val accountType =
+                        navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
                     // 해당 타입을 넘겨주면 데이터에서 타입에 맞는 것을 찾아 화면을 그려줌
                     SingleAccountScreen(accountType)
                 }
             }
             Box(Modifier.padding(innerPadding)) {
-                currentScreen
+//                currentScreen
             }
         }
     }
@@ -190,3 +200,6 @@ fun NavHostController.navigateSingleTopTo(route: String) =
         // 이동할 대상 ID를 사용하여 이전에 저장된 상태가 없다면 이 옵션은 효과가 없다.
         restoreState = true
     }
+
+fun NavHostController.navigateToSingleAccount(accountType: String) =
+    this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
