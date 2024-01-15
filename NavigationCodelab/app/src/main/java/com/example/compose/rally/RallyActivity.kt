@@ -203,3 +203,9 @@ fun NavHostController.navigateSingleTopTo(route: String) =
 
 fun NavHostController.navigateToSingleAccount(accountType: String) =
     this.navigateSingleTopTo("${SingleAccount.route}/$accountType")
+
+// 위 방법 (인수 추가) 이외에도 딥링크를 추가하여 특정 URL, 동작, MIME 타입 유형을 컴포저블에 연결할 수 있음
+// 딥링크란 앱 내의 특정 대상으로 직접 이동 할 수 있는 링크를 뜻함
+// Navigation Compose는 암시적 딥 링크를 지원함, 암시적 딥링크가 호출되면 앱의 상응하는 대상을 염
+
+// 외부 앱에 딥링크를 노출하는 것은 기본적으로 사용 설정 되지 않음
