@@ -72,6 +72,7 @@ fun OverviewScreen(
     ) {
         AlertCard()
         Spacer(Modifier.height(RallyDefaultPadding))
+        // 클릭 이벤트로 인해 Card Composable이 실행 됨
         AccountsCard(
             onClickSeeAll = onClickSeeAllAccounts,
             onAccountClick = onAccountClick

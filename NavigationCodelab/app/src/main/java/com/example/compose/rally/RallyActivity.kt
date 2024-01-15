@@ -120,7 +120,15 @@ fun RallyApp() {
                 composable(route = Overview.route) {
                     // 하위 screen이 아닌 컴포저블을 직접 추가
                     // 이렇게 되면, RallyDestination과 화면 객체는 icon, route와 같은 탐색 관련 정보만 저장하며 Compose UI와 분리
-                    OverviewScreen()
+                    OverviewScreen(
+                        // 클릭 이벤트를 추가 (관련 대상으로 이동하는 클릭 이벤트)
+                        onClickSeeAllAccounts = {
+                            navController.navigateSingleTopTo(Accounts.route)
+                        },
+                        onClickSeeAllBills = {
+                            navController.navigateSingleTopTo(Bills.route)
+                        }
+                    )
                 }
                 composable(route = Accounts.route) {
                     AccountsScreen()
