@@ -155,7 +155,14 @@ fun RallyApp() {
 //                    )
                     arguments = SingleAccount.argument
                 ) {
-                    SingleAccountScreen()
+                    // 전달된 arguments 값을 받아야함
+                    // compose navigation에는 각 NavHost 컴포저블 함수는 백스택에 있는 항목의 현재 경로 및 전달된 arguments의 정보를 저장하는 클래스가 있음
+                    // NavBackStackEntry
+                    // NavBackStackEntry를 사용하여 arguments 목록을 가져온 후 필요한 argument를 찾고 컴포저블에 넘겨주면 됨
+                    navBackStackEntry ->
+                    val accountType = navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+                    // 해당 타입을 넘겨주면 데이터에서 타입에 맞는 것을 찾아 화면을 그려줌
+                    SingleAccountScreen(accountType)
                 }
             }
             Box(Modifier.padding(innerPadding)) {
