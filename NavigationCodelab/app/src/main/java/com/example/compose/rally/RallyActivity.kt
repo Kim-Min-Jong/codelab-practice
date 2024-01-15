@@ -34,7 +34,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.compose.rally.ui.accounts.AccountsScreen
+import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.components.RallyTabRow
+import com.example.compose.rally.ui.overview.OverviewScreen
 import com.example.compose.rally.ui.theme.RallyTheme
 
 /**
@@ -115,17 +118,19 @@ fun RallyApp() {
 
                 // NavGraph에 3개의 컴포저블을 추가
                 composable(route = Overview.route) {
-                    Overview.screen()
+                    // 하위 screen이 아닌 컴포저블을 직접 추가
+                    // 이렇게 되면, RallyDestination과 화면 객체는 icon, route와 같은 탐색 관련 정보만 저장하며 Compose UI와 분리
+                    OverviewScreen()
                 }
                 composable(route = Accounts.route) {
-                    Accounts.screen()
+                    AccountsScreen()
                 }
                 composable(route = Bills.route) {
-                    Bills.screen()
+                    BillsScreen()
                 }
             }
             Box(Modifier.padding(innerPadding)) {
-                currentScreen.screen()
+                currentScreen
             }
         }
     }
