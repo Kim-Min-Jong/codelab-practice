@@ -36,6 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.bills.BillsScreen
@@ -162,7 +163,10 @@ fun RallyApp() {
 //                            type = NavType.StringType
 //                        }
 //                    )
-                    arguments = SingleAccount.argument
+                    arguments = SingleAccount.argument,
+                    // arguments 와 같이 여러개의 딥링크 지정이 가능
+                    // manifest의 intent-filter에 정의된 것과 일치하는 패턴을 전달해야함
+                    deepLinks = SingleAccount.deepLinks
                 ) {
                     // 전달된 arguments 값을 받아야함
                     // compose navigation에는 각 NavHost 컴포저블 함수는 백스택에 있는 항목의 현재 경로 및 전달된 arguments의 정보를 저장하는 클래스가 있음
@@ -209,3 +213,4 @@ fun NavHostController.navigateToSingleAccount(accountType: String) =
 // Navigation Compose는 암시적 딥 링크를 지원함, 암시적 딥링크가 호출되면 앱의 상응하는 대상을 염
 
 // 외부 앱에 딥링크를 노출하는 것은 기본적으로 사용 설정 되지 않음
+// manifest에 intent-filter를 선언해 생성
