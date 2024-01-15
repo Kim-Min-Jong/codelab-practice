@@ -106,82 +106,91 @@ fun RallyApp() {
                 )
             }
         ) { innerPadding ->
-            // Navigation의 주요 세가지 NavController, NavGraph, NavHost
-            // NavController는 항상 단일 NavHost 컴포저블에 연결됨
-            // NavHost는 컨테이너 역할을 하여 그래프의 현재 대상은 표시함. 여러 컴포저블 이동 간 navHost의 콘텐츠가 자동으로 재구성 됨
-            // 또, NavController를 이동 가능한 컴포저블 대상을 매핑하는 NavGraph에 연결함
-            // 여기서 NavHost는 가져올 수 있는 컴포저블의 모음
-
-            NavHost(
-                // NavController를 NavHost에 연결
+            RallyNavHost(
                 navController = navController,
-                // navigation의 시작점을 연결
-                startDestination = Overview.route,
                 modifier = Modifier.padding(innerPadding)
-            ) {
-                // builder: NavGraphBuilder.() -> Unit - 탐색 그래프를 정의하고 만드는 일을 담당
+            )
+        }
+    }
+}
 
-                // NavGraph에 3개의 컴포저블을 추가
-                composable(route = Overview.route) {
-                    // 하위 screen이 아닌 컴포저블을 직접 추가
-                    // 이렇게 되면, RallyDestination과 화면 객체는 icon, route와 같은 탐색 관련 정보만 저장하며 Compose UI와 분리
-                    OverviewScreen(
-                        // 클릭 이벤트를 추가 (관련 대상으로 이동하는 클릭 이벤트)
-                        onClickSeeAllAccounts = {
-                            navController.navigateSingleTopTo(Accounts.route)
-                        },
-                        onClickSeeAllBills = {
-                            navController.navigateSingleTopTo(Bills.route)
-                        },
-                        onAccountClick = { accountType ->
-                            navController.navigateToSingleAccount(accountType)
-                        }
-                    )
+// NavHost를 하나의 Composable로 추출
+@Composable
+fun RallyNavHost(
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
+    // Navigation의 주요 세가지 NavController, NavGraph, NavHost
+    // NavController는 항상 단일 NavHost 컴포저블에 연결됨
+    // NavHost는 컨테이너 역할을 하여 그래프의 현재 대상은 표시함. 여러 컴포저블 이동 간 navHost의 콘텐츠가 자동으로 재구성 됨
+    // 또, NavController를 이동 가능한 컴포저블 대상을 매핑하는 NavGraph에 연결함
+    // 여기서 NavHost는 가져올 수 있는 컴포저블의 모음
+
+    NavHost(
+        // NavController를 NavHost에 연결
+        navController = navController,
+        // navigation의 시작점을 연결
+        startDestination = Overview.route,
+        modifier = modifier
+    ) {
+        // builder: NavGraphBuilder.() -> Unit - 탐색 그래프를 정의하고 만드는 일을 담당
+
+        // NavGraph에 3개의 컴포저블을 추가
+        composable(route = Overview.route) {
+            // 하위 screen이 아닌 컴포저블을 직접 추가
+            // 이렇게 되면, RallyDestination과 화면 객체는 icon, route와 같은 탐색 관련 정보만 저장하며 Compose UI와 분리
+            OverviewScreen(
+                // 클릭 이벤트를 추가 (관련 대상으로 이동하는 클릭 이벤트)
+                onClickSeeAllAccounts = {
+                    navController.navigateSingleTopTo(Accounts.route)
+                },
+                onClickSeeAllBills = {
+                    navController.navigateSingleTopTo(Bills.route)
+                },
+                onAccountClick = { accountType ->
+                    navController.navigateToSingleAccount(accountType)
                 }
-                composable(route = Accounts.route) {
-                    AccountsScreen(
-                        onAccountClick = { accountType ->
-                            navController.navigateToSingleAccount(accountType)
-                        }
-                    )
+            )
+        }
+        composable(route = Accounts.route) {
+            AccountsScreen(
+                onAccountClick = { accountType ->
+                    navController.navigateToSingleAccount(accountType)
                 }
-                composable(route = Bills.route) {
-                    BillsScreen()
-                }
-                // 개별 계좌 표시 탐색 컴포저블 생성
-                composable(
-                    route =
-                    // 해당 루트의 타입으로 화면을 전환
-                    // 내비게이션은 탐색시 / 패턴에 따라 경로를 추적
-                    "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}",
-                    // 컴포저블이 위 인자를 받아야한다는 것을 알려줘야함
-                    // arguments 값을 통해 전달 할 수 있음
-                    // 인수 목록을 받기 떄문에 원하는만큼 지정 가능
-                    // 좀 더 안전하게 타입을 지정하여 전달, 지정하지 않으면 타입추론을 해 전달 됨.
+            )
+        }
+        composable(route = Bills.route) {
+            BillsScreen()
+        }
+        // 개별 계좌 표시 탐색 컴포저블 생성
+        composable(
+            route =
+            // 해당 루트의 타입으로 화면을 전환
+            // 내비게이션은 탐색시 / 패턴에 따라 경로를 추적
+            "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}",
+            // 컴포저블이 위 인자를 받아야한다는 것을 알려줘야함
+            // arguments 값을 통해 전달 할 수 있음
+            // 인수 목록을 받기 떄문에 원하는만큼 지정 가능
+            // 좀 더 안전하게 타입을 지정하여 전달, 지정하지 않으면 타입추론을 해 전달 됨.
 //                    arguments = listOf(
 //                        navArgument(SingleAccount.accountTypeArg) {
 //                            type = NavType.StringType
 //                        }
 //                    )
-                    arguments = SingleAccount.argument,
-                    // arguments 와 같이 여러개의 딥링크 지정이 가능
-                    // manifest의 intent-filter에 정의된 것과 일치하는 패턴을 전달해야함
-                    deepLinks = SingleAccount.deepLinks
-                ) {
-                    // 전달된 arguments 값을 받아야함
-                    // compose navigation에는 각 NavHost 컴포저블 함수는 백스택에 있는 항목의 현재 경로 및 전달된 arguments의 정보를 저장하는 클래스가 있음
-                    // NavBackStackEntry
-                    // NavBackStackEntry를 사용하여 arguments 목록을 가져온 후 필요한 argument를 찾고 컴포저블에 넘겨주면 됨
-                        navBackStackEntry ->
-                    val accountType =
-                        navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
-                    // 해당 타입을 넘겨주면 데이터에서 타입에 맞는 것을 찾아 화면을 그려줌
-                    SingleAccountScreen(accountType)
-                }
-            }
-            Box(Modifier.padding(innerPadding)) {
-//                currentScreen
-            }
+            arguments = SingleAccount.argument,
+            // arguments 와 같이 여러개의 딥링크 지정이 가능
+            // manifest의 intent-filter에 정의된 것과 일치하는 패턴을 전달해야함
+            deepLinks = SingleAccount.deepLinks
+        ) {
+            // 전달된 arguments 값을 받아야함
+            // compose navigation에는 각 NavHost 컴포저블 함수는 백스택에 있는 항목의 현재 경로 및 전달된 arguments의 정보를 저장하는 클래스가 있음
+            // NavBackStackEntry
+            // NavBackStackEntry를 사용하여 arguments 목록을 가져온 후 필요한 argument를 찾고 컴포저블에 넘겨주면 됨
+                navBackStackEntry ->
+            val accountType =
+                navBackStackEntry.arguments?.getString(SingleAccount.accountTypeArg)
+            // 해당 타입을 넘겨주면 데이터에서 타입에 맞는 것을 찾아 화면을 그려줌
+            SingleAccountScreen(accountType)
         }
     }
 }
@@ -214,3 +223,7 @@ fun NavHostController.navigateToSingleAccount(accountType: String) =
 
 // 외부 앱에 딥링크를 노출하는 것은 기본적으로 사용 설정 되지 않음
 // manifest에 intent-filter를 선언해 생성
+
+
+
+
