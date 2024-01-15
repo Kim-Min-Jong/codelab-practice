@@ -35,6 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.compose.rally.ui.accounts.AccountsScreen
+import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.bills.BillsScreen
 import com.example.compose.rally.ui.components.RallyTabRow
 import com.example.compose.rally.ui.overview.OverviewScreen
@@ -135,6 +136,14 @@ fun RallyApp() {
                 }
                 composable(route = Bills.route) {
                     BillsScreen()
+                }
+                // 개별 계좌 표시
+                composable(route =
+                    // 해당 루트의 타입으로 화면을 전환
+                    // 내비게이션은 탐색시 / 패턴에 따라 경로를 추적
+                    "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}"
+                ) {
+                    SingleAccountScreen()
                 }
             }
             Box(Modifier.padding(innerPadding)) {
