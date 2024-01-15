@@ -30,10 +30,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.compose.rally.ui.accounts.AccountsScreen
 import com.example.compose.rally.ui.accounts.SingleAccountScreen
 import com.example.compose.rally.ui.bills.BillsScreen
@@ -137,11 +139,21 @@ fun RallyApp() {
                 composable(route = Bills.route) {
                     BillsScreen()
                 }
-                // 개별 계좌 표시
+                // 개별 계좌 표시 탐색 컴포저블 생성
                 composable(route =
                     // 해당 루트의 타입으로 화면을 전환
                     // 내비게이션은 탐색시 / 패턴에 따라 경로를 추적
-                    "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}"
+                    "${SingleAccount.route}/{${SingleAccount.accountTypeArg}}",
+                    // 컴포저블이 위 인자를 받아야한다는 것을 알려줘야함
+                    // arguments 값을 통해 전달 할 수 있음
+                    // 인수 목록을 받기 떄문에 원하는만큼 지정 가능
+                    // 좀 더 안전하게 타입을 지정하여 전달, 지정하지 않으면 타입추론을 해 전달 됨.
+//                    arguments = listOf(
+//                        navArgument(SingleAccount.accountTypeArg) {
+//                            type = NavType.StringType
+//                        }
+//                    )
+                    arguments = SingleAccount.argument
                 ) {
                     SingleAccountScreen()
                 }
