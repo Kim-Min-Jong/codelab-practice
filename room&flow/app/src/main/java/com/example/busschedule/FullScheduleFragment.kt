@@ -20,9 +20,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.BusApplication
 import com.example.busschedule.databinding.FullScheduleFragmentBinding
+import javax.microedition.khronos.opengles.GL
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class FullScheduleFragment: Fragment() {
 
@@ -31,6 +39,13 @@ class FullScheduleFragment: Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var recyclerView: RecyclerView
+
+    // 뷰모델 객체 생성
+    private val viewModel: BusScheduleViewModel by activityViewModels{
+        BusScheduleViewModelFactory(
+            (activity?.application as BusApplication).database.scheduleDao()
+        )
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,10 +57,24 @@ class FullScheduleFragment: Fragment() {
         return view
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // 어댑터 생성 및 연결
+        val busStopAdapter = BusStopAdapter {
+            val action = FullScheduleFragmentDirections.actionFullScheduleFragmentToStopScheduleFragment(it.stopName)
+            // jetpack navigation을 통한 fragment 이동
+            view.findNavController().navigate(action)
+        }
+        recyclerView.adapter = busStopAdapter
+
+        // 데이터 연결
+        GlobalScope.launch(Dispatchers.IO) {
+            busStopAdapter.submitList(viewModel.fullSchedule())
+        }
     }
 
     override fun onDestroyView() {

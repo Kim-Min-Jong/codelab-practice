@@ -20,9 +20,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.BusApplication
 import com.example.busschedule.databinding.StopScheduleFragmentBinding
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class StopScheduleFragment: Fragment() {
 
@@ -37,6 +43,13 @@ class StopScheduleFragment: Fragment() {
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var stopName: String
+
+    // 동일하게..
+    private val viewModel: BusScheduleViewModel by activityViewModels {
+        BusScheduleViewModelFactory(
+            (activity?.application as BusApplication).database.scheduleDao()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,10 +69,17 @@ class StopScheduleFragment: Fragment() {
         return view
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         recyclerView = binding.recyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        val busStopAdapter = BusStopAdapter({})
+        recyclerView.adapter = busStopAdapter
+        GlobalScope.launch(Dispatchers.IO) {
+            busStopAdapter.submitList(viewModel.scheduleForStopName(stopName))
+        }
+
     }
 
     override fun onDestroyView() {
