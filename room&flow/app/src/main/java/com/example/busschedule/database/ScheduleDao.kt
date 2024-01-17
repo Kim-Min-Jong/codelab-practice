@@ -2,6 +2,7 @@ package com.example.busschedule.database
 
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 // DAO (Data Access Object)
 // DAO는 데이터 액세스 객체를 나타내며 데이터 액세스 권한을 제공하는 Kotlin 컴포넌트이다.
@@ -12,9 +13,9 @@ import androidx.room.Query
 interface ScheduleDao {
     // @Quert 어노테이션을 사용하면 직접 쿼리 작성이 가능하다.
     @Query("SELECT * FROM schedule ORDER BY arrival_time ASC")
-    fun getAll(): List<Schedule>
+    fun getAll(): Flow<List<Schedule>>
 
     // : 콜론을 붙여 쿼리에서 매개변수 참조가 가능하다.
     @Query("SELECT * FROM schedule WHERE stop_name = :stopName ORDER BY arrival_time ASC")
-    fun getByStopName(stopName: String): List<Schedule>
+    fun getByStopName(stopName: String): Flow<List<Schedule>>
 }
