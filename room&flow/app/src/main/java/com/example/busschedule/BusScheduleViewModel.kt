@@ -1,6 +1,8 @@
 package com.example.busschedule
 
 import androidx.lifecycle.ViewModel
+import com.example.busschedule.database.Schedule
+import com.example.busschedule.database.ScheduleDao
 
 // 데이터베이스에 접근할 뷰모델 정의
 

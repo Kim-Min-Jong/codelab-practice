@@ -1,4 +1,4 @@
-package com.example.busschedule
+package com.example.busschedule.database
 
 import androidx.room.Dao
 import androidx.room.Query

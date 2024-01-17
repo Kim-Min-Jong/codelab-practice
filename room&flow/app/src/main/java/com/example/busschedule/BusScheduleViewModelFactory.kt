@@ -2,6 +2,7 @@ package com.example.busschedule
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.busschedule.database.ScheduleDao
 
 // 뷰모델은 직접 인스턴스화를 할 수 없어서 다른 방법을 사용해야한다.
 // ViewModel 클래스 BusScheduleViewModel은 수명 주기를 인식해야 하므로 수명 주기 이벤트에 응답할 수 있는 객체로 인스턴스화해야한다.
