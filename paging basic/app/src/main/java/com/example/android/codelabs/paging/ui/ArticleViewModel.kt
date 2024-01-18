@@ -34,7 +34,10 @@ class ArticleViewModel(
 
     /**
      * Stream of [Article]s for the UI.
+     * https://medium.com/androiddevelopers/things-to-know-about-flows-sharein-and-statein-operators-20e6ccb2bc74
+     * 참고
      */
+    // flow인데 데이터를 저장할 수 있는 flow
     val items: StateFlow<List<Article>> = repository.articleStream
         .stateIn(
             scope = viewModelScope,
