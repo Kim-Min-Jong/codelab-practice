@@ -19,10 +19,12 @@ package com.example.android.codelabs.paging.ui
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -48,6 +50,28 @@ class ArticleActivity : AppCompatActivity() {
         val articleAdapter = ArticleAdapter()
 
         binding.bindAdapter(articleAdapter = articleAdapter)
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // PagingDataAdapter.loadStateFlow를 통해 PagingDataAdapter를 통한 CombinedLoadStates에 액세스할 수 있음
+                articleAdapter.loadStateFlow.collect {
+                    // CombinedLoadStates 인스턴스는 데이터를 로드하는 Paging 라이브러리에 있는 모든 구성요소의 로드 상태를 설명함
+                    // CombinedLoadStates.source는 LoadStates 유형으로, 세 가지 유형의 LoadState 필드가 있다
+                    //
+                    // LoadStates.append: 사용자의 현재 위치 후에 가져오는 항목(리스트)의 LoadState용
+                    // LoadStates.prepend: 사용자의 현재 위치 전에 가져오는 항목의 LoadState용
+                    // LoadStates.refresh: 초기 로드의 LoadState용
+
+                    // 각 LoadState 자체는 다음 중 하나일 수 있음
+                    // LoadState.Loading: 항목(리스트)을 로드하고 있음
+                    // LoadState.NotLoading: 항목을 로드하고 있지 않음
+                    // LoadState.Error: 로드 오류가 발생
+
+                    binding.prependProgress.isVisible = it.source.prepend is LoadState.Loading
+                    binding.appendProgress.isVisible = it.source.append is LoadState.Loading
+                }
+            }
+        }
 
         // Collect from the Article Flow in the ViewModel, and submit it to the
         // ListAdapter.

@@ -4,6 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import java.time.LocalDateTime
 import java.util.Collections.max
+import kotlinx.coroutines.delay
 import kotlin.math.max
 
 
@@ -47,6 +48,9 @@ class ArticlePagingSource : PagingSource<Int, Article>() {
         val start = params.key ?: STARTING_KEY
         // 보여 줄 페이지의 범위
         val range = start until (start + params.loadSize)
+
+        // 지연을 통한 로딩 UI 출력
+        if (start != STARTING_KEY) delay(LOAD_DELAY_MILLIS)
 
         return LoadResult.Page(
             // 페이지의 데이터를 생성
