@@ -19,9 +19,7 @@ package com.example.android.codelabs.paging.data
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-/**
- * Immutable model class for an article
- */
+// 페이징에 사용 될 모델
 data class Article(
     val id: Int,
     val title: String,
