@@ -28,6 +28,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.android.codelabs.paging.Injection
 import com.example.android.codelabs.paging.databinding.ActivityArticlesBinding
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class ArticleActivity : AppCompatActivity() {
@@ -54,8 +55,12 @@ class ArticleActivity : AppCompatActivity() {
             // We repeat on the STARTED lifecycle because an Activity may be PAUSED
             // but still visible on the screen, for example in a multi window app
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                items.collect {
-                    articleAdapter.submitList(it)
+                // 새 pagingData 인스턴스를 내보낼 때
+                // 이전 pagingData 내보내기에 관한 컬렉션이 취소되도록
+                // pagingData Flow에서 collectLatest를 사용
+                items.collectLatest {
+                    // PagingDataAdapter는 submitData 를 사용
+                    articleAdapter.submitData(it)
                 }
             }
         }
