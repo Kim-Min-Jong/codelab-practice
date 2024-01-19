@@ -17,6 +17,9 @@
 package com.example.android.codelabs.paging.data
 
 import android.util.Log
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.api.IN_QUALIFIER
 import com.example.android.codelabs.paging.model.Repo
@@ -32,79 +35,39 @@ private const val GITHUB_STARTING_PAGE_INDEX = 1
 /**
  * Repository class that works with local and remote data sources.
  */
+// 현재 상태는 GithubService에서 데이터를 flow로 가져와 viewModel로 전달함
+// 전달한 데이터는 다시 LiveData로 바꿔 UI로 출력
+// 시된 목록의 끝에 도달하여 네트워크에서 더 많은 데이터가 로드될 때마다
+// Flow<RepoSearchResult>에는 최신 데이터 외에 쿼리 결과 이전에 가져온 데이터의 전체 목록이 포함되는 문제 발생
+// PagingData 처리를 통해 이러한 문제들을 해결
+// -> 결과를 모두 캡슐화 (LoadResult 형태)
 class GithubRepository(private val service: GithubService) {
 
-    // keep the list of all results received
-    private val inMemoryCache = mutableListOf<Repo>()
+    // PagingData를 구성하기 위해 PagingData를 앱의 다른 레이어에 전달하는 데 사용할 API에 따라 Pager 클래스의 여러 빌더 메서드 중 하나를 사용
+    //
+    // 1. Kotlin Flow - Pager.flow 사용
+    // 2. LiveData - Pager.liveData 사용
+    // 3. RxJava Flowable - Pager.flowable 사용
+    // 4. RxJava Observable - Pager.observable 사용
 
-    // shared flow of results, which allows us to broadcast updates so
-    // the subscriber will have the latest data
-    private val searchResults = MutableSharedFlow<RepoSearchResult>(replay = 1)
-
-    // keep the last requested page. When the request is successful, increment the page number.
-    private var lastRequestedPage = GITHUB_STARTING_PAGE_INDEX
-
-    // avoid triggering multiple requests in the same time
-    private var isRequestInProgress = false
-
-    /**
-     * Search repositories whose names match the query, exposed as a stream of data that will emit
-     * every time we get more data from the network.
-     */
-    suspend fun getSearchResultStream(query: String): Flow<RepoSearchResult> {
-        Log.d("GithubRepository", "New query: $query")
-        lastRequestedPage = 1
-        inMemoryCache.clear()
-        requestAndSaveData(query)
-
-        return searchResults
+        // 사용하는 PagingData 빌더에 관계없이 다음 매개변수를 전달
+    // 1. PagingConfig - 이 클래스는 로드 대기 시간, 초기 로드의 크기 요청 등 PagingSource에서 콘텐츠를 로드하는 방법에 관한 옵션을 설정
+    // 2. PagingSource를 만드는 방법을 정의하는 함수
+    fun getSearchResultStream(query: String): Flow<PagingData<Repo>> {
+        return Pager(
+            // 로딩 대기시간, 초기 로딩 크기 결정등 설정하는 매개변수
+            // 기본 적으로 Paging은 로드하는 모든 페이지를 메모리에 유지
+            // 사용자 스크롤시 메모리를 낭비하지 않으려면 maxSize를 설정 (여기선 설정 X)
+            config = PagingConfig(
+                pageSize = NETWORK_PAGE_SIZE,
+                // 로딩되지 않은 컨텐츠의 미리보기를 할 지
+                enablePlaceholders = false
+            ),
+            // Paging에 들어갈 데이터를 입력 - PagingSource를 받아야함
+            pagingSourceFactory = { GithubPagingSource(service, query) }
+        ).flow
     }
-
-    suspend fun requestMore(query: String) {
-        if (isRequestInProgress) return
-        val successful = requestAndSaveData(query)
-        if (successful) {
-            lastRequestedPage++
-        }
-    }
-
-    suspend fun retry(query: String) {
-        if (isRequestInProgress) return
-        requestAndSaveData(query)
-    }
-
-    private suspend fun requestAndSaveData(query: String): Boolean {
-        isRequestInProgress = true
-        var successful = false
-
-        val apiQuery = query + IN_QUALIFIER
-        try {
-            val response = service.searchRepos(apiQuery, lastRequestedPage, NETWORK_PAGE_SIZE)
-            Log.d("GithubRepository", "response $response")
-            val repos = response.items ?: emptyList()
-            inMemoryCache.addAll(repos)
-            val reposByName = reposByName(query)
-            searchResults.emit(RepoSearchResult.Success(reposByName))
-            successful = true
-        } catch (exception: IOException) {
-            searchResults.emit(RepoSearchResult.Error(exception))
-        } catch (exception: HttpException) {
-            searchResults.emit(RepoSearchResult.Error(exception))
-        }
-        isRequestInProgress = false
-        return successful
-    }
-
-    private fun reposByName(query: String): List<Repo> {
-        // from the in memory cache select only the repos whose name or description matches
-        // the query. Then order the results.
-        return inMemoryCache.filter {
-            it.name.contains(query, true) ||
-                    (it.description != null && it.description.contains(query, true))
-        }.sortedWith(compareByDescending<Repo> { it.stars }.thenBy { it.name })
-    }
-
     companion object {
-        const val NETWORK_PAGE_SIZE = 30
+        const val NETWORK_PAGE_SIZE = 50
     }
 }
