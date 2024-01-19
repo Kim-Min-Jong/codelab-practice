@@ -16,12 +16,10 @@
 
 package com.example.android.codelabs.paging
 
-import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import androidx.savedstate.SavedStateRegistryOwner
 import com.example.android.codelabs.paging.api.GithubService
 import com.example.android.codelabs.paging.data.GithubRepository
-import com.example.android.codelabs.paging.db.RepoDatabase
 import com.example.android.codelabs.paging.ui.ViewModelFactory
 
 /**
@@ -35,15 +33,15 @@ object Injection {
      * Creates an instance of [GithubRepository] based on the [GithubService] and a
      * [GithubLocalCache]
      */
-    private fun provideGithubRepository(context: Context): GithubRepository {
-        return GithubRepository(GithubService.create(), RepoDatabase.getInstance(context))
+    private fun provideGithubRepository(): GithubRepository {
+        return GithubRepository(GithubService.create())
     }
 
     /**
      * Provides the [ViewModelProvider.Factory] that is then used to get a reference to
      * [ViewModel] objects.
      */
-    fun provideViewModelFactory(context: Context, owner: SavedStateRegistryOwner): ViewModelProvider.Factory {
-        return ViewModelFactory(owner, provideGithubRepository(context))
+    fun provideViewModelFactory(owner: SavedStateRegistryOwner): ViewModelProvider.Factory {
+        return ViewModelFactory(owner, provideGithubRepository())
     }
 }
