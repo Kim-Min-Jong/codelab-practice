@@ -43,6 +43,7 @@ class SearchRepositoriesViewModel(
     /**
      * Stream of immutable states representative of the UI.
      */
+    // Paging3를 이용하면 LiveData로 변환할 필요가 없음, 단 StateFlow로 관리
     val state: LiveData<UiState>
 
     /**
@@ -94,6 +95,7 @@ class SearchRepositoriesViewModel(
 private val UiAction.Scroll.shouldFetchMore
     get() = visibleItemCount + lastVisibleItemPosition + VISIBLE_THRESHOLD >= totalItemCount
 
+// 상태 관리를 위한 sealed class
 sealed class UiAction {
     data class Search(val query: String) : UiAction()
     data class Scroll(
