@@ -44,6 +44,9 @@ class SearchRepositoriesViewModel(
      * Stream of immutable states representative of the UI.
      */
     // Paging3를 이용하면 LiveData로 변환할 필요가 없음, 단 StateFlow로 관리
+    // 참고: PagingData Flow를 다른 Flows와 함께 사용하거나 결합X
+    // 내보낸 PagingData는 각각 독립적으로 사용되어야한다.
+    // 또한 shareIn 및 stateIn 같은 연산자를 PagingData Flows에 사용해서는 안 된다.
     val state: LiveData<UiState>
 
     /**
@@ -106,8 +109,14 @@ sealed class UiAction {
 }
 
 data class UiState(
-    val query: String,
-    val searchResult: RepoSearchResult
+    // 디폴트 검색값 설정
+    val query: String = DEFAULT_QUERY,
+    // 마지막으로 수행 된 검색값 설정
+    val lastQueryScrolled: String = DEFAULT_QUERY,
+    // 입력된 새 쿼리와 관련해 리스트의 상단으로 스크롤 하면 첫번째 결과가 표시되는데
+    // 페이징 데이터가 여러번 내보내 질 수도 있으니
+    // 사용자가 스크롤을 시작하지 않은 경우에만 상단으로 스크롤 할 수 있도록 변수 설정
+    val hasNotScrolledForCurrentSearch: Boolean = false
 )
 
 private const val VISIBLE_THRESHOLD = 5
