@@ -16,6 +16,7 @@
 
 package com.example.android.codelabs.paging.ui
 
+import android.os.Build.VERSION_CODES.S
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -26,19 +27,25 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.android.codelabs.paging.data.GithubRepository
 import com.example.android.codelabs.paging.model.Repo
 import com.example.android.codelabs.paging.model.RepoSearchResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 /**
@@ -83,7 +90,7 @@ class SearchRepositoriesViewModel(
         // 마지막으로 스크롤시 나왔던 쿼리 (사용자가 목록과 상호작용한 마지막 검색어)
         val lastQueryScrolled: String = savedStateHandle.get(LAST_QUERY_SCROLLED) ?: DEFAULT_QUERY
         // 데이터 상태 스트림
-        val actionStateFlow = MutableStateFlow<UiAction>()
+        val actionStateFlow = MutableSharedFlow<UiAction>()
 
         // Flow를 특정 UiAction 유형으로 분할
         // UiAction.Search - 사용자가 특정 쿼리를 입력하는 각 경우
@@ -93,7 +100,7 @@ class SearchRepositoriesViewModel(
             .filterIsInstance<UiAction.Search>()
             .distinctUntilChanged()
             .onStart {
-                emit(UiAction.Search(query =  initialQuery))
+                emit(UiAction.Search(query = initialQuery))
             }
         // 2
         val queriesScrolled = actionStateFlow
@@ -110,7 +117,40 @@ class SearchRepositoriesViewModel(
             )
             .onStart { emit(UiAction.Scroll(currentQuery = lastQueryScrolled)) }
 
+
+        // pagingData 초기화
+        pagingDataFlow = searches
+            // 새로운 검색어마다 Pager를 새로 만들어야 하므로 searches 스트림에 flatmapLatest 연산자 사용
+            .flatMapLatest { searchRepo(queryString = it.query) }
+            // PagaingData가 viewModelScope 유지 중에는 cache되도록..
+            .cachedIn(viewModelScope)
+
+        // 상태 초기화 (searches, queriesScolled 를 함께 사용
+        state = combine(
+            searches,
+            queriesScrolled,
+            ::Pair
+        ).map { (search, scroll) ->
+            // search 값과 scroll값을 통해 UiState를 제어
+            UiState(
+                query = search.query,
+                lastQueryScrolled = scroll.currentQuery,
+                // 검색쿼리와 스크롤쿼리가 맞지 않으면 사용자가 스크롤을 했다고 판단
+                hasNotScrolledForCurrentSearch = search.query != scroll.currentQuery
+            )
+        }
+            // flow에 할당
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+                initialValue = UiState()
+            )
+        accept = { action ->
+            // action을 통해 새ㅇ로운 값을 스트림으로 보냄 (액티비티로..)
+            viewModelScope.launch { actionStateFlow.emit(action) }
+        }
     }
+
 
     override fun onCleared() {
         savedStateHandle[LAST_SEARCH_QUERY] = state.value.query
@@ -122,6 +162,7 @@ class SearchRepositoriesViewModel(
     private fun searchRepo(queryString: String): Flow<PagingData<Repo>> =
         repository.getSearchResultStream(queryString)
 }
+
 // This is outside the ViewModel class, but in the same file
 private const val LAST_QUERY_SCROLLED: String = "last_query_scrolled"
 
