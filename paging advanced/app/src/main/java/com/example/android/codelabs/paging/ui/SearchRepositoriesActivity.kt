@@ -147,6 +147,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         pagingData: Flow<PagingData<Repo>>,
         onScrollChanged: (UiAction.Scroll) -> Unit
     ) {
+        // 재시도 버튼 이벤트 정의
+        retryButton.setOnClickListener { repoAdapter.retry() }
+
         // Paging 라이브러리가 목록 스크롤을 자동으로 처리하지만, 사용자가 현재 쿼리의 목록을 스크롤했는지를 나타내는 신호로 OnScrollListener가 여전히 필요
         list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
@@ -189,7 +192,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
         // 빈 목록 시 메시지 표시
         // 목록이 로드되는 시점을 파악하기 위해 PagingDataAdapter.loadStateFlow 속성을 사용
-        //  이 Flow는 로드 상태가 변경될 때마다 CombinedLoadStates 객체를 통해 메시지를 표시
+        // 이 Flow는 로드 상태가 변경될 때마다 CombinedLoadStates 객체를 통해 메시지를 표시
         lifecycleScope.launch {
             repoAdapter.loadStateFlow.collect { loadState ->
                 // CombinedLoadStates의 refresh 상태가 NotLoading 및 adapter.itemCount == 0인 경우 목록이 비어 있음
@@ -197,6 +200,27 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 // 상태에 따라 UI visibility 전환
                 emptyList.isVisible = isListEmpty
                 list.isVisible = !isListEmpty
+
+                // 데이터 로딩 상태에 따른 Ui 상태 변경 처리
+
+                // 초기 로딩이나 새로 고침시 프로그레스 보여주기
+                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                // 초기 로딩이나 새로 고침 실패 시 재시도 버튼 보여주기
+                retryButton.isVisible = loadState.source.refresh is LoadState.Error
+
+                // 에러 상황 발생 마다 toast 메세지 띄우기
+                val errorState = loadState.source.append as? LoadState.Error
+                    ?: loadState.source.prepend as? LoadState.Error
+                    ?: loadState.append as? LoadState.Error
+                    ?: loadState.prepend as? LoadState.Error
+
+                errorState?.let {
+                    Toast.makeText(
+                        this@SearchRepositoriesActivity,
+                        "\uD83D\uDE28 Wooops ${it.error}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
             }
         }
     }

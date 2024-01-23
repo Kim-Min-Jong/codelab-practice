@@ -58,7 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/input_layout"
         tools:ignore="UnusedAttribute"/>
-
+    <!-- progress -->
     <ProgressBar
         android:id="@+id/progress_bar"
         style="?android:attr/progressBarStyle"
