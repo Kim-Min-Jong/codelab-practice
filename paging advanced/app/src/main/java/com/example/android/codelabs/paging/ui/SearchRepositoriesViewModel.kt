@@ -16,6 +16,7 @@
 
 package com.example.android.codelabs.paging.ui
 
+import android.os.Build.VERSION_CODES.P
 import android.os.Build.VERSION_CODES.S
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +29,8 @@ import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
 import com.example.android.codelabs.paging.data.GithubRepository
 import com.example.android.codelabs.paging.model.Repo
 import com.example.android.codelabs.paging.model.RepoSearchResult
@@ -159,8 +162,36 @@ class SearchRepositoriesViewModel(
         super.onCleared()
     }
 
-    private fun searchRepo(queryString: String): Flow<PagingData<Repo>> =
+    private fun searchRepo(queryString: String): Flow<PagingData<UiModel>> =
         repository.getSearchResultStream(queryString)
+            // Flow<PagingData<Repo>>를 반환하므로 먼저 각 Repo를 UiModel.RepoItem으로 변환하는 작업
+            .map { pagingData -> pagingData.map { UiModel.RepoItem(it) } }
+            .map {
+                // 구분자 삽입을 위해 flow가 표시 될때마다, agingData.insertSeparators()를 호출
+                // 이 메소드는 전후 요소가 지정된 경우 각 원본 요소가 포함된 데이터를 구분자와 함께 반환한다.
+                // 리스트의 처음과 끝에서는 각 전후 요소는 null이다.(없기 때문에) + 구분자를 만들 필요가 없을 때도 null을 반환한다.
+                it.insertSeparators { before, after ->
+                    // 리스트의 마지막일 때
+                    if (after == null) {
+                        return@insertSeparators null
+                    }
+                    // 리스트의 시작일 때
+                    if (before == null) {
+                        return@insertSeparators UiModel.SeparatorItem("${after.roundedStarCount}0.000+ stars")
+                    }
+                    // 두 항목 사이 일 때
+                    if(before.roundedStarCount > after.roundedStarCount) {
+                        // 모델에 구분자 표시할 텍스트 전달
+                        if (after.roundedStarCount >= 1) {
+                            UiModel.SeparatorItem("${after.roundedStarCount}0.000+ stars")
+                        } else {
+                            UiModel.SeparatorItem("< 10.000+ stars")
+                        }
+                    } else {
+                        null
+                    }
+                }
+            }
 }
 
 // This is outside the ViewModel class, but in the same file
@@ -178,6 +209,15 @@ sealed class UiAction {
         val currentQuery: String
     ) : UiAction()
 }
+
+// 구분자와 데이터를 구분할 sealed class
+sealed class UiModel {
+    data class RepoItem(val repo: Repo): UiModel()
+    data class SeparatorItem(val description: String): UiModel()
+}
+// 10000개의 좋아요 숫자로 구분자를 구분짓기 위한 확장함수
+private val UiModel.RepoItem.roundedStarCount: Int
+    get() = this.repo.stars / 10_000
 
 data class UiState(
     // 디폴트 검색값 설정
