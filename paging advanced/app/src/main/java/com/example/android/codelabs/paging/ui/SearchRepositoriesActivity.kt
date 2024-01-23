@@ -27,6 +27,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.map
+import androidx.paging.LoadState
+import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -39,7 +41,10 @@ import com.example.android.codelabs.paging.model.RepoSearchResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
@@ -62,6 +67,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         // bind the state
         binding.bindState(
             uiState = viewModel.state,
+            pagingData = viewModel.pagingDataFlow,
             uiActions = viewModel.accept
         )
     }
@@ -73,7 +79,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     private fun ActivitySearchRepositoriesBinding.bindState(
         // 상태를 flow로 받고있기 때문에 변경
         uiState: StateFlow<UiState>,
-        pagingData: Flow<PagingData<Repo>>
+        pagingData: Flow<PagingData<Repo>>,
         uiActions: (UiAction) -> Unit
     ) {
         val repoAdapter = ReposAdapter()
@@ -86,6 +92,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         bindList(
             repoAdapter = repoAdapter,
             uiState = uiState,
+            pagingData = pagingData,
             onScrollChanged = uiActions
         )
     }
@@ -128,29 +135,49 @@ class SearchRepositoriesActivity : AppCompatActivity() {
 
     private fun ActivitySearchRepositoriesBinding.bindList(
         repoAdapter: ReposAdapter,
-        uiState: LiveData<UiState>,
+        uiState: StateFlow<UiState>,
+        pagingData: Flow<PagingData<Repo>>,
         onScrollChanged: (UiAction.Scroll) -> Unit
     ) {
-        setupScrollListener(onScrollChanged)
-
-        uiState
-            .map(UiState::searchResult)
-            .distinctUntilChanged()
-            .observe(this@SearchRepositoriesActivity) { result ->
-                when (result) {
-                    is RepoSearchResult.Success -> {
-                        showEmptyList(result.data.isEmpty())
-                        repoAdapter.submitList(result.data)
-                    }
-                    is RepoSearchResult.Error -> {
-                        Toast.makeText(
-                            this@SearchRepositoriesActivity,
-                            "\uD83D\uDE28 Wooops $result.message}",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
+        // Paging 라이브러리가 목록 스크롤을 자동으로 처리하지만, 사용자가 현재 쿼리의 목록을 스크롤했는지를 나타내는 신호로 OnScrollListener가 여전히 필요
+        list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (dy != 0) onScrollChanged(UiAction.Scroll(currentQuery = uiState.value.query))
             }
+        })
+
+        // shouldScrollToTop -  bool 플래그를 만들도록 파이프라인을 설정
+        // 그러면, collect할 수 있는 두 흐름 즉, PagingData Flow 및 shouldScrollToTop Flow가 생김
+        val notLoading = repoAdapter.loadStateFlow
+            // LoadState가 refresh(페이징 데이터가 바뀔때)일때만 flow를 방출한다(emit)
+            .distinctUntilChangedBy { it.source.refresh }
+            // refresh가 NotLoading 상태일 때는 true
+            .map { it.source.refresh is LoadState.NotLoading }
+
+        // uiState에서 상태값 가져옴
+        val hasNotScrolledForCurrentSearch = uiState
+            .map { it.hasNotScrolledForCurrentSearch }
+            .distinctUntilChanged()
+
+        // 데이터 flow 결합
+        val shouldScrollToTop = combine(
+            notLoading,
+            hasNotScrolledForCurrentSearch,
+            Boolean::and
+        ).distinctUntilChanged()
+
+        lifecycleScope.launch {
+            // 페이징 데이터를 리사이클러뷰 어댑터에 제공
+            pagingData.collectLatest {
+                repoAdapter.submitData(it)
+            }
+        }
+        lifecycleScope.launch {
+            // 스크롤이 필요한 상태면 맨위로 보내겠다.
+            shouldScrollToTop.collect { shouldScroll ->
+                if(shouldScroll) list.scrollToPosition(0)
+            }
+        }
     }
 
     private fun ActivitySearchRepositoriesBinding.showEmptyList(show: Boolean) {
@@ -158,25 +185,4 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         list.isVisible = !show
     }
 
-    private fun ActivitySearchRepositoriesBinding.setupScrollListener(
-        onScrollChanged: (UiAction.Scroll) -> Unit
-    ) {
-        val layoutManager = list.layoutManager as LinearLayoutManager
-        list.addOnScrollListener(object : OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                super.onScrolled(recyclerView, dx, dy)
-                val totalItemCount = layoutManager.itemCount
-                val visibleItemCount = layoutManager.childCount
-                val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-
-                onScrollChanged(
-                    UiAction.Scroll(
-                        visibleItemCount = visibleItemCount,
-                        lastVisibleItemPosition = lastVisibleItem,
-                        totalItemCount = totalItemCount
-                    )
-                )
-            }
-        })
-    }
 }
