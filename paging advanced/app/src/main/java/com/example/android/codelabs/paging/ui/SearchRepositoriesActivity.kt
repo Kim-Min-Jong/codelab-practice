@@ -186,6 +186,19 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 if(shouldScroll) list.scrollToPosition(0)
             }
         }
+
+        // 빈 목록 시 메시지 표시
+        // 목록이 로드되는 시점을 파악하기 위해 PagingDataAdapter.loadStateFlow 속성을 사용
+        //  이 Flow는 로드 상태가 변경될 때마다 CombinedLoadStates 객체를 통해 메시지를 표시
+        lifecycleScope.launch {
+            repoAdapter.loadStateFlow.collect { loadState ->
+                // CombinedLoadStates의 refresh 상태가 NotLoading 및 adapter.itemCount == 0인 경우 목록이 비어 있음
+                val isListEmpty = loadState.refresh is LoadState.NotLoading && repoAdapter.itemCount == 0
+                // 상태에 따라 UI visibility 전환
+                emptyList.isVisible = isListEmpty
+                list.isVisible = !isListEmpty
+            }
+        }
     }
 
     private fun ActivitySearchRepositoriesBinding.showEmptyList(show: Boolean) {
