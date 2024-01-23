@@ -69,7 +69,7 @@ class SearchRepositoriesViewModel(
     // 또한 shareIn 및 stateIn 같은 연산자를 PagingData Flows에 사용해서는 안 된다.
     val state: StateFlow<UiState>
 
-    val pagingDataFlow: Flow<PagingData<Repo>>
+    val pagingDataFlow: Flow<PagingData<UiModel>>
 
 
     /**
