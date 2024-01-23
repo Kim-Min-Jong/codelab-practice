@@ -83,7 +83,15 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         uiActions: (UiAction) -> Unit
     ) {
         val repoAdapter = ReposAdapter()
-        list.adapter = repoAdapter
+        // PagingDataAdapter를 위한 세 가지 유용한 메소드
+        // 1. withLoadStateHeader: 머리글만 표시하려는 경우, 목록의 시작 부분에만 항목을 추가할 수 있는 경우 사용
+        // 2. withLoadStateFooter: 바닥글만 표시하려는 경우, 목록의 끝 부분에만 항목을 추가할 수 있는 경우 사용
+        // 3. withLoadStateHeaderAndFooter: 머리글과 바닥글을 표시하려는 경우, 목록을 두 방향으로 모두 페이징할 수 있는 경우.
+        list.adapter = repoAdapter.withLoadStateHeaderAndFooter(
+            // 메인 repoAdapter에 헤더와 푸터 (맨 위, 아래)에 LoadStateAdapter를 연결
+            header = ReposLoadStateAdapter { repoAdapter.retry() },
+            footer = ReposLoadStateAdapter { repoAdapter.retry() }
+        )
 
         bindSearch(
             uiState = uiState,
