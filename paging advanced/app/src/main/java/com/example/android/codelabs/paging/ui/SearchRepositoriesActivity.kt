@@ -68,7 +68,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         // bind the state
         binding.bindState(
             uiState = viewModel.state,
-            pagingData = viewModel.pagingDataFlow,
             uiActions = viewModel.accept
         )
     }
@@ -80,7 +79,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     private fun ActivitySearchRepositoriesBinding.bindState(
         // 상태를 flow로 받고있기 때문에 변경
         uiState: StateFlow<UiState>,
-        pagingData: Flow<PagingData<Repo>>,
         uiActions: (UiAction) -> Unit
     ) {
         val repoAdapter = ReposAdapter()
@@ -101,8 +99,8 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         bindList(
             repoAdapter = repoAdapter,
             uiState = uiState,
-            pagingData = pagingData,
-            onScrollChanged = uiActions
+            onScrollChanged = uiActions,
+            header = ReposLoadStateAdapter { }
         )
     }
 
@@ -143,9 +141,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
     }
 
     private fun ActivitySearchRepositoriesBinding.bindList(
+        header: ReposLoadStateAdapter,
         repoAdapter: ReposAdapter,
         uiState: StateFlow<UiState>,
-        pagingData: Flow<PagingData<Repo>>,
         onScrollChanged: (UiAction.Scroll) -> Unit
     ) {
         // 재시도 버튼 이벤트 정의
@@ -161,10 +159,13 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         // shouldScrollToTop -  bool 플래그를 만들도록 파이프라인을 설정
         // 그러면, collect할 수 있는 두 흐름 즉, PagingData Flow 및 shouldScrollToTop Flow가 생김
         val notLoading = repoAdapter.loadStateFlow
-            // LoadState가 refresh(페이징 데이터가 바뀔때)일때만 flow를 방출한다(emit)
-            .distinctUntilChangedBy { it.source.refresh }
-            // refresh가 NotLoading 상태일 때는 true
-            .map { it.source.refresh is LoadState.NotLoading }
+//            // LoadState가 refresh(페이징 데이터가 바뀔때)일때만 flow를 방출한다(emit)
+//            .distinctUntilChangedBy { it.source.refresh }
+//            // refresh가 NotLoading 상태일 때는 true
+//            .map { it.source.refresh is LoadState.NotLoading }
+            .asRemotePresentationState()
+            .map { it == RemotePresentationState.PRESENTED }
+
 
         // uiState에서 상태값 가져옴
         val hasNotScrolledForCurrentSearch = uiState
@@ -179,12 +180,6 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         ).distinctUntilChanged()
 
         lifecycleScope.launch {
-            // 페이징 데이터를 리사이클러뷰 어댑터에 제공
-            pagingData.collectLatest {
-                repoAdapter.submitData(it)
-            }
-        }
-        lifecycleScope.launch {
             // 스크롤이 필요한 상태면 맨위로 보내겠다.
             shouldScrollToTop.collect { shouldScroll ->
                 if (shouldScroll) list.scrollToPosition(0)
@@ -196,6 +191,12 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         // 이 Flow는 로드 상태가 변경될 때마다 CombinedLoadStates 객체를 통해 메시지를 표시
         lifecycleScope.launch {
             repoAdapter.loadStateFlow.collect { loadState ->
+
+                header.loadState = loadState.mediator
+                    ?.refresh
+                    ?.takeIf { it is LoadState.Error && repoAdapter.itemCount > 0 }
+                    ?: loadState.prepend
+
                 // CombinedLoadStates의 refresh 상태가 NotLoading 및 adapter.itemCount == 0인 경우 목록이 비어 있음
                 val isListEmpty =
                     loadState.refresh is LoadState.NotLoading && repoAdapter.itemCount == 0
@@ -204,11 +205,11 @@ class SearchRepositoriesActivity : AppCompatActivity() {
                 list.isVisible = !isListEmpty
 
                 // 데이터 로딩 상태에 따른 Ui 상태 변경 처리
-
+                progressBar.isVisible = loadState.mediator?.refresh is LoadState.Loading
                 // 초기 로딩이나 새로 고침시 프로그레스 보여주기
-                progressBar.isVisible = loadState.source.refresh is LoadState.Loading
+                list.isVisible =  loadState.source.refresh is LoadState.NotLoading || loadState.mediator?.refresh is LoadState.NotLoading
                 // 초기 로딩이나 새로 고침 실패 시 재시도 버튼 보여주기
-                retryButton.isVisible = loadState.source.refresh is LoadState.Error
+                retryButton.isVisible = loadState.mediator?.refresh is LoadState.Error && repoAdapter.itemCount == 0
 
                 // 에러 상황 발생 마다 toast 메세지 띄우기
                 val errorState = loadState.source.append as? LoadState.Error
