@@ -57,8 +57,9 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         setContentView(view)
 
         // get the view model
-        val viewModel = ViewModelProvider(this, Injection.provideViewModelFactory(owner = this))
-            .get(SearchRepositoriesViewModel::class.java)
+        val viewModel =
+            ViewModelProvider(this, Injection.provideViewModelFactory(owner = this, context = this))
+                .get(SearchRepositoriesViewModel::class.java)
 
         // add dividers between RecyclerView's row items
         val decoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
@@ -151,7 +152,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         retryButton.setOnClickListener { repoAdapter.retry() }
 
         // Paging 라이브러리가 목록 스크롤을 자동으로 처리하지만, 사용자가 현재 쿼리의 목록을 스크롤했는지를 나타내는 신호로 OnScrollListener가 여전히 필요
-        list.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+        list.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 if (dy != 0) onScrollChanged(UiAction.Scroll(currentQuery = uiState.value.query))
             }
@@ -186,7 +187,7 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             // 스크롤이 필요한 상태면 맨위로 보내겠다.
             shouldScrollToTop.collect { shouldScroll ->
-                if(shouldScroll) list.scrollToPosition(0)
+                if (shouldScroll) list.scrollToPosition(0)
             }
         }
 
@@ -196,7 +197,8 @@ class SearchRepositoriesActivity : AppCompatActivity() {
         lifecycleScope.launch {
             repoAdapter.loadStateFlow.collect { loadState ->
                 // CombinedLoadStates의 refresh 상태가 NotLoading 및 adapter.itemCount == 0인 경우 목록이 비어 있음
-                val isListEmpty = loadState.refresh is LoadState.NotLoading && repoAdapter.itemCount == 0
+                val isListEmpty =
+                    loadState.refresh is LoadState.NotLoading && repoAdapter.itemCount == 0
                 // 상태에 따라 UI visibility 전환
                 emptyList.isVisible = isListEmpty
                 list.isVisible = !isListEmpty
