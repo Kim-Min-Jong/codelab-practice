@@ -49,15 +49,27 @@ class GithubRemoteMediator(
          */
         val page = when (loadType) {
             LoadType.REFRESH -> {
-                // TODO
+                val remoteKeys = getRemoteKeyClosestToCurrentPosition(state)
+                // remote key가 null 이면 anchorPosistion도 null 이였음로 초기 페이지를 로딩
+                remoteKeys?.nextKey?.minus(1) ?: GITHUB_STARTING_PAGE_INDEX
             }
 
             LoadType.PREPEND -> {
-                // TODO
+                val remoteKeys = getRemoteKeyForFirstItem(state)
+                // remoteKey가 unll 이면, 새로고침 결과가 아직 db에 없는 것
+                val prevKey = remoteKeys?.prevKey
+                    ?: return MediatorResult.Success(endOfPaginationReached =  remoteKeys != null)
+                prevKey
             }
 
             LoadType.APPEND -> {
-                // TODO
+                val remoteKeys = getRemoteKeyForLastItem(state)
+                // remote key가 null 이면 새로고침 결과가 아직 db에 없는 것
+                // RemoteKeys가 null이 아니게 되면 Paging이 이 메서드를 호출하므로 endOfPaginationReached = false와 함께 Success를 반환할 수 있음
+                // remoteKeys는 null이 아니지만 nextKey는 null인 경우 추가할 수 있는 페이지의 끝에 도달했다는 의미
+                val nextKey = remoteKeys?.nextKey
+                    ?: return MediatorResult.Success(endOfPaginationReached = remoteKeys != null)
+                nextKey
             }
         }
 
@@ -108,7 +120,55 @@ class GithubRemoteMediator(
         }
     }
 
+    // LoadType.APPEND
+    // 현재 로드된 데이터의 끝 부분에서 데이터를 로드해야하는 경우
+    // -> 데이터베이스의 마지막 항목을 기반으로 네트워크 페이지 키를 계산해야함
+    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int ,Repo>): RemoteKeys? {
+        // 데이터가 있는 마지막 페이지를 가져옴
+        // 마지막 페이지에서 마지막 항목을 가져옴
+        return state.pages.lastOrNull() {
+            it.data.isNotEmpty()
+        }?.data?.lastOrNull()?.let { repo ->
+            // 마지막 항목의 키를 가져옴
+            repoDatabase.remoteKeysDao().remoteKeysRepoId(repo.id)
+        }
+    }
+
+    // LoadType.PREPEND
+    // 현재 로드된 데이터 세트의 시작 부분에서 데이터를 로드해야 하는 경우
+    // 데이터베이스의 첫 번째 항목을 기반으로 네트워크 페이지 키를 계산해야함
+    private suspend fun getRemoteKeyForFirstItem(state: PagingState<Int, Repo>): RemoteKeys? {
+        // 데이터가 있는 첫 페이지를 가져옴
+        // 첫 페이지에서 첫 항목을 가져옴
+        return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
+            ?.let { repo ->
+                // 처음 항목의 키를 가져옴
+                repoDatabase.remoteKeysDao().remoteKeysRepoId(repo.id)
+            }
+    }
+
+    // LoadType.REFRESH
+    // 데이터를 첫 로드 or PagingDataAdapter.refresh()가 호출되는 경우 호출
+    // 데이터를 로드하기 위한 참조 지점은 state.anchorPosition이 됨
+    // 첫 로드인 경우 anchorPosition은 null
+    // refresh()가 호출되면 anchorPosition이 표시된 목록에 처음 표시되는 위치이므로
+    // 그 특정 항목이 포함된 페이지를 로드해야함
+    private suspend fun getRemoteKeyClosestToCurrentPosition(
+        state: PagingState<Int, Repo>
+    ): RemoteKeys? {
+        // anchorPosition부터 PagingData를 로딩 시작
+        return state.anchorPosition?.let { position ->
+            // 가장 가까운 아이템을 anchor로 하여 키를 찾음
+            state.closestItemToPosition(position)?.id?.let { repoId ->
+                repoDatabase.remoteKeysDao().remoteKeysRepoId(repoId)
+            }
+        }
+    }
 }
-}
+
+
+
 // base page index
 private const val GITHUB_STARTING_PAGE_INDEX = 1
+
+
