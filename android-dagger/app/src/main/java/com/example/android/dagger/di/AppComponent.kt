@@ -3,6 +3,8 @@ package com.example.android.dagger.di
 import android.content.Context
 import com.example.android.dagger.main.MainActivity
 import com.example.android.dagger.registration.RegistrationActivity
+import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
+import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -12,7 +14,7 @@ import javax.inject.Singleton
 // 이건 Component 생명주기의 스코프라 불리곤 한다.
 // 이는  구성 요소의 수명 주기에 따라 유형 범위를 지정 "이라고도 한다.
 // 타입을 구성 요소로 범위 지정한다는 것은 타입을 제공해야 할 때마다 해당 타입의 동일한 인스턴스가 사용된다는 의미이다.
-// 이것은 한 번 만들어지면 생명주기 동안 계속 유지되는 특성이 있다.
+// 이것은 한 번 만들어지면 생명주기 동안 계속 유지되는 특성이 있다. (새로 만들어지지 않음)
 // dagger에서는 @Singleton 어노테이션을 통해 위와 같은 기능을 수행할 수 있다.
 @Singleton
 
@@ -54,4 +56,9 @@ interface AppComponent {
 
     // MainActivity도 똑같이 주입
     fun inject(activity: MainActivity)
+
+    // SubComponent (fragment) 도 동일하게 진행
+    fun inject(fragment: EnterDetailsFragment)
+
+    fun inject(fragment: TermsAndConditionsFragment)
 }
