@@ -1,8 +1,12 @@
 package com.example.android.dagger.registration
 
+import com.example.android.dagger.di.ActivityScope
 import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
 import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
 import dagger.Subcomponent
+
+// 뷰모델 스코프 지정
+@ActivityScope
 
 // dagger 사용을 위해 fragment에도 inject를 적용하였다.
 // 여기서 RegistrationViewModel이 여러 군데에서 사용되게 되는데
@@ -35,3 +39,18 @@ interface RegistrationComponent {
     fun inject(fragment: TermsAndConditionsFragment)
 
 }
+
+/**
+ * RegistrationComponent가 activity 및 fragment에 연결 전에는 application이 메모리에 올라와 있고
+ * 동일한 그래프 인스턴스를 사용하려고 하기 때문에 application의 수명주기가 연결된다.
+ *
+ *
+ * 하위 컴포넌트가 필요한 이유중 하나는 RegistratinViewModel이 액티비티와 프래그먼트가 새로운 flow마다
+ * 새로운 인스턴스를 원하는데, 상위가 Singleton으로 있으면 그러지 못한다.
+ *
+ * 그래서 Registration Activity의 모든 새로운 flow에 인스턴스를 만들기 위해 새로운 하위 컴포넌트를 만든다.
+ *
+ * RegistrationComponent 도 결국 Registration Activity에 수명주기가 연결되어있기 떄문에, 이전에 연결했던
+ * application 방식과 동일한 방식으로 참조를 유지하여, fragment에도 접근할 수 있다.
+ *
+ */

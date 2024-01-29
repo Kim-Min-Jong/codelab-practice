@@ -60,7 +60,7 @@ class EnterDetailsFragment : Fragment() {
          * A Fragment injects Dagger in the onAttach method after calling super.
          */
         // 중요! - 프래그먼트에서는 super.onAttach (뷰가 생성되기 전)후 에 프래그먼트를 주입
-        (requireActivity().application as MyApplication).appComponent.inject(this)
+        (activity as RegistrationActivity).registrationComponent.inject(this)
     }
 
     override fun onCreateView(

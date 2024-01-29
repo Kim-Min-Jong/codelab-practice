@@ -36,7 +36,8 @@ class TermsAndConditionsFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        (requireActivity().application as MyApplication).appComponent.inject(this)
+        // 이 fragment(activity) scope에서만 동작하도록 함
+        (activity as RegistrationActivity).registrationComponent.inject(this)
     }
 
     override fun onCreateView(

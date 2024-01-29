@@ -16,6 +16,7 @@
 
 package com.example.android.dagger.registration
 
+import com.example.android.dagger.di.ActivityScope
 import com.example.android.dagger.user.UserManager
 import javax.inject.Inject
 
@@ -23,6 +24,9 @@ import javax.inject.Inject
  * RegistrationViewModel is the ViewModel that the Registration flow ([RegistrationActivity]
  * and fragments) uses to keep user's input data.
  */
+
+// 뷰모델 스코프 지정
+@ActivityScope
 
 // @Inject는 dagger에게 해당 타입의 인스턴스(생성자 매개변수)를 제공하는 방법을 알린다.
 // 여기서는 RegistrationViewModel의 생성자가 UserManager를 인수로 사용하므로 종속성으로 관리되어 dagger에게 알려진다.

@@ -28,6 +28,8 @@ import javax.inject.Inject
 
 class RegistrationActivity : AppCompatActivity() {
 
+    lateinit var registrationComponent: RegistrationComponent
+
     // RegisterViewModel에 Inject를 달아 줌으로서 dagger에 제공
     // 인스턴스화가 불가능한 ViewModel을 dagger에 전달하기 위해 activity단 주입해 종속 그래프에서 찾도록함
     @Inject
@@ -39,7 +41,12 @@ class RegistrationActivity : AppCompatActivity() {
         // super.onCreate에서는 액티비티 복원단계에서 액티비티 바인딩에 프래그먼트가 붙기 때문에
 
         // dagger에게 이 activity를 알린다.
-        (application as MyApplication).appComponent.inject(this)
+//        (application as MyApplication).appComponent.inject(this)
+
+        // regisrartion activity scope에서만 동작하도록 알린다.
+
+        registrationComponent = (application as MyApplication).appComponent.registrationComponent().create()
+        registrationComponent.inject(this)
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
