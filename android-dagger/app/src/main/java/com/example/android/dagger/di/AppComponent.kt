@@ -1,6 +1,7 @@
 package com.example.android.dagger.di
 
 import android.content.Context
+import com.example.android.dagger.main.MainActivity
 import com.example.android.dagger.registration.RegistrationActivity
 import dagger.BindsInstance
 import dagger.Component
@@ -40,4 +41,7 @@ interface AppComponent {
     // 이 인터페이스 내에선 Dagger가 그 종속성을 알지 못함
     // 컴파일 타임에 에러가 발생함
     fun inject(activity: RegistrationActivity)
+
+    // MainActivity도 똑같이 주입
+    fun inject(activity: MainActivity)
 }

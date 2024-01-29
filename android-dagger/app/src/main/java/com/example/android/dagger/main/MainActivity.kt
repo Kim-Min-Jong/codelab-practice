@@ -26,10 +26,21 @@ import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
 import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.settings.SettingsActivity
+import com.example.android.dagger.user.UserManager
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var mainViewModel: MainViewModel
+    // 주입 시 주의
+    // dagger inject 변수는 패키지 단 가시성(접근자)이 필요하므로 private 키워드 금지
+
+    // UserManager와 연결을 위해 주입
+    @Inject
+    lateinit var userManager: UserManager
+
+    // MainViewModel과 연결을 위해 주입
+    @Inject
+    lateinit var mainViewModel: MainViewModel
 
     /**
      * If the User is not registered, RegistrationActivity will be launched,
@@ -37,9 +48,13 @@ class MainActivity : AppCompatActivity() {
      * else carry on with MainActivity
      */
     override fun onCreate(savedInstanceState: Bundle?) {
+        // MainActivity를 dagger에 알림
+        (application as MyApplication).appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
 
-        val userManager = (application as MyApplication).userManager
+        // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
+//        val userManager = (application as MyApplication).userManager
         if (!userManager.isUserLoggedIn()) {
             if (!userManager.isUserRegistered()) {
                 startActivity(Intent(this, RegistrationActivity::class.java))
@@ -50,8 +65,8 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             setContentView(R.layout.activity_main)
-
-            mainViewModel = MainViewModel(userManager.userDataRepository!!)
+            // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
+//            mainViewModel = MainViewModel(userManager.userDataRepository!!)
             setupViews()
         }
     }
