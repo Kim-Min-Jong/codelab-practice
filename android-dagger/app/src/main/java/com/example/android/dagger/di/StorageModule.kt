@@ -1,0 +1,31 @@
+package com.example.android.dagger.di
+
+import com.example.android.dagger.storage.SharedPreferencesStorage
+import com.example.android.dagger.storage.Storage
+import dagger.Binds
+import dagger.Module
+
+// dagger는 인터페이스를 직접 인스턴스화 할 수 없기 때문에 제공 방법을 달리 해야한다 (interface Storage)
+// dagger에게 Storage를 알려줘야 하는데
+// 이 경우 Storage를 상속 받는 SharedPreferenceStorage를 이용해 알려 줄 수 있다.
+
+// @Module
+// Component와 비슷하게 Module도 dagger에게 특정 타입의 인스턴스를 알려준다.
+// 단, 모듈 내에서는 @Provides와 @Binds 어노테이션에 의해 종속성이 결정된다.
+
+@Module
+abstract class StorageModule {
+
+    // Storage interface를 dagger에 알리기 위해 @Binds 메소드 사용
+    // @Binds를 붙인 메소드는 추상 함수로 만들어 줘야함
+    // 리턴타입은 반환하고 싶은 인터페이스 타입을 지정
+    // 매개변수로는 그 인터페이스를 구체화하는 클래스 등을 주입
+    // 이렇게 하면 dagger는 Storage interface를 알게됨
+
+    // Storage가 요청될 때, dagger는 이 부분에서 Storage를 찾지만
+    // SharedPreferenceStorage는 아직 dagger에 알려지지 않았음
+    // 따로 어노테이션을 달아, dagger에 알려야함.
+    @Binds
+    abstract fun provideStorage(storage: SharedPreferencesStorage): Storage
+
+}
