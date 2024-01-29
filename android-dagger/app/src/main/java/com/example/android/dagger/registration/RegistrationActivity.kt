@@ -29,6 +29,7 @@ import javax.inject.Inject
 class RegistrationActivity : AppCompatActivity() {
 
     // RegisterViewModel에 Inject를 달아 줌으로서 dagger에 제공
+    // 인스턴스화가 불가능한 ViewModel을 dagger에 전달하기 위해 activity단 주입해 종속 그래프에서 찾도록함
     @Inject
     lateinit var registrationViewModel: RegistrationViewModel
 
