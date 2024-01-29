@@ -5,6 +5,16 @@ import com.example.android.dagger.main.MainActivity
 import com.example.android.dagger.registration.RegistrationActivity
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Singleton
+
+// 다양한 이유로 같은 인스턴스를 제공하는 것을 원할 때도 있다. (같은 인스턴스를 공유하는 다른 타입의 객체를 만들고 싶을떄.. 매번 인스턴스를 만들때마다 비용이 클 때 등..)
+// 이러한 특별한 인스턴스를 같는 것이 있다. (Scopes)
+// 이건 Component 생명주기의 스코프라 불리곤 한다.
+// 이는  구성 요소의 수명 주기에 따라 유형 범위를 지정 "이라고도 한다.
+// 타입을 구성 요소로 범위 지정한다는 것은 타입을 제공해야 할 때마다 해당 타입의 동일한 인스턴스가 사용된다는 의미이다.
+// 이것은 한 번 만들어지면 생명주기 동안 계속 유지되는 특성이 있다.
+// dagger에서는 @Singleton 어노테이션을 통해 위와 같은 기능을 수행할 수 있다.
+@Singleton
 
 // dagger 프로젝트가 프로젝트의 종속 그래프를 생성하고, 관리하며 종석성을 얻을 수 있기 원한다.
 // 이를 위해서 인터페이스를 생성하고 @Component 어노테이션을 붙일수 있다.

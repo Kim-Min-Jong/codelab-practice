@@ -18,6 +18,7 @@ package com.example.android.dagger.user
 
 import com.example.android.dagger.storage.Storage
 import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val REGISTERED_USER = "registered_user"
 private const val PASSWORD_SUFFIX = "password"
@@ -28,6 +29,7 @@ private const val PASSWORD_SUFFIX = "password"
  */
 
 // @Inject를 달아주면, dagger는 RegisterViewModel과 UserManager의 인스턴스 제공방법을 다 알게 됨
+@Singleton
 class UserManager @Inject constructor(private val storage: Storage) {
 
     /**
