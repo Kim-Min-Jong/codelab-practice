@@ -34,6 +34,13 @@ class RegistrationActivity : AppCompatActivity() {
     lateinit var registrationViewModel: RegistrationViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // 중요!
+        // 액티비티에서 사용할 때, dagger 주입은 프래그먼트 복원 문제 때문에 super.onCreate 이전에서 해야한다.
+        // super.onCreate에서는 액티비티 복원단계에서 액티비티 바인딩에 프래그먼트가 붙기 때문에
+
+        // dagger에게 이 activity를 알린다.
+        (application as MyApplication).appComponent.inject(this)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)
 

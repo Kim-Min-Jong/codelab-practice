@@ -17,10 +17,22 @@
 package com.example.android.dagger
 
 import android.app.Application
+import com.example.android.dagger.di.AppComponent
+import com.example.android.dagger.di.DaggerAppComponent
 import com.example.android.dagger.storage.SharedPreferencesStorage
 import com.example.android.dagger.user.UserManager
 
 open class MyApplication : Application() {
+
+    // android에서는 앱이 실행되는 동안 그래프가 메모리에 있는 것을 원하기에
+    // application 클래스에서 dagger 그래프를 만든다.
+    // 이 방식은 앱의 라이프사이클에 연결된다.
+    // application 단에서 그래프를 연결하면 context도 사용할 수 있으며
+    // 사용자 정의 application을 사용하므로 테스트 및 활용성도 좋아진다.
+    val appComponent: AppComponent by lazy {
+        // dagger는 DaggerAppComponent에 의해 생성된다.
+        DaggerAppComponent.factory().create(applicationContext)
+    }
 
     open val userManager by lazy {
         UserManager(SharedPreferencesStorage(this))
