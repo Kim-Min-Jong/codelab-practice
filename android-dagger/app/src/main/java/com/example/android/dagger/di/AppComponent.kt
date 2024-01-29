@@ -3,6 +3,7 @@ package com.example.android.dagger.di
 import android.content.Context
 import com.example.android.dagger.main.MainActivity
 import com.example.android.dagger.registration.RegistrationActivity
+import com.example.android.dagger.registration.RegistrationComponent
 import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
 import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
 import dagger.BindsInstance
@@ -45,20 +46,31 @@ interface AppComponent {
         fun create(@BindsInstance context: Context): AppComponent
     }
 
-    // dagger에 RegistratinActivity를 주입하도록 요청하고
-    // @Inject 어노테이션이 달린 종속성을 제공해야한다고 알림
+//    // dagger에 RegistratinActivity를 주입하도록 요청하고
+//    // @Inject 어노테이션이 달린 종속성을 제공해야한다고 알림
+//
+//    // 하지만 RegistrationActivity 에서는 RegistrationViewModel을
+//    // @Inject로 주입을 받고 있는데 (UserManager, Storage) ,
+//    // 이 인터페이스 내에선 Dagger가 그 종속성을 알지 못함
+//    // 컴파일 타임에 에러가 발생함
+//    fun inject(activity: RegistrationActivity)
+//
+//    // SubComponent (fragment) 도 동일하게 진행
+//    fun inject(fragment: EnterDetailsFragment)
+//
+//    fun inject(fragment: TermsAndConditionsFragment)
 
-    // 하지만 RegistrationActivity 에서는 RegistrationViewModel을
-    // @Inject로 주입을 받고 있는데 (UserManager, Storage) ,
-    // 이 인터페이스 내에선 Dagger가 그 종속성을 알지 못함
-    // 컴파일 타임에 에러가 발생함
-    fun inject(activity: RegistrationActivity)
+    // SubComponent에 의해 생성되므로 위의 것들은 삭제시켜도 됨
+    // SubComponent에 의해 그래프가 생성
+    fun registrationComponent(): RegistrationComponent.Factory
 
     // MainActivity도 똑같이 주입
     fun inject(activity: MainActivity)
 
-    // SubComponent (fragment) 도 동일하게 진행
-    fun inject(fragment: EnterDetailsFragment)
+    /**
+     * 한 가지 알아둘 점 - dagger 그래프와 상호작용 하는 방법
+     * 1. Unit을 반환하고 매개변수를 사용하면, 사용된 매개변수가 dagger에 주입됨
+     * 2. 매개변수 없이 반환만 하면 그래프에 주입됨(검색 가능)
+     */
 
-    fun inject(fragment: TermsAndConditionsFragment)
 }
