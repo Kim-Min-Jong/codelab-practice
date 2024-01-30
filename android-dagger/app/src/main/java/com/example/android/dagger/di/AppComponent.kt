@@ -27,7 +27,10 @@ import javax.inject.Singleton
 // 컴파일 타임에 종속성 그래프를 생성하는데 필요한 정보를 제공
 @Component(
     // module을 그래프 생성시 dagger에게 알려줌
-    modules = [StorageModule::class, AppSubComponents::class]
+    modules = [
+        StorageModule::class,
+        AppSubComponents::class
+    ]
 )
 interface AppComponent {
 
@@ -63,6 +66,8 @@ interface AppComponent {
     // SubComponent에 의해 생성되므로 위의 것들은 삭제시켜도 됨
     // SubComponent에 의해 그래프가 생성
     fun registrationComponent(): RegistrationComponent.Factory
+    fun loginComponent(): LoginComponent.Factory
+
 
     // MainActivity도 똑같이 주입
     fun inject(activity: MainActivity)
