@@ -34,7 +34,8 @@ open class MyApplication : Application() {
         DaggerAppComponent.factory().create(applicationContext)
     }
 
-    open val userManager by lazy {
-        UserManager(SharedPreferencesStorage(this))
-    }
+    // UserManager도 dagger에 의해 관리 될것이기에 제거
+//    open val userManager by lazy {
+//        UserManager(SharedPreferencesStorage(this))
+//    }
 }

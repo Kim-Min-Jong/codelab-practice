@@ -29,6 +29,7 @@ import kotlin.random.Random
 // user flow에서 login out / register는 다른 flow이기 때문에 같은 인스턴스를 사용하지 않길 원함
 // 그래서 UserData도 SubComponent로 빼는 작업이 필요함
 
+@LoggedUserScope
 class UserDataRepository @Inject constructor(private val userManager: UserManager) {
 
     val username: String

@@ -16,7 +16,6 @@
 
 package com.example.android.dagger.user
 
-import com.example.android.dagger.di.UserComponent
 import com.example.android.dagger.storage.Storage
 import javax.inject.Inject
 import javax.inject.Singleton

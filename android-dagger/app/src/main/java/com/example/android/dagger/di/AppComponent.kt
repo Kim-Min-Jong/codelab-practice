@@ -7,6 +7,7 @@ import com.example.android.dagger.registration.RegistrationComponent
 import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
 import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
 import com.example.android.dagger.settings.SettingsActivity
+import com.example.android.dagger.user.UserManager
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -70,11 +71,15 @@ interface AppComponent {
     fun loginComponent(): LoginComponent.Factory
 
 
-    // MainActivity도 똑같이 주입
-    fun inject(activity: MainActivity)
+    // 새로운 스코프에와 userManager(UserComponent)에 의해 관리되므로 제거 가능
 
-    // 새로운 액티비티(프래그먼트 x)이니 app 단에서 새로 주입
-    fun inject(activity: SettingsActivity)
+//    // MainActivity도 똑같이 주입
+//    fun inject(activity: MainActivity)
+//
+//    // 새로운 액티비티(프래그먼트 x)이니 app 단에서 새로 주입
+//    fun inject(activity: SettingsActivity)
+
+    fun userManager(): UserManager
 
     /**
      * 한 가지 알아둘 점 - dagger 그래프와 상호작용 하는 방법

@@ -34,9 +34,11 @@ class MainActivity : AppCompatActivity() {
     // 주입 시 주의
     // dagger inject 변수는 패키지 단 가시성(접근자)이 필요하므로 private 키워드 금지
 
-    // UserManager와 연결을 위해 주입
-    @Inject
-    lateinit var userManager: UserManager
+
+    // dagger - UserComponent에 의해 주입되므로 제거 가능
+//    // UserManager와 연결을 위해 주입
+//    @Inject
+//    lateinit var userManager: UserManager
 
     // MainViewModel과 연결을 위해 주입
     @Inject
@@ -48,10 +50,10 @@ class MainActivity : AppCompatActivity() {
      * else carry on with MainActivity
      */
     override fun onCreate(savedInstanceState: Bundle?) {
-        // MainActivity를 dagger에 알림
-        (application as MyApplication).appComponent.inject(this)
 
         super.onCreate(savedInstanceState)
+        // MainActivity를 dagger에 알림
+        val userManager = (application as MyApplication).appComponent.userManager()
 
         // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
 //        val userManager = (application as MyApplication).userManager
@@ -67,6 +69,8 @@ class MainActivity : AppCompatActivity() {
             setContentView(R.layout.activity_main)
             // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
 //            mainViewModel = MainViewModel(userManager.userDataRepository!!)
+            // UserComponet - UserManger를 통해 주입
+            userManager.userComponent!!.inject(this)
             setupViews()
         }
     }
