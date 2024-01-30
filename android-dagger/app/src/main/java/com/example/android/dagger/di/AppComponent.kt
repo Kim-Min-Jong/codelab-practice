@@ -6,6 +6,7 @@ import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.registration.RegistrationComponent
 import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
 import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
+import com.example.android.dagger.settings.SettingsActivity
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton
@@ -71,6 +72,9 @@ interface AppComponent {
 
     // MainActivity도 똑같이 주입
     fun inject(activity: MainActivity)
+
+    // 새로운 액티비티(프래그먼트 x)이니 app 단에서 새로 주입
+    fun inject(activity: SettingsActivity)
 
     /**
      * 한 가지 알아둘 점 - dagger 그래프와 상호작용 하는 방법

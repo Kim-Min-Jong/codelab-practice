@@ -16,6 +16,7 @@
 
 package com.example.android.dagger.user
 
+import com.example.android.dagger.di.UserComponent
 import com.example.android.dagger.storage.Storage
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,19 +31,30 @@ private const val PASSWORD_SUFFIX = "password"
 
 // @Inject를 달아주면, dagger는 RegisterViewModel과 UserManager의 인스턴스 제공방법을 다 알게 됨
 @Singleton
-class UserManager @Inject constructor(private val storage: Storage) {
+class UserManager @Inject constructor(
+    private val storage: Storage,
+    // UserManager는 User 정보를 사용하기에 UserComponent의 수명주기를 따라야해
+    // UserComponent 인스턴스가 필요하다.
+    private val userComponentFactory: UserComponent.Factory
+    ) {
 
     /**
      *  UserDataRepository is specific to a logged in user. This determines if the user
      *  is logged in or not, when the user logs in, a new instance will be created.
      *  When the user logs out, this will be null.
      */
-    var userDataRepository: UserDataRepository? = null
+    // UserComponent를 주입 받으므로 제거 가능
+//    var userDataRepository: UserDataRepository? = null
+
+    // user 객체를 component를 이용해 생성
+    var userComponent: UserComponent? = null
+        private set
+
 
     val username: String
         get() = storage.getString(REGISTERED_USER)
 
-    fun isUserLoggedIn() = userDataRepository != null
+    fun isUserLoggedIn() = userComponent!= null
 
     fun isUserRegistered() = storage.getString(REGISTERED_USER).isNotEmpty()
 
@@ -64,7 +76,7 @@ class UserManager @Inject constructor(private val storage: Storage) {
     }
 
     fun logout() {
-        userDataRepository = null
+        userComponent = null
     }
 
     fun unregister() {
@@ -74,7 +86,8 @@ class UserManager @Inject constructor(private val storage: Storage) {
         logout()
     }
 
+    // user component 생성
     private fun userJustLoggedIn() {
-        userDataRepository = UserDataRepository(this)
+        userComponent = userComponentFactory.create()
     }
 }
