@@ -31,7 +31,11 @@ open class MyApplication : Application() {
     // 사용자 정의 application을 사용하므로 테스트 및 활용성도 좋아진다.
     val appComponent: AppComponent by lazy {
         // dagger는 DaggerAppComponent에 의해 생성된다.
-        DaggerAppComponent.factory().create(applicationContext)
+        initializeComponent()
+    }
+
+    open fun initializeComponent(): AppComponent {
+        return DaggerAppComponent.factory().create(applicationContext)
     }
 
     // UserManager도 dagger에 의해 관리 될것이기에 제거

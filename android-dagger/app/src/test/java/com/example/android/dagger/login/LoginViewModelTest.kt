@@ -28,6 +28,8 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when` as whenever
 
+// DI의 장점 - 테스트 용이
+
 class LoginViewModelTest {
 
     // Executes each task synchronously using Architecture Components.
@@ -38,6 +40,7 @@ class LoginViewModelTest {
 
     @Before
     fun setup() {
+        // dagger에 주입없이 바로 사용가능 (직접 호출 가능)
         userManager = mock(UserManager::class.java)
         viewModel = LoginViewModel(userManager)
     }
