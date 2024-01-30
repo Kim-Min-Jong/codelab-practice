@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 // @Inject를 지정해 dagger에 알려줌
 // 새로 추가 되었으니, 그래프인 Component에도 알려줘야함
-class SharedPreferencesStorage @Inject constructor(context: Context) : Storage {
+class SharedPreferencesStorage @Inject constructor(name: String, context: Context) : Storage {
 
     private val sharedPreferences = context.getSharedPreferences("Dagger", Context.MODE_PRIVATE)
 
