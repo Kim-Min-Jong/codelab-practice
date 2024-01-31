@@ -30,6 +30,7 @@ import javax.inject.Singleton
 @Component(
     // module을 그래프 생성시 dagger에게 알려줌
     modules = [
+        // 이 두 모듈을 hilt가 알 수 있도록 해야함
         StorageModule::class,
         AppSubComponents::class
     ]

@@ -6,7 +6,15 @@ import com.example.android.dagger.storage.Storage
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import javax.inject.Qualifier
+
+// @InstallIn 어노테이션은 매개변수를 사용하여 그 요소에 이 모듈을 추가함
+// 여기서는 hilt 기본 컴포넌트인 ApplicationComponent에
+// StorageModule라는 모듈을 알리는 역할
+// 이러면 애플리케이션 수준 컴포넌트를 이전할 때 ApplicationComponent에서 결합이 됨
+@InstallIn(ApplicationComponent::class)
 
 // dagger는 인터페이스를 직접 인스턴스화 할 수 없기 때문에 제공 방법을 달리 해야한다 (interface Storage)
 // dagger에게 Storage를 알려줘야 하는데
