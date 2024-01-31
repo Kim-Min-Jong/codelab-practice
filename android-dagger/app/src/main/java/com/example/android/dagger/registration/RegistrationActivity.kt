@@ -26,20 +26,24 @@ import com.example.android.dagger.registration.enterdetails.EnterDetailsFragment
 import com.example.android.dagger.registration.termsandconditions.TermsAndConditionsFragment
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ApplicationComponent
 import javax.inject.Inject
 
+// AndroidEntryPoint를 통해 진입점을 재설정
+// 이제 직접 만든 EntryPoint는 필요없음 -- AppComponent도 삭제 가능
+@AndroidEntryPoint
 class RegistrationActivity : AppCompatActivity() {
 
     // hilt로 이전하는 동안 hilt의 entrypoint를 통해 dagger의 종속 항목에 요청할 수 있다.
     // EntryPoint를 사용하면 모든 dagger 컴포넌트를 이전하는동안 계속 앱이 작동 할 수 있도록 한다.
     // 각 dagger 컴포넌트를 hilt에서 생성된 ApplicationComponent의 종속항목으로 교체한다.
-    @InstallIn(ApplicationComponent::class)
-    @EntryPoint
-    interface  RegistrationEntryPoint {
-        fun registrationComponent(): RegistrationComponent.Factory
-    }
+//    @InstallIn(ApplicationComponent::class)
+//    @EntryPoint
+//    interface  RegistrationEntryPoint {
+//        fun registrationComponent(): RegistrationComponent.Factory
+//    }
 
     lateinit var registrationComponent: RegistrationComponent
 
@@ -61,8 +65,8 @@ class RegistrationActivity : AppCompatActivity() {
         // dagger로 된 부분을 hilt로 교체한다 (EntryPoint 사용)
 //        registrationComponent = (application as MyApplication).appComponent.registrationComponent().create()
 //        registrationComponent.inject(this)
-        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, RegistrationEntryPoint::class.java)
-        registrationComponent = entryPoint.registrationComponent().create()
+//        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, RegistrationEntryPoint::class.java)
+//        registrationComponent = entryPoint.registrationComponent().create()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registration)

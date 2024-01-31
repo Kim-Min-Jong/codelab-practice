@@ -29,10 +29,12 @@ import com.example.android.dagger.settings.SettingsActivity
 import com.example.android.dagger.user.UserManager
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ApplicationComponent
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     // UserManager는 RegistrationComponent, LoginComponent와 달리 UserManager는 MainActivity 및 SettingsActivity 모두에서 사용됨
