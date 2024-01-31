@@ -21,7 +21,12 @@ import com.example.android.dagger.di.AppComponent
 import com.example.android.dagger.di.DaggerAppComponent
 import com.example.android.dagger.storage.SharedPreferencesStorage
 import com.example.android.dagger.user.UserManager
+import dagger.hilt.android.HiltAndroidApp
 
+// hilt를 초기화하고 작성을 시작하려면 Application 클래스에
+// @HiltAndroidApp이라고 추가해 진입점을 설정해 주어야한다.
+// 이 어노테이션은 dagger가 apt(annotation processer)에서 픽업하여 사용할 코드 생성을 트리거하도록 Hilt에 알린다.
+@HiltAndroidApp
 open class MyApplication : Application() {
 
     // android에서는 앱이 실행되는 동안 그래프가 메모리에 있는 것을 원하기에
