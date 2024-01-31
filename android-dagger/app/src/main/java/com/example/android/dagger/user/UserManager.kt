@@ -36,7 +36,6 @@ class UserManager @Inject constructor(
     // UserComponent 인스턴스가 필요하다.
     private val userComponentFactory: UserComponent.Factory
     ) {
-
     /**
      *  UserDataRepository is specific to a logged in user. This determines if the user
      *  is logged in or not, when the user logs in, a new instance will be created.

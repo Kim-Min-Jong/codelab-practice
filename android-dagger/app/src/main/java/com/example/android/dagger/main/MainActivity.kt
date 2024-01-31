@@ -27,9 +27,23 @@ import com.example.android.dagger.login.LoginActivity
 import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.settings.SettingsActivity
 import com.example.android.dagger.user.UserManager
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.components.ApplicationComponent
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
+
+    // UserManager는 RegistrationComponent, LoginComponent와 달리 UserManager는 MainActivity 및 SettingsActivity 모두에서 사용됨
+    // EntryPoint 인터페이스는 한 번만 생성하면 됨
+    // 이 EntryPoint는 MainActivity 및 SettingsActivity 모두에서 사용 가능
+    // 그래서 간단히 하기위해 MainActivity에서 인터페이스 선언
+    @InstallIn(ApplicationComponent::class)
+    @EntryPoint
+    interface UserManagerEntryPoint {
+        fun userManager(): UserManager
+    }
 
     // 주입 시 주의
     // dagger inject 변수는 패키지 단 가시성(접근자)이 필요하므로 private 키워드 금지
@@ -53,7 +67,9 @@ class MainActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         // MainActivity를 dagger에 알림
-        val userManager = (application as MyApplication).appComponent.userManager()
+//        val userManager = (application as MyApplication).appComponent.userManager()
+        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, UserManagerEntryPoint::class.java)
+        val userManager = entryPoint.userManager()
 
         // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
 //        val userManager = (application as MyApplication).userManager

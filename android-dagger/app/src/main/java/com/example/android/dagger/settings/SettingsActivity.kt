@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat.startActivity
 import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
+import com.example.android.dagger.main.MainActivity
+import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
 
 // Setting Activity 도 dagger로 전환
@@ -35,8 +37,11 @@ class SettingsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // super.onCreate 전 액티비티를 주입
-        val userManager =  (application as MyApplication).appComponent.userManager()
-        userManager.userComponent!!.inject(this)
+//        val userManager =  (application as MyApplication).appComponent.userManager()
+//        userManager.userComponent!!.inject(this)
+        // 동일하게 hilt로 변경
+        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, MainActivity.UserManagerEntryPoint::class.java)
+        val userManager = entryPoint.userManager()
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_settings)
