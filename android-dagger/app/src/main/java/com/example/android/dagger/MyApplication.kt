@@ -28,20 +28,21 @@ import dagger.hilt.android.HiltAndroidApp
 // 이 어노테이션은 dagger가 apt(annotation processer)에서 픽업하여 사용할 코드 생성을 트리거하도록 Hilt에 알린다.
 @HiltAndroidApp
 open class MyApplication : Application() {
+    // hilt가 전반적인 컴포넌트들을 알아서 만들기에 제거 가능
 
-    // android에서는 앱이 실행되는 동안 그래프가 메모리에 있는 것을 원하기에
-    // application 클래스에서 dagger 그래프를 만든다.
-    // 이 방식은 앱의 라이프사이클에 연결된다.
-    // application 단에서 그래프를 연결하면 context도 사용할 수 있으며
-    // 사용자 정의 application을 사용하므로 테스트 및 활용성도 좋아진다.
-    val appComponent: AppComponent by lazy {
-        // dagger는 DaggerAppComponent에 의해 생성된다.
-        initializeComponent()
-    }
-
-    open fun initializeComponent(): AppComponent {
-        return DaggerAppComponent.factory().create(applicationContext)
-    }
+//    // android에서는 앱이 실행되는 동안 그래프가 메모리에 있는 것을 원하기에
+//    // application 클래스에서 dagger 그래프를 만든다.
+//    // 이 방식은 앱의 라이프사이클에 연결된다.
+//    // application 단에서 그래프를 연결하면 context도 사용할 수 있으며
+//    // 사용자 정의 application을 사용하므로 테스트 및 활용성도 좋아진다.
+//    val appComponent: AppComponent by lazy {
+//        // dagger는 DaggerAppComponent에 의해 생성된다.
+//        initializeComponent()
+//    }
+//
+//    open fun initializeComponent(): AppComponent {
+//        return DaggerAppComponent.factory().create(applicationContext)
+//    }
 
     // UserManager도 dagger에 의해 관리 될것이기에 제거
 //    open val userManager by lazy {
