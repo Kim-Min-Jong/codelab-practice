@@ -44,13 +44,16 @@ interface AppComponent {
     // 그래프의 인스턴스를 생성(컴파일 단계)에서 사용가능하므로 이때 전달해줘야함
     // 이때, Factory와 @BindsInstance를 사용할 수 있음
 
-    // Factory 패턴
-    @Component.Factory
-    interface Factory {
-        // @BindsInstance는 그래프 외부의 객체를 가져와 사용할 수 있음
-        // @BindsInstance에 의해 context를 가진 Appcomponent가 반환됨
-        fun create(@BindsInstance context: Context): AppComponent
-    }
+//    // Factory 패턴
+//    @Component.Factory
+//    interface Factory {
+//        // @BindsInstance는 그래프 외부의 객체를 가져와 사용할 수 있음
+//        // @BindsInstance에 의해 context를 가진 Appcomponent가 반환됨
+//        fun create(@BindsInstance context: Context): AppComponent
+//        // dagger 에서는 @BindsInstance를 사용하여 context를 전달하는 것이 일반적이지만
+//        // hilt에서는 사전 정의 된 것이 있으므로 필요하지 않음
+//        // @ApplicationContext or @ActivityContext를 통해 접근할 수 있음
+//    }
 
 //    // dagger에 RegistratinActivity를 주입하도록 요청하고
 //    // @Inject 어노테이션이 달린 종속성을 제공해야한다고 알림

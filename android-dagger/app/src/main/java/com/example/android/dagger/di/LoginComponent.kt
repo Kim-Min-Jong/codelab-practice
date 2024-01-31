@@ -16,10 +16,10 @@ import dagger.Subcomponent
 interface LoginComponent {
 
     // factory로 Component 생성 하기 위한 인터페이스
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): LoginComponent
-    }
+//    @Subcomponent.Factory
+//    interface Factory {
+//        fun create(): LoginComponent
+//    }
 
     // LoginComponent에 주입될 액티비티를 받는 메소드
     fun inject(activity: LoginActivity)

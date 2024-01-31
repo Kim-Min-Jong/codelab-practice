@@ -28,10 +28,10 @@ import dagger.Subcomponent
 interface RegistrationComponent {
 
     // Component(instance)를 새로 만들기 위한 factory 인터페이스)
-    @Subcomponent.Factory
-    interface Factory {
-        fun create(): RegistrationComponent
-    }
+//    @Subcomponent.Factory
+//    interface Factory {
+//        fun create(): RegistrationComponent
+//    }
 
     // 상위 요소를 갖는 하위요소로써 새로 만들어 낸다.
     fun inject(activity: RegistrationActivity)
