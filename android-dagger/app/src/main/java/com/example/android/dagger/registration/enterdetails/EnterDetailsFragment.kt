@@ -30,8 +30,10 @@ import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.registration.RegistrationViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class EnterDetailsFragment : Fragment() {
 
     /**
@@ -52,16 +54,16 @@ class EnterDetailsFragment : Fragment() {
     private lateinit var usernameEditText: EditText
     private lateinit var passwordEditText: EditText
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        /**
-         * An Activity injects Dagger in the onCreate method before calling super.
-         *
-         * A Fragment injects Dagger in the onAttach method after calling super.
-         */
-        // 중요! - 프래그먼트에서는 super.onAttach (뷰가 생성되기 전)후 에 프래그먼트를 주입
-        (activity as RegistrationActivity).registrationComponent.inject(this)
-    }
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//        /**
+//         * An Activity injects Dagger in the onCreate method before calling super.
+//         *
+//         * A Fragment injects Dagger in the onAttach method after calling super.
+//         */
+//        // 중요! - 프래그먼트에서는 super.onAttach (뷰가 생성되기 전)후 에 프래그먼트를 주입
+//        (activity as RegistrationActivity).registrationComponent.inject(this)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

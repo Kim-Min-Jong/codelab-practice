@@ -27,18 +27,20 @@ import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.registration.RegistrationActivity
 import com.example.android.dagger.registration.RegistrationViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class TermsAndConditionsFragment : Fragment() {
 
     @Inject
     lateinit var registrationViewModel: RegistrationViewModel
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        // 이 fragment(activity) scope에서만 동작하도록 함
-        (activity as RegistrationActivity).registrationComponent.inject(this)
-    }
+//    override fun onAttach(context: Context) {
+//        super.onAttach(context)
+//        // 이 fragment(activity) scope에서만 동작하도록 함
+//        (activity as RegistrationActivity).registrationComponent.inject(this)
+//    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

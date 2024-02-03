@@ -16,7 +16,8 @@ import dagger.hilt.android.components.ApplicationComponent
 @Module(
     subcomponents = [
         RegistrationComponent::class,
-        LoginComponent::class,
+        // Hilt에서 결합을 생성하므로 하위 구성요소 목록에서 LoginComponent를 삭제 가능
+//        LoginComponent::class,
         UserComponent::class
     ]
 )
