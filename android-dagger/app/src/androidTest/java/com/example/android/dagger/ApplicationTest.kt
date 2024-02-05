@@ -21,10 +21,22 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import com.example.android.dagger.di.StorageModule
 import com.example.android.dagger.main.MainActivity
+import com.example.android.dagger.storage.Storage
+import org.junit.Rule
 import org.junit.Test
 
+// hilt에서 UI 테스트를 사용할 떄 붙이는 어노테이션
+@HiltAndroidTest
+// hilt 테스트 중 원래 StorageModule이아니라 TestStorageModule이 사용되어애하기 때문에
+// 선언된 StorageModule을 제거
+@UninstallModules(StorageModule::class)
 class ApplicationTest {
+
+    //  이 테스트 규칙은 구성요소의 상태를 관리하며 테스트에서 삽입 작업을 하는 데 사용
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
 
     @Test
     fun runApp() {

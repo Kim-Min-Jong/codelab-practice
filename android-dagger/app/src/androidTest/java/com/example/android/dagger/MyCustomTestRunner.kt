@@ -27,6 +27,7 @@ import androidx.test.runner.AndroidJUnitRunner
 class MyCustomTestRunner : AndroidJUnitRunner() {
 
     override fun newApplication(cl: ClassLoader?, name: String?, context: Context?): Application {
-        return super.newApplication(cl, MyTestApplication::class.java.name, context)
+//        Hilt는 이미 HiltTestApplication.이라는 테스트에 사용할 수 있는 Application을 제공하므로 사용
+        return super.newApplication(cl, HiltTestApplication::class.java.name, context)
     }
 }
