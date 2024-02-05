@@ -17,6 +17,7 @@
 package com.example.android.dagger.storage
 
 import com.example.android.dagger.user.UserComponent
+import com.example.android.dagger.user.UserDataRepository
 import com.example.android.dagger.user.UserManager
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -33,14 +34,16 @@ class UserManagerTest {
 
     @Before
     fun setup() {
-        // Return mock userComponent when calling the factory
-        val userComponentFactory = Mockito.mock(UserComponent.Factory::class.java)
-        val userComponent = Mockito.mock(UserComponent::class.java)
-        // factory를 통해 userComponent를 만들어 낼 수 있는지 테스트
-        `when`(userComponentFactory.create()).thenReturn(userComponent)
+//        // Return mock userComponent when calling the factory
+//        val userComponentFactory = Mockito.mock(UserComponent.Factory::class.java)
+//        val userComponent = Mockito.mock(UserComponent::class.java)
+//        // factory를 통해 userComponent를 만들어 낼 수 있는지 테스트
+//        `when`(userComponentFactory.create()).thenReturn(userComponent)
+
+        // hilt를 통해 종속 삽입 방식을 바꿨으므로 위는 삭제 가능
 
         storage = FakeStorage()
-        userManager = UserManager(storage, userComponentFactory)
+        userManager = UserManager(storage, UserDataRepository())
     }
 
     @Test
