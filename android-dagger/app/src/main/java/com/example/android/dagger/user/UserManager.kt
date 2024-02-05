@@ -32,9 +32,12 @@ private const val PASSWORD_SUFFIX = "password"
 @Singleton
 class UserManager @Inject constructor(
     private val storage: Storage,
-    // UserManager는 User 정보를 사용하기에 UserComponent의 수명주기를 따라야해
-    // UserComponent 인스턴스가 필요하다.
-    private val userComponentFactory: UserComponent.Factory
+//    // UserManager는 User 정보를 사용하기에 UserComponent의 수명주기를 따라야해
+//    // UserComponent 인스턴스가 필요하다.
+//    private val userComponentFactory: UserComponent.Factory
+    // hilt를 사용하면 더 이상 UserComponent의 인스턴스를 만들 필요가 없으므로 UserDataRepositoryㅡㄹ 바로 받음
+    // 그러면 UserDataRepository가 종속항목에 포함
+    private val userDataRepository: UserDataRepository
     ) {
     /**
      *  UserDataRepository is specific to a logged in user. This determines if the user
@@ -44,15 +47,15 @@ class UserManager @Inject constructor(
     // UserComponent를 주입 받으므로 제거 가능
 //    var userDataRepository: UserDataRepository? = null
 
-    // user 객체를 component를 이용해 생성
-    var userComponent: UserComponent? = null
-        private set
+//    // user 객체를 component를 이용해 생성
+//    var userComponent: UserComponent? = null
+//        private set
 
 
     val username: String
         get() = storage.getString(REGISTERED_USER)
 
-    fun isUserLoggedIn() = userComponent!= null
+    fun isUserLoggedIn() = userDataRepository.username != null
 
     fun isUserRegistered() = storage.getString(REGISTERED_USER).isNotEmpty()
 
@@ -74,7 +77,8 @@ class UserManager @Inject constructor(
     }
 
     fun logout() {
-        userComponent = null
+        // repositoty에서 동작
+        userDataRepository.cleanUp()
     }
 
     fun unregister() {
@@ -86,6 +90,7 @@ class UserManager @Inject constructor(
 
     // user component 생성
     private fun userJustLoggedIn() {
-        userComponent = userComponentFactory.create()
+        // repositoty에서 동작
+        userDataRepository.initData(username)
     }
 }

@@ -29,20 +29,33 @@ import kotlin.random.Random
 // user flow에서 login out / register는 다른 flow이기 때문에 같은 인스턴스를 사용하지 않길 원함
 // 그래서 UserData도 SubComponent로 빼는 작업이 필요함
 
-@LoggedUserScope
-class UserDataRepository @Inject constructor(private val userManager: UserManager) {
+//@LoggedUserScope (hilt에서 관리되므로 삭제)
+class UserDataRepository @Inject constructor(
+    // 이미 hilt에 의해 삽입되있으므로 순환 참조 방지를 위해 삭제
+//    private val userManager: UserManager
+) {
 
-    val username: String
-        get() = userManager.username
+    var username: String? = null
+        private set
 
-    var unreadNotifications: Int
-
+    var unreadNotifications: Int? = null
+        private set
     init {
         unreadNotifications = randomInt()
     }
 
     fun refreshUnreadNotifications() {
         unreadNotifications = randomInt()
+    }
+
+    fun initData(username: String) {
+        this.username = username
+        unreadNotifications = randomInt()
+    }
+
+    fun cleanUp() {
+        username = null
+        unreadNotifications = -1
     }
 }
 

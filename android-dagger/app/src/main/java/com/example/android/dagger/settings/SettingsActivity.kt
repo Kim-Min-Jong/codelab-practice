@@ -25,6 +25,7 @@ import com.example.android.dagger.MyApplication
 import com.example.android.dagger.R
 import com.example.android.dagger.login.LoginActivity
 import com.example.android.dagger.main.MainActivity
+import com.example.android.dagger.user.UserManager
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import javax.inject.Inject
@@ -36,6 +37,8 @@ class SettingsActivity : AppCompatActivity() {
 
     @Inject
     lateinit var settingsViewModel: SettingsViewModel
+    @Inject
+    lateinit var userManager: UserManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // super.onCreate 전 액티비티를 주입

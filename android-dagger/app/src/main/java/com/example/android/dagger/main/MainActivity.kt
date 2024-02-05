@@ -41,11 +41,11 @@ class MainActivity : AppCompatActivity() {
     // EntryPoint 인터페이스는 한 번만 생성하면 됨
     // 이 EntryPoint는 MainActivity 및 SettingsActivity 모두에서 사용 가능
     // 그래서 간단히 하기위해 MainActivity에서 인터페이스 선언
-    @InstallIn(ApplicationComponent::class)
-    @EntryPoint
-    interface UserManagerEntryPoint {
-        fun userManager(): UserManager
-    }
+//    @InstallIn(ApplicationComponent::class)
+//    @EntryPoint
+//    interface UserManagerEntryPoint {
+//        fun userManager(): UserManager
+//    }
 
     // 주입 시 주의
     // dagger inject 변수는 패키지 단 가시성(접근자)이 필요하므로 private 키워드 금지
@@ -53,8 +53,8 @@ class MainActivity : AppCompatActivity() {
 
     // dagger - UserComponent에 의해 주입되므로 제거 가능
 //    // UserManager와 연결을 위해 주입
-//    @Inject
-//    lateinit var userManager: UserManager
+    @Inject
+    lateinit var userManager: UserManager
 
     // MainViewModel과 연결을 위해 주입
     @Inject
@@ -70,8 +70,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         // MainActivity를 dagger에 알림
 //        val userManager = (application as MyApplication).appComponent.userManager()
-        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, UserManagerEntryPoint::class.java)
-        val userManager = entryPoint.userManager()
+//        val entryPoint = EntryPointAccessors.fromApplication(applicationContext, UserManagerEntryPoint::class.java)
+//        val userManager = entryPoint.userManager()
 
         // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
 //        val userManager = (application as MyApplication).userManager
@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             // 수동 주입은 더 이상 필요하지 않음 - dagger가 알아서 해줌
 //            mainViewModel = MainViewModel(userManager.userDataRepository!!)
             // UserComponet - UserManger를 통해 주입
-            userManager.userComponent!!.inject(this)
+//            userManager.userComponent!!.inject(this)
             setupViews()
         }
     }
