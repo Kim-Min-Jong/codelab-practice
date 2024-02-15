@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.allWords
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -80,7 +81,10 @@ class GameViewModel: ViewModel() {
     // user의 단어를 확인하는 메소드
     fun checkUserGuess() {
         if (userGuess.equals(currentWord, ignoreCase = true)) {
-
+            // 추측이 맞다면 점수를 증가
+            val updatedScore = _uiState.value.score.plus(SCORE_INCREASE)
+            // 상태를 변경
+            updateGameState(updatedScore)
         } else {
             // 틀릴 경우 에러 보여줌
             _uiState.update { currentState ->
@@ -89,5 +93,21 @@ class GameViewModel: ViewModel() {
         }
         // Reset user guess
         updateUserGuess("")
+    }
+
+    // 게임 상태가 바꿈을 나타내는 함수
+    private fun updateGameState(updatedScore: Int) {
+        // State를 update
+        _uiState.update { currentState ->
+            // 바뀐 것만 카피해서 업데이트
+            // 점수를 업데이트하고 현재 단어 수를 늘리고 새 단어를 선택
+            currentState.copy(
+                isGuessedWordWrong = false,
+                currentScrambledWord = pickRandomWordAndShuffle(),
+                score = updatedScore,
+                currentWordCount = currentState.currentWordCount.inc(),
+            )
+
+        }
     }
 }
