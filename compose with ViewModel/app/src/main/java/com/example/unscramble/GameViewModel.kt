@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import com.example.unscramble.data.MAX_NO_OF_WORDS
 import com.example.unscramble.data.SCORE_INCREASE
 import com.example.unscramble.data.allWords
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -97,17 +98,30 @@ class GameViewModel: ViewModel() {
 
     // 게임 상태가 바꿈을 나타내는 함수
     private fun updateGameState(updatedScore: Int) {
-        // State를 update
-        _uiState.update { currentState ->
-            // 바뀐 것만 카피해서 업데이트
-            // 점수를 업데이트하고 현재 단어 수를 늘리고 새 단어를 선택
-            currentState.copy(
-                isGuessedWordWrong = false,
-                currentScrambledWord = pickRandomWordAndShuffle(),
-                score = updatedScore,
-                currentWordCount = currentState.currentWordCount.inc(),
-            )
+        if (usedWords.size == MAX_NO_OF_WORDS) {
+            // 마지막 라운드
+            _uiState.update { currentState ->
+                currentState.copy(
+                    isGuessedWordWrong = false,
+                    // 최종점수로 업데이트
+                    score = updatedScore,
+                    // 플래그를 true로 게임 끝
+                    isGameOver = true
+                )
+            }
+        } else {
+            // State를 update
+            _uiState.update { currentState ->
+                // 바뀐 것만 카피해서 업데이트
+                // 점수를 업데이트하고 현재 단어 수를 늘리고 새 단어를 선택
+                currentState.copy(
+                    isGuessedWordWrong = false,
+                    currentScrambledWord = pickRandomWordAndShuffle(),
+                    score = updatedScore,
+                    currentWordCount = currentState.currentWordCount.inc(),
+                )
 
+            }
         }
     }
 

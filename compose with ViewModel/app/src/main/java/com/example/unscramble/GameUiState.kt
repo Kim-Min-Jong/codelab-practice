@@ -10,4 +10,6 @@ data class GameUiState(
     val score: Int = 0,
     // 단어 수를 세는 변수
     val currentWordCount: Int = 1,
+    // 마지막 라운드를 확인하는 변수
+    val isGameOver: Boolean = false
 )
