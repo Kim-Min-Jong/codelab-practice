@@ -91,6 +91,7 @@ fun GameScreen(
                 gameViewModel.checkUserGuess()
             },
             userGuess = gameViewModel.userGuess,
+            isGuessWrong = gameUiState.isGuessedWordWrong,
             currentScrambledWord = gameUiState.currentScrambledWord,
             modifier = Modifier
                 .fillMaxWidth()
@@ -148,6 +149,7 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
+    isGuessWrong: Boolean,
     onUserGuessChanged: (String) -> Unit,
     userGuess: String,
     onKeyboardDone: () -> Unit,
@@ -196,8 +198,14 @@ fun GameLayout(
                 ),
                 // 값이 바뀔 떄 불리는 콜백
                 onValueChange = onUserGuessChanged,
-                label = { Text(stringResource(R.string.enter_your_word)) },
-                isError = false,
+                label = {
+                    if (isGuessWrong) {
+                        Text(stringResource(R.string.wrong_guess))
+                    } else {
+                        Text(stringResource(R.string.enter_your_word))
+                    }
+                },
+                isError = isGuessWrong,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
