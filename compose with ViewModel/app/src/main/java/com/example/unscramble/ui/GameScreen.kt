@@ -85,6 +85,9 @@ fun GameScreen(
             style = typography.titleLarge,
         )
         GameLayout(
+            onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
+            onKeyboardDone = { },
+            userGuess = gameViewModel.userGuess,
             currentScrambledWord = gameUiState.currentScrambledWord,
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,6 +142,9 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
+    onUserGuessChanged: (String) -> Unit,
+    userGuess: String,
+    onKeyboardDone: () -> Unit,
     currentScrambledWord: String,
     modifier: Modifier = Modifier
 ) {
@@ -173,7 +179,7 @@ fun GameLayout(
                 style = typography.titleMedium
             )
             OutlinedTextField(
-                value = "",
+                value = userGuess,
                 singleLine = true,
                 shape = shapes.large,
                 modifier = Modifier.fillMaxWidth(),
@@ -182,14 +188,18 @@ fun GameLayout(
                     unfocusedContainerColor = colorScheme.surface,
                     disabledContainerColor = colorScheme.surface,
                 ),
-                onValueChange = { },
+                // 값이 바뀔 떄 불리는 콜백
+                onValueChange = onUserGuessChanged,
                 label = { Text(stringResource(R.string.enter_your_word)) },
                 isError = false,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     imeAction = ImeAction.Done
                 ),
                 keyboardActions = KeyboardActions(
-                    onDone = { }
+                    onDone = {
+                        // 가상 키보드에서 완료(검색)버튼 눌렸을 때 불리는 콜백
+                        onKeyboardDone()
+                    }
                 )
             )
         }

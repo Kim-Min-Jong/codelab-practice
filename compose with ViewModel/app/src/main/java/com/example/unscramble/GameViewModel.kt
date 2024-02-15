@@ -1,5 +1,8 @@
 package com.example.unscramble
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.unscramble.data.allWords
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +40,10 @@ class GameViewModel: ViewModel() {
     // 사용된 단어를 저장하는 집합
     private var usedWords: MutableSet<String> = mutableSetOf()
 
+    // 사용자가 추축하는 단어
+    var userGuess by mutableStateOf("")
+        private set
+
     // 임의 단어를 선택하는 함수
     private fun pickRandomWordAndShuffle(): String {
         currentWord = allWords.random()
@@ -63,5 +70,9 @@ class GameViewModel: ViewModel() {
     fun resetGame() {
         usedWords.clear()
         _uiState.value = GameUiState(currentScrambledWord = pickRandomWordAndShuffle())
+    }
+
+    fun updateUserGuess(guessedWord: String) {
+        userGuess = guessedWord
     }
 }
