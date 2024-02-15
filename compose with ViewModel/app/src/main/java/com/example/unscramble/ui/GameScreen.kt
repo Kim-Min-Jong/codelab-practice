@@ -85,6 +85,7 @@ fun GameScreen(
             style = typography.titleLarge,
         )
         GameLayout(
+            wordCount = gameUiState.currentWordCount,
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
             onKeyboardDone = {
                 // 키보드 입력이 끝났을 때도, 단어 확인
@@ -130,7 +131,7 @@ fun GameScreen(
             }
         }
 
-        GameStatus(score = 0, modifier = Modifier.padding(20.dp))
+        GameStatus(score = gameUiState.score, modifier = Modifier.padding(20.dp))
     }
 }
 
@@ -149,6 +150,7 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 
 @Composable
 fun GameLayout(
+    wordCount: Int,
     isGuessWrong: Boolean,
     onUserGuessChanged: (String) -> Unit,
     userGuess: String,
@@ -173,7 +175,7 @@ fun GameLayout(
                     .background(colorScheme.surfaceTint)
                     .padding(horizontal = 10.dp, vertical = 4.dp)
                     .align(alignment = Alignment.End),
-                text = stringResource(R.string.word_count, 0),
+                text = stringResource(R.string.word_count, wordCount),
                 style = typography.titleMedium,
                 color = colorScheme.onPrimary
             )
