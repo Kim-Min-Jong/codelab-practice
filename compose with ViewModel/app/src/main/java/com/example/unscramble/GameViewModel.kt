@@ -110,4 +110,12 @@ class GameViewModel: ViewModel() {
 
         }
     }
+
+    // 스킵 버튼을 눌렀을 때 동작을 하는 함수
+    fun skipWord() {
+        // 점수는 그대로
+        updateGameState(_uiState.value.score)
+        // 추측 글자는 빈 값으로 변경
+        updateUserGuess("")
+    }
 }
