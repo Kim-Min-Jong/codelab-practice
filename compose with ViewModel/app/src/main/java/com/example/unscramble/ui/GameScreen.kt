@@ -133,6 +133,14 @@ fun GameScreen(
 
         GameStatus(score = gameUiState.score, modifier = Modifier.padding(20.dp))
     }
+    // 게임이 끝났다면
+    if (gameUiState.isGameOver) {
+        // 다시하기를 물어보는 다이얼로그를 띄움 (점수 포함)
+        FinalScoreDialog(
+            score = gameUiState.score,
+            onPlayAgain = { gameViewModel.resetGame() }
+        )
+    }
 }
 
 @Composable
