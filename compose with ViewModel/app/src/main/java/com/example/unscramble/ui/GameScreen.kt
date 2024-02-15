@@ -41,6 +41,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,6 +67,9 @@ fun GameScreen(
 ) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
+    // uiState 가 변경될 때마다 이 변수를 사용하여 리컴포지션을 발생하도록...
+    val gameUiState by gameViewModel.uiState.collectAsState()
+
     Column(
         modifier = Modifier
             .statusBarsPadding()
@@ -79,6 +85,7 @@ fun GameScreen(
             style = typography.titleLarge,
         )
         GameLayout(
+            currentScrambledWord = gameUiState.currentScrambledWord,
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
@@ -131,7 +138,10 @@ fun GameStatus(score: Int, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun GameLayout(modifier: Modifier = Modifier) {
+fun GameLayout(
+    currentScrambledWord: String,
+    modifier: Modifier = Modifier
+) {
     val mediumPadding = dimensionResource(R.dimen.padding_medium)
 
     Card(
@@ -154,7 +164,7 @@ fun GameLayout(modifier: Modifier = Modifier) {
                 color = colorScheme.onPrimary
             )
             Text(
-                text = "scrambleun",
+                text = currentScrambledWord,
                 style = typography.displayMedium
             )
             Text(
