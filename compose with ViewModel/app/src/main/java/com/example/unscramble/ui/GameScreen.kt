@@ -86,7 +86,10 @@ fun GameScreen(
         )
         GameLayout(
             onUserGuessChanged = { gameViewModel.updateUserGuess(it) },
-            onKeyboardDone = { },
+            onKeyboardDone = {
+                // 키보드 입력이 끝났을 때도, 단어 확인
+                gameViewModel.checkUserGuess()
+            },
             userGuess = gameViewModel.userGuess,
             currentScrambledWord = gameUiState.currentScrambledWord,
             modifier = Modifier
@@ -104,7 +107,10 @@ fun GameScreen(
 
             Button(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { }
+                onClick = {
+                    // submit 버튼 누를 시 checkUpdateGuess 실행 (확인 작업)
+                    gameViewModel.checkUserGuess()
+                }
             ) {
                 Text(
                     text = stringResource(R.string.submit),
