@@ -1,0 +1,6 @@
+<resources>
+
+    <!-- Number of columns for garden and plant list grid -->
+    <integer name="grid_columns">2</integer>
+
+</resources>
