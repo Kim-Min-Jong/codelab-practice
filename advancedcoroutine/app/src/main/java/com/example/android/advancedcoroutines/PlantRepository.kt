@@ -16,6 +16,8 @@
 
 package com.example.android.advancedcoroutines
 
+import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import com.example.android.advancedcoroutines.utils.CacheOnSuccess
 import com.example.android.advancedcoroutines.utils.ComparablePair
 import kotlinx.coroutines.CoroutineDispatcher
@@ -40,7 +42,17 @@ class PlantRepository private constructor(
      * Fetch a list of [Plant]s from the database.
      * Returns a LiveData-wrapped List of Plants.
      */
-    val plants = plantDao.getPlants()
+    val plants = liveData<List<Plant>> {
+        val plantsLiveData = plantDao.getPlants()
+
+        // suspend 함수를 통해 불러오는 도중 실패하면 전체가 실패하도록 -> 안정성, 보안성
+        val customSortOrder = plantsListSortOrderCache.getOrAwait()
+        // livedata에 값을 보냄 (emitSource)
+        // 호출할 때마다 이전 값이 사라지고 새로 생성
+        emitSource(plantsLiveData.map {
+            plants -> plants.applySort(customSortOrder)
+        })
+    }
 
     // 정렬 순서를 가져와 메모리에 캐시하는 함수
     // 에러가 생길 경우 빈 리스트를 반환
