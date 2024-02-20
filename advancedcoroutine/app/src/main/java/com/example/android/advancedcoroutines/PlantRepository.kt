@@ -16,6 +16,8 @@
 
 package com.example.android.advancedcoroutines
 
+import com.example.android.advancedcoroutines.utils.CacheOnSuccess
+import com.example.android.advancedcoroutines.utils.ComparablePair
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 
@@ -39,6 +41,22 @@ class PlantRepository private constructor(
      * Returns a LiveData-wrapped List of Plants.
      */
     val plants = plantDao.getPlants()
+
+    // 정렬 순서를 가져와 메모리에 캐시하는 함수
+    // 에러가 생길 경우 빈 리스트를 반환
+    private var plantsListSortOrderCache =
+        CacheOnSuccess(onErrorFallback = { listOf<String>()}) {
+            plantService.customPlantSortOrder()
+        }
+
+    // 리스트를 다시 정렬해 customSortOrder에 있는 Plants를 목록 앞부분에 배치
+    private fun List<Plant>.applySort(customOrder: List<String>): List<Plant> =
+        sortedBy { plant ->
+            val positionForItem = customOrder.indexOf(plant.plantId).let { order ->
+                if (order > -1) order else Int.MAX_VALUE
+            }
+            ComparablePair(positionForItem, plant.name)
+        }
 
     /**
      * Fetch a list of [Plant]s from the database that matches a given [GrowZone].
@@ -90,6 +108,8 @@ class PlantRepository private constructor(
         val plants = plantService.plantsByGrowZone(growZone)
         plantDao.insertAll(plants)
     }
+
+
 
     companion object {
 

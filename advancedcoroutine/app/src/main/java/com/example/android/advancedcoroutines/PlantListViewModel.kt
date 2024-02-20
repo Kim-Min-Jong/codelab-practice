@@ -62,6 +62,7 @@ class PlantListViewModel internal constructor(
     /**
      * A list of plants that updates based on the current filter.
      */
+    // switchMap -> livedata 변환 메소드
     val plants: LiveData<List<Plant>> = growZone.switchMap { growZone ->
         if (growZone == NoGrowZone) {
             plantRepository.plants
