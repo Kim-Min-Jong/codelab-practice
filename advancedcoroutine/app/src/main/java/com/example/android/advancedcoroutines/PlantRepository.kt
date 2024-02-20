@@ -74,9 +74,13 @@ class PlantRepository private constructor(
      * Fetch a list of [Plant]s from the database that matches a given [GrowZone].
      * Returns a LiveData-wrapped List of Plants.
      */
-    fun getPlantsWithGrowZone(growZone: GrowZone) =
-        plantDao.getPlantsWithGrowZoneNumber(growZone.number)
-
+    fun getPlantsWithGrowZone(growZone: GrowZone) = liveData {
+            val plantsGrowZoneLiveData = plantDao.getPlantsWithGrowZoneNumber(growZone.number)
+            val customSortOrder = plantsListSortOrderCache.getOrAwait()
+            emitSource(plantsGrowZoneLiveData.map {
+                    plantList -> plantList.applySort(customSortOrder)
+            })
+        }
     /**
      * Returns true if we should make a network request.
      */
