@@ -16,12 +16,15 @@
 
 package com.example.android.advancedcoroutines
 
+import androidx.annotation.AnyThread
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import com.example.android.advancedcoroutines.utils.CacheOnSuccess
 import com.example.android.advancedcoroutines.utils.ComparablePair
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Repository module for handling data operations.
@@ -70,17 +73,31 @@ class PlantRepository private constructor(
             ComparablePair(positionForItem, plant.name)
         }
 
+    // 복잡한 livedata 비동기 처리
+    // 각 값이 처리될 떄 suspend transform 구현
+    // 우선 기본 쓰레드에서 안전하게 사용할 수 있는 범용 정렬 알고리즘 구현
+    @AnyThread
+    suspend fun List<Plant>.applyMainSafeSort(customSortOrder: List<String>) =
+        // dispatcher 전환
+        // withContext를 호출하면 람다 전용의 다른 디스패처로 전환되었다가 이 람다 결과와 함께 호출했던 디스패처로 돌아옴
+        withContext(defaultDispatcher) {
+            this@applyMainSafeSort.applySort(customSortOrder)
+        }
+
     /**
      * Fetch a list of [Plant]s from the database that matches a given [GrowZone].
      * Returns a LiveData-wrapped List of Plants.
      */
-    fun getPlantsWithGrowZone(growZone: GrowZone) = liveData {
-            val plantsGrowZoneLiveData = plantDao.getPlantsWithGrowZoneNumber(growZone.number)
-            val customSortOrder = plantsListSortOrderCache.getOrAwait()
-            emitSource(plantsGrowZoneLiveData.map {
-                    plantList -> plantList.applySort(customSortOrder)
-            })
-        }
+    fun getPlantsWithGrowZone(growZone: GrowZone) =
+        // 네트워크에서 맞춤 정렬 순서가 수신되면 이 순서를 새 기본 안전 applyMainSafeSort와 함께 사용
+        // 여기도 중간에 실패하면 모두 실패하여 종료하도록 -- 캐시되있으므로 데이터는 안전함
+        plantDao.getPlantsWithGrowZoneNumber(growZone.number)
+            .switchMap { plantsList ->
+                liveData {
+                    val customSortOrder = plantsListSortOrderCache.getOrAwait()
+                    emit(plantsList.applyMainSafeSort(customSortOrder))
+                }
+            }
     /**
      * Returns true if we should make a network request.
      */
