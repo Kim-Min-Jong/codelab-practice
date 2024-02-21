@@ -31,6 +31,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.withContext
@@ -140,7 +141,15 @@ class PlantRepository private constructor(
 //                }
 //            }
         // livedata -> flow
-        plantDao.getPlantsFlowWithGrowZoneNumber(growZone.number)
+        // Flow에서 map 및 다른 연산자는 정지 람다를 허용
+        plantDao.getPlantsFlowWithGrowZoneNumber(growZone.number).map {
+            // 추가 변환
+            plantList ->
+            // 비동기 작업 결합 (순차 실행 - not combine)
+            val sortOrderFromNetwork = plantsListSortOrderCache.getOrAwait()
+            val nextValue = plantList.applyMainSafeSort(sortOrderFromNetwork)
+            nextValue
+        }
 
     /**
      * Returns true if we should make a network request.
