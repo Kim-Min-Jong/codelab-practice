@@ -24,6 +24,8 @@ import com.example.android.advancedcoroutines.utils.CacheOnSuccess
 import com.example.android.advancedcoroutines.utils.ComparablePair
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.withContext
 
 /**
@@ -45,17 +47,21 @@ class PlantRepository private constructor(
      * Fetch a list of [Plant]s from the database.
      * Returns a LiveData-wrapped List of Plants.
      */
-    val plants = liveData<List<Plant>> {
-        val plantsLiveData = plantDao.getPlants()
+//    val plants = liveData<List<Plant>> {
+//        val plantsLiveData = plantDao.getPlants()
+//
+//        // suspend 함수를 통해 불러오는 도중 실패하면 전체가 실패하도록 -> 안정성, 보안성
+//        val customSortOrder = plantsListSortOrderCache.getOrAwait()
+//        // livedata에 값을 보냄 (emitSource)
+//        // 호출할 때마다 이전 값이 사라지고 새로 생성
+//        emitSource(plantsLiveData.map {
+//            plants -> plants.applySort(customSortOrder)
+//        })
+//    }
+    // livedata -> flow
+    val plantsFlow: Flow<List<Plant>>
+        get() = plantDao.getPlantsFlow()
 
-        // suspend 함수를 통해 불러오는 도중 실패하면 전체가 실패하도록 -> 안정성, 보안성
-        val customSortOrder = plantsListSortOrderCache.getOrAwait()
-        // livedata에 값을 보냄 (emitSource)
-        // 호출할 때마다 이전 값이 사라지고 새로 생성
-        emitSource(plantsLiveData.map {
-            plants -> plants.applySort(customSortOrder)
-        })
-    }
 
     // 정렬 순서를 가져와 메모리에 캐시하는 함수
     // 에러가 생길 경우 빈 리스트를 반환
@@ -91,13 +97,16 @@ class PlantRepository private constructor(
     fun getPlantsWithGrowZone(growZone: GrowZone) =
         // 네트워크에서 맞춤 정렬 순서가 수신되면 이 순서를 새 기본 안전 applyMainSafeSort와 함께 사용
         // 여기도 중간에 실패하면 모두 실패하여 종료하도록 -- 캐시되있으므로 데이터는 안전함
-        plantDao.getPlantsWithGrowZoneNumber(growZone.number)
-            .switchMap { plantsList ->
-                liveData {
-                    val customSortOrder = plantsListSortOrderCache.getOrAwait()
-                    emit(plantsList.applyMainSafeSort(customSortOrder))
-                }
-            }
+//        plantDao.getPlantsWithGrowZoneNumber(growZone.number)
+//            .switchMap { plantsList ->
+//                liveData {
+//                    val customSortOrder = plantsListSortOrderCache.getOrAwait()
+//                    emit(plantsList.applyMainSafeSort(customSortOrder))
+//                }
+//            }
+        // livedata -> flow
+        plantDao.getPlantsFlowWithGrowZoneNumber(growZone.number)
+
     /**
      * Returns true if we should make a network request.
      */

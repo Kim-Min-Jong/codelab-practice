@@ -19,6 +19,7 @@ package com.example.android.advancedcoroutines
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
@@ -30,6 +31,15 @@ import kotlinx.coroutines.launch
 class PlantListViewModel internal constructor(
     private val plantRepository: PlantRepository
 ) : ViewModel() {
+
+    init {
+        clearGrowZoneNumber()
+
+        // 초기 캐싱 데이터 가져오기
+        launchDataLoad {
+            plantRepository.tryUpdateRecentPlantsCache()
+        }
+    }
 
     /**
      * Request a snackbar to display a string.
@@ -62,14 +72,17 @@ class PlantListViewModel internal constructor(
     /**
      * A list of plants that updates based on the current filter.
      */
-    // switchMap -> livedata 변환 메소드
-    val plants: LiveData<List<Plant>> = growZone.switchMap { growZone ->
-        if (growZone == NoGrowZone) {
-            plantRepository.plants
-        } else {
-            plantRepository.getPlantsWithGrowZone(growZone)
-        }
-    }
+//     switchMap -> livedata 변환 메소드
+//    val plants: LiveData<List<Plant>> = growZone.switchMap { growZone ->
+//        if (growZone == NoGrowZone) {
+//            plantRepository.plants
+//        } else {
+//            plantRepository.getPlantsWithGrowZone(growZone)
+//        }
+//    }
+    // flow -> livedata
+    val plantUsingFlow: LiveData<List<Plant>> =
+        plantRepository.plantsFlow.asLiveData()
 
     init {
         // When creating a new ViewModel, clear the grow zone and perform any related udpates
