@@ -25,7 +25,11 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -34,14 +38,36 @@ import kotlinx.coroutines.launch
 class PlantListViewModel internal constructor(
     private val plantRepository: PlantRepository
 ) : ViewModel() {
+    /**
+     * The current growZone selection.
+     */
+    // stateflow - 특별한 종류의 Flow 값 홀더로서, 제공된 마지막 값만 보유
+    // ThreadSafe하여 동시에 여러 쓰레드에서도 사용 가능
+    private val growZoneFlow = MutableStateFlow(NoGrowZone)
+    private val growZone = MutableLiveData(NoGrowZone)
 
     init {
         clearGrowZoneNumber()
 
         // 초기 캐싱 데이터 가져오기
-        launchDataLoad {
-            plantRepository.tryUpdateRecentPlantsCache()
+//        launchDataLoad {
+//            plantRepository.tryUpdateRecentPlantsCache()
+//        }
+        // 매핑을 하는데 새로운 코루틴에서 실행
+        growZoneFlow.mapLatest { growZone ->
+            _spinner.value = true
+            if (growZone == NoGrowZone) {
+                plantRepository.tryUpdateRecentPlantsCache()
+            } else {
+                plantRepository.getPlantsWithGrowZone(growZone)
+            }
         }
+            // 이전 flow에서 값을 내보낼때마다 호출 -> 처리가 되면 스피너를 초기화함
+            .onEach { _spinner.value = true }
+            // 오류가 발생했을 때, 오류 메시지를 넘김
+            .catch { throwable -> _snackbar.value = throwable.message }
+            // viewModel 범위 내에서 flow 수집 -> viewModel이 삭제되면 collect가 취소
+            .launchIn(viewModelScope)
     }
 
     /**
@@ -67,13 +93,6 @@ class PlantListViewModel internal constructor(
     val spinner: LiveData<Boolean>
         get() = _spinner
 
-    /**
-     * The current growZone selection.
-     */
-    // stateflow - 특별한 종류의 Flow 값 홀더로서, 제공된 마지막 값만 보유
-    // ThreadSafe하여 동시에 여러 쓰레드에서도 사용 가능
-    private val growZoneFlow = MutableStateFlow(NoGrowZone)
-    private val growZone = MutableLiveData(NoGrowZone)
 
     /**
      * A list of plants that updates based on the current filter.
@@ -116,7 +135,7 @@ class PlantListViewModel internal constructor(
         growZoneFlow.value = GrowZone(num)
 
         // initial code version, will move during flow rewrite
-        launchDataLoad { plantRepository.tryUpdateRecentPlantsCache() }
+//        launchDataLoad { plantRepository.tryUpdateRecentPlantsCache() }
     }
 
     /**
@@ -130,7 +149,7 @@ class PlantListViewModel internal constructor(
         growZoneFlow.value = NoGrowZone
 
         // initial code version, will move during flow rewrite
-        launchDataLoad { plantRepository.tryUpdateRecentPlantsCache() }
+//        launchDataLoad { plantRepository.tryUpdateRecentPlantsCache() }
     }
 
     /**
