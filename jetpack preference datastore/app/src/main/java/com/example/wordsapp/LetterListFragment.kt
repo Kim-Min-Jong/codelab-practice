@@ -25,11 +25,13 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.asLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.wordsapp.data.SettingDataStore
 import com.example.wordsapp.databinding.FragmentLetterListBinding
+import kotlinx.coroutines.launch
 
 /**
  * Entry fragment for the app. Displays a [RecyclerView] of letters.
@@ -73,6 +75,11 @@ class LetterListFragment : Fragment() {
             isLinearLayoutManager = it
             // recyclerView 업데이트
             chooseLayout()
+
+            // 메뉴가 만들어지면 프레임마다 다시 그려지지 않습니다. 프레임마다 같은 메뉴를 다시 그리는 것이 중복되기 때문에..
+            // 다시 그려서 맞춰주기
+            // 메뉴 아이템 다시 그리기
+            activity?.invalidateOptionsMenu()
         }
     }
 
@@ -127,6 +134,14 @@ class LetterListFragment : Fragment() {
                 // Sets layout and icon
                 chooseLayout()
                 setIcon(item)
+
+                // 사용자가 메뉴 옵션을 탭할 때 Preferences DataStore에 레이아웃 설정 쓰기
+                lifecycleScope.launch {
+                    settingDataStore.saveLayoutToPreferenceStore(
+                        isLinearLayoutManager,
+                        requireContext()
+                    )
+                }
 
                 return true
             }
