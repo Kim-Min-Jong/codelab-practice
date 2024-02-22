@@ -24,9 +24,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.wordsapp.data.SettingDataStore
 import com.example.wordsapp.databinding.FragmentLetterListBinding
 
 /**
@@ -42,6 +44,8 @@ class LetterListFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     // Keeps track of which LayoutManager is in use for the [RecyclerView]
     private var isLinearLayoutManager = true
+
+    private lateinit var settingDataStore: SettingDataStore
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,9 +65,15 @@ class LetterListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = binding.recyclerView
-        // Sets the LayoutManager of the recyclerview
-        // On the first run of the app, it will be LinearLayoutManager
-        chooseLayout()
+        // 초기화
+        settingDataStore = SettingDataStore(requireContext())
+
+        // preference를 livedata로 변환해서 관찰 -> UI 변화
+        settingDataStore.preferenceFlow.asLiveData().observe(viewLifecycleOwner) {
+            isLinearLayoutManager = it
+            // recyclerView 업데이트
+            chooseLayout()
+        }
     }
 
     /**
