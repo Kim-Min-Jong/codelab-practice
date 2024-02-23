@@ -58,7 +58,7 @@ suspend fun printTemperature(): String {
     // printTemperature와 printForecast는 동일한 상위 코루틴의 하위 코루틴인데
     // 하위 코루틴 중 한개가 예외가 발생해 실패 하면 상위 코루틴으로 전파되어 상위 코루틴이 취소되고
     // 모든 하위 코루틴도 취소 되게 됨
-    throw AssertionError("Temperature is invalid")
+//    throw AssertionError("Temperature is invalid")
     return "30\u00b0C"
 }
 
@@ -66,13 +66,12 @@ suspend fun printTemperature(): String {
 // 해당 코루틴 스코프가 완료되어야만 반환되고 다음 동작을 수행함
 suspend fun getWeatherReport() = coroutineScope {
     val forecast = async { printForecast() }
-    val temperature = async {
-        try {
-            printTemperature()
-        } catch (e: AssertionError) {
-            println("Caught exception $e")
-            "{ No temperature found }"
-        }
-    }
-    "${forecast.await()} ${temperature.await()}"
+    val temperature = async { printTemperature() }
+
+    delay(200)
+    // 코루틴을 취소할 수 도 있음
+    // 동일 범위의 다른 코루틴에겐 영향을 미치지 않고, 상위 코루틴은 취소되지 않음
+    // 해당 코루틴만 취소됨
+    temperature.cancel()
+    "${forecast.await()}"
 }
