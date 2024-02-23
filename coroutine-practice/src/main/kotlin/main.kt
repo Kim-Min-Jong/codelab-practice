@@ -26,14 +26,16 @@ fun main() {
             // async는 특정 유형을 반환하므로 리턴에 신경써야함
             // async() 함수는 Deferred 유형의 객체를 반환
             // await()를 사용한 Deferred 객체의 결과에 액세스할 수 있음
-            val forecast: Deferred<String> = async {
-                printForecast()
-            }
-            val temperature: Deferred<String> = async {
-                printTemperature()
-            }
+//            val forecast: Deferred<String> = async {
+//                printForecast()
+//            }
+//            val temperature: Deferred<String> = async {
+//                printTemperature()
+//            }
+//
+//            println("${forecast.await()} ${temperature.await()}")
 
-            println("${forecast.await()} ${temperature.await()}")
+            println(getWeatherReport())
 
             // await가 수행 되기 전 까진 수행이 되지 않음
             println("Have a good day!")
@@ -50,4 +52,12 @@ suspend fun printForecast(): String {
 suspend fun printTemperature(): String {
     delay(1000)
     return "30\u00b0C"
+}
+
+// 더 작은 코루틴으로 잘라보기
+// 해당 코루틴 스코프가 완료되어야만 반환되고 다음 동작을 수행함
+suspend fun getWeatherReport() = coroutineScope {
+    val forecast = async { printForecast() }
+    val temperature = async { printTemperature() }
+    "${forecast.await()} ${temperature.await()}"
 }
