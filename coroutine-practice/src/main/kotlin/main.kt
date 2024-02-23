@@ -11,11 +11,19 @@ fun main() {
             println("Weather forecast")
             // suspend function은 코루틴 스코프내에서만 실행가능 -- 컴파일 오류
             // 1초씩 지연되며 실행
-            printForecast()
-            printTemperature()
-        }
-    }
+//            printForecast()
+//            printTemperature()
 
+            // 동시에 수행 해보기 위해 새로운 코루틴을 실행 - launch 메소드
+            launch {
+                printForecast()
+            }
+            launch {
+                printTemperature()
+            }
+        }
+
+    }
     println("Execution time: ${time / 1000.0} seconds")
 }
 suspend fun printForecast() {
