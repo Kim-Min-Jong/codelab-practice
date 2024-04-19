@@ -21,6 +21,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -114,7 +117,15 @@ fun DogItem(
     Card(
         modifier = modifier
     ) {
-        Column {
+        Column(
+            // 애니메이션 시 크기 변경 처리를 위한 설정(스프링 애니메이션)
+            modifier = modifier.animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMedium
+                )
+            )
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
