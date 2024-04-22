@@ -34,8 +34,8 @@ data class BlankEntity (
  *
  * Note that exportSchema should be true in production databases.
  */
-@Database(entities = [BlankEntity::class], version = 1, exportSchema = false)
+@Database(entities = [LocalTask::class], version = 1, exportSchema = false)
 abstract class ToDoDatabase : RoomDatabase() {
-
+    abstract fun taskDao(): TaskDao
 }
 
