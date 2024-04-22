@@ -46,3 +46,10 @@ fun LocalTask.toExternal() = Task(
 
 // for list
 fun List<LocalTask>.toExternal() = this.map { it.toExternal() }
+
+fun Task.toLocal() = LocalTask(
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted
+)
