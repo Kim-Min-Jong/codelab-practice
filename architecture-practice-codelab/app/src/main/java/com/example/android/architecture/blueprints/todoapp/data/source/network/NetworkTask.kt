@@ -16,6 +16,8 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.network
 
+import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
+
 // data 영역의 네트워크 데이터모델
 // 각자 영역에 맞는 데이터 모델만을 맡기 위해 생성
 
@@ -31,3 +33,24 @@ data class NetworkTask(
         COMPLETE
     }
 }
+
+// Network 영역 mapper 함수
+
+// network to local
+fun NetworkTask.toLocal() = LocalTask(
+    id = id,
+    title = title,
+    description = shortDescription,
+    isCompleted = (status == NetworkTask.TaskStatus.COMPLETE)
+)
+fun List<NetworkTask>.toLocal() = this.map { it.toLocal() }
+
+// local to network
+fun LocalTask.toNetwork() = NetworkTask(
+    id = id,
+    title = title,
+    shortDescription = description,
+    status = if (isCompleted) NetworkTask.TaskStatus.COMPLETE else NetworkTask.TaskStatus.ACTIVE
+)
+fun List<LocalTask>.toNetwork() = this.map { it.toNetwork() }
+
