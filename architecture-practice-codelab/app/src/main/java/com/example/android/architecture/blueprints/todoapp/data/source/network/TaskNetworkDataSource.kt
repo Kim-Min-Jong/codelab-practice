@@ -15,3 +15,42 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.network
+
+import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+
+class TaskNetworkDataSource @Inject constructor() {
+    // 동시 접근을 막기 위한 뮤텍스 선언
+    private val accessMutex = Mutex()
+
+    // 더미 데이터
+    private var tasks = listOf(
+        NetworkTask(
+            id = "PISA",
+            title = "Build tower in Pisa",
+            shortDescription = "Ground looks good, no foundation work required."
+        ),
+        NetworkTask(
+            id = "TACOMA",
+            title = "Finish bridge in Tacoma",
+            shortDescription = "Found awesome girders at half the cost!"
+        )
+    )
+
+    // 더미데이터 불러오기
+    suspend fun loadTasks(): List<NetworkTask> = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        return tasks
+    }
+
+    // 더미데이터 업데이트
+    suspend fun saveTasks(newTasks: List<NetworkTask>) = accessMutex.withLock {
+        delay(SERVICE_LATENCY_IN_MILLIS)
+        tasks = newTasks
+    }
+}
+
+// 서버와 통신하는 것 같이 딜레이를 줌
+private const val SERVICE_LATENCY_IN_MILLIS = 2000L
