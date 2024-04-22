@@ -16,5 +16,16 @@
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 // data 영역의 데이터베이스 데이터모델
 // 각자 영역에 맞는 데이터 모델만을 맡기 위해 생성
+
+@Entity(tableName = "task")
+data class LocalTask(
+    @PrimaryKey val id: String,
+    var title: String,
+    var description: String,
+    var isCompleted: String
+)
