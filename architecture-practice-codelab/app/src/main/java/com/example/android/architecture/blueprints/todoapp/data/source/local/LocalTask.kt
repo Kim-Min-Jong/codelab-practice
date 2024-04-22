@@ -18,6 +18,7 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.android.architecture.blueprints.todoapp.data.Task
 
 // data 영역의 데이터베이스 데이터모델
 // 각자 영역에 맞는 데이터 모델만을 맡기 위해 생성
@@ -27,5 +28,21 @@ data class LocalTask(
     @PrimaryKey val id: String,
     var title: String,
     var description: String,
-    var isCompleted: String
+    var isCompleted: Boolean
 )
+
+/**
+ * 함수 매핑은 함수가 사용되는 경계에 있어야 합니다. 여기서는 LocalTask.kt가 해당 유형과 함수를 매핑하기에 좋은 위치입니다.
+ */
+// repository 단에서 사용할 mapper 함수
+
+// LocalTask to Task
+fun LocalTask.toExternal() = Task(
+    id = id,
+    title = title,
+    description = description,
+    isCompleted = isCompleted
+)
+
+// for list
+fun List<LocalTask>.toExternal() = this.map { it.toExternal() }
