@@ -22,20 +22,24 @@ import com.example.android.architecture.blueprints.todoapp.data.source.local.toL
 import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
 import com.example.android.architecture.blueprints.todoapp.data.source.network.toLocal
 import com.example.android.architecture.blueprints.todoapp.data.source.network.toNetwork
+import com.example.android.architecture.blueprints.todoapp.di.ApplicationScope
 import com.example.android.architecture.blueprints.todoapp.di.DefaultDispatcher
 import java.util.UUID
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class DefaultTaskRepository @Inject constructor(
     // inject를 통해 주입 됨
     private val localDataSource: TaskDao,
     private val remoteDataSource: TaskNetworkDataSource,
-    @DefaultDispatcher private val dispatcher: CoroutineDispatcher
+    @DefaultDispatcher private val dispatcher: CoroutineDispatcher,
+    @ApplicationScope private val scope: CoroutineScope
 ) {
     fun observeAll(): Flow<List<Task>> = localDataSource.observeAll().map { tasks ->
         tasks.toExternal()
@@ -75,10 +79,14 @@ class DefaultTaskRepository @Inject constructor(
     }
 
     private suspend fun saveTasksToNetwork() {
-        val localTasks = localDataSource.observeAll().first()
-        val networkTasks = withContext(dispatcher) {
-            localTasks.toNetwork()
+        // 스코프에 따라 지연이 발생하는 경우가 있을 수 ㅣㅇㅆ음
+        // 다른 코루틴 스코프를 열어 동시 실행해야함
+        scope.launch {
+            val localTasks = localDataSource.observeAll().first()
+            val networkTasks = withContext(dispatcher) {
+                localTasks.toNetwork()
+            }
+            remoteDataSource.saveTasks(networkTasks)
         }
-        remoteDataSource.saveTasks(networkTasks)
     }
 }
