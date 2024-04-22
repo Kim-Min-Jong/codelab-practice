@@ -15,3 +15,28 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data.source.local
+
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface TaskDao {
+    @Query("SELECT * FROM task")
+    fun observeAll(): Flow<List<LocalTask>>
+
+    // insert or update 기본키 확인해서 존재하면 update 아니면 insert
+    @Upsert
+    suspend fun upsert(task: LocalTask)
+
+    @Upsert
+    suspend fun upsertAll(tasks: List<LocalTask>)
+
+    @Query("DELETE FROM task")
+    suspend fun deleteAll()
+
+    @Query("UPDATE task SET isCompleted = :completed WHERE id = :taskId")
+    suspend fun updateCompleted(taskId: String, completed: Boolean)
+
+}
