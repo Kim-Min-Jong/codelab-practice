@@ -18,3 +18,16 @@ package com.example.android.architecture.blueprints.todoapp.data.source.network
 
 // data 영역의 네트워크 데이터모델
 // 각자 영역에 맞는 데이터 모델만을 맡기 위해 생성
+
+data class NetworkTask(
+    val id: String,
+    val title: String,
+    val shortDescription: String,
+    val priority: Int? = null,
+    val status: TaskStatus = TaskStatus.ACTIVE
+) {
+    enum class TaskStatus {
+        ACTIVE,
+        COMPLETE
+    }
+}
