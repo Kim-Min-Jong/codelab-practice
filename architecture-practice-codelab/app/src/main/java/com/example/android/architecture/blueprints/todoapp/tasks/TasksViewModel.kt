@@ -23,6 +23,7 @@ import com.example.android.architecture.blueprints.todoapp.ADD_EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.DELETE_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.EDIT_RESULT_OK
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.data.DefaultTaskRepository
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ACTIVE_TASKS
 import com.example.android.architecture.blueprints.todoapp.tasks.TasksFilterType.ALL_TASKS
@@ -57,10 +58,10 @@ data class TasksUiState(
 @HiltViewModel
 class TasksViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
-    // TODO private val taskRepository: DefaultTaskRepository,
+    private val taskRepository: DefaultTaskRepository,
 ) : ViewModel() {
 
-    private val tasksStream = flow<List<Task>> {emptyList<Task>() }
+    private val tasksStream = taskRepository.observeAll()
 
     private val _savedFilterType =
         savedStateHandle.getStateFlow(TASKS_FILTER_SAVED_STATE_KEY, ALL_TASKS)
@@ -82,9 +83,11 @@ class TasksViewModel @Inject constructor(
             Async.Loading -> {
                 TasksUiState(isLoading = true)
             }
+
             is Async.Error -> {
                 TasksUiState(userMessage = tasksAsync.errorMessage)
             }
+
             is Async.Success -> {
                 TasksUiState(
                     items = tasksAsync.data,
@@ -114,7 +117,7 @@ class TasksViewModel @Inject constructor(
 
     fun completeTask(task: Task, completed: Boolean) = viewModelScope.launch {
         if (completed) {
-            // TODO: taskRepository.completeTask(task.id)
+            taskRepository.complete(task.id)
             showSnackbarMessage(R.string.task_marked_complete)
         } else {
             showSnackbarMessage(R.string.task_marked_active)
@@ -140,7 +143,7 @@ class TasksViewModel @Inject constructor(
     fun refresh() {
         _isLoading.value = true
         viewModelScope.launch {
-            // TODO: taskRepository.refresh()
+            taskRepository.refresh()
             _isLoading.value = false
         }
     }
@@ -154,6 +157,7 @@ class TasksViewModel @Inject constructor(
                 ACTIVE_TASKS -> if (task.isActive) {
                     tasksToShow.add(task)
                 }
+
                 COMPLETED_TASKS -> if (task.isCompleted) {
                     tasksToShow.add(task)
                 }
@@ -170,12 +174,14 @@ class TasksViewModel @Inject constructor(
                     R.drawable.logo_no_fill
                 )
             }
+
             ACTIVE_TASKS -> {
                 FilteringUiInfo(
                     R.string.label_active, R.string.no_tasks_active,
                     R.drawable.ic_check_circle_96dp
                 )
             }
+
             COMPLETED_TASKS -> {
                 FilteringUiInfo(
                     R.string.label_completed, R.string.no_tasks_completed,
