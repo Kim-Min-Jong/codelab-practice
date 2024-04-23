@@ -15,3 +15,30 @@
  */
 
 package com.example.android.architecture.blueprints.todoapp.data
+
+import com.example.android.architecture.blueprints.todoapp.data.source.local.FakeTaskDao
+import com.example.android.architecture.blueprints.todoapp.data.source.local.LocalTask
+import com.example.android.architecture.blueprints.todoapp.data.source.network.TaskNetworkDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class DefaultTaskRepositoryTest {
+    private var testDispatcher = UnconfinedTestDispatcher()
+    private var testScope = TestScope(testDispatcher)
+
+    private val localTasks = listOf(
+        LocalTask(id = "1", title = "title1", description = "description1", isCompleted = false),
+        LocalTask(id = "2", title = "title2", description = "description2", isCompleted = true),
+    )
+
+    private val localDataSource = FakeTaskDao(localTasks)
+    private val networkDataSource = TaskNetworkDataSource()
+    private val taskRepository = DefaultTaskRepository(
+        localDataSource = localDataSource,
+        remoteDataSource = networkDataSource,
+        dispatcher = testDispatcher,
+        scope = testScope
+    )
+}

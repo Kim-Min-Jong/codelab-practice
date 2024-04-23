@@ -19,3 +19,34 @@ package com.example.android.architecture.blueprints.todoapp.data.source.local
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
+// test를 위한 더미 dao
+class FakeTaskDao(initialTasks: List<LocalTask>): TaskDao {
+    private val _tasks = initialTasks.toMutableList()
+    private val tasksStream = MutableStateFlow(_tasks)
+
+    override fun observeAll(): Flow<List<LocalTask>>
+        = tasksStream
+
+    override suspend fun upsert(task: LocalTask) {
+        _tasks.removeIf{ it.id == task.id }
+        _tasks.add(task)
+        tasksStream.emit(_tasks)
+    }
+
+    override suspend fun upsertAll(tasks: List<LocalTask>) {
+        val newTasksId = tasks.map { it.id }
+        _tasks.removeIf { newTasksId.contains(it.id) }
+        _tasks.addAll(tasks)
+    }
+
+    override suspend fun deleteAll() {
+        _tasks.clear()
+        tasksStream.emit(_tasks)
+    }
+
+    override suspend fun updateCompleted(taskId: String, completed: Boolean) {
+        _tasks.firstOrNull { it.id == taskId }?.let { it.isCompleted = completed }
+        tasksStream.emit(_tasks)
+    }
+
+}
