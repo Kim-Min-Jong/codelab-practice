@@ -118,10 +118,26 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     private fun loadTask(taskId: String) {
+        _uiState.update {
+            it.copy(isLoading = true)
+        }
         viewModelScope.launch {
-            _uiState.update {
-                it.copy(isLoading = true)
-            }
+//            taskRepository.getTask(taskId).let { task ->
+//                if (task != null) {
+//                    _uiState.update {
+//                        it.copy(
+//                            title = task.title,
+//                            description = task.description,
+//                            isTaskCompleted = task.isCompleted,
+//                            isLoading = false
+//                        )
+//                    }
+//                } else {
+//                    _uiState.update {
+//                        it.copy(isLoading = false)
+//                    }
+//                }
+//            }
         }
     }
 }
