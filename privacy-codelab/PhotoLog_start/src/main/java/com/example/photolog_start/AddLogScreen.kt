@@ -112,8 +112,22 @@ fun AddLogScreen(
     }
     // endregion
 
-    // TODO: Step 1. Register ActivityResult to request Camera permission
-
+    // Step 1. Register ActivityResult to request Camera permission
+    // 카메라 권한 런처 for compose
+    val requestCameraPermission =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                viewModel.onPermissionChange(CAMERA, isGranted)
+                canAddPhoto {
+                    navController.navigate(Screens.Camera.route)
+                }
+            }
+            else {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Camera currently disabled due to denied permission.")
+                }
+            }
+        }
     // TODO: Step 3. Add explanation dialog for Camera permission
 
     // TODO: Step 5. Register ActivityResult to request Location permissions
@@ -261,9 +275,13 @@ fun AddLogScreen(
 
                             // region Camera
                             IconButton(onClick = {
-                                // TODO: Step 2. Check & request for Camera permission before navigating to the camera screen.
+                                // Step 2. Check & request for Camera permission before navigating to the camera screen.
+                                // 버튼 클릭 시 권한에 따라 요청할지 화면을 넘어갈지 결정
                                 canAddPhoto {
-                                    navController.navigate(Screens.Camera.route)
+                                    when {
+                                        state.hasCameraAccess -> navController.navigate(Screens.Camera.route)
+                                        else -> requestCameraPermission.launch(CAMERA)
+                                    }
                                 }
                             })
                             {
