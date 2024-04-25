@@ -22,9 +22,16 @@
 
 package com.example.photolog_start
 
+import android.app.AppOpsManager
+import android.app.AppOpsManager.OPSTR_CAMERA
+import android.app.AppOpsManager.OPSTR_COARSE_LOCATION
+import android.app.AsyncNotedAppOp
+import android.app.SyncNotedAppOp
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -44,6 +51,11 @@ class MainActivity : ComponentActivity() {
         permissionManager = (application as PhotoLogApplication).permissions
 
         // TODO: Step 2. Register Data Access Audit Callback
+        // 로깅 매니저 등록 (안드로이드 R이상)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            val appOpsManager = getSystemService(AppOpsManager::class.java) as AppOpsManager
+            appOpsManager.setOnOpNotedCallback(mainExecutor, DataAccessAuditListener)
+        }
 
         setContent {
             PhotoLogTheme {
@@ -85,7 +97,36 @@ class MainActivity : ComponentActivity() {
     }
 
     // TODO: Step 1. Create Data Access Audit Listener Object
+    // 사용자가 접근한 데이터에 대해 로깅을 하기 위한 오브젝트
 
+    /*
+     데이터 액세스 분석 API
+    onNoted(): 앱이 사용자 데이터에 액세스하는 동기(양방향 바인딩) API를 호출할 때 호출됩니다. 이는 일반적으로 콜백이 필요 없는 API 호출입니다.
+    onAsyncNoted(): 앱이 사용자 데이터에 액세스하는 비동기(단방향 바인딩) API를 호출할 때 호출됩니다. 이는 일반적으로 콜백이 필요한 API 호출이며 콜백이 호출될 때 데이터 액세스가 발생합니다.
+    onSelfNoted(): 호출 가능성이 매우 낮습니다. 예를 들어 앱이 자체 UID를 noteOp()에 전달할 때 발생합니다.
+     */
+    @RequiresApi(Build.VERSION_CODES.R)
+    object DataAccessAuditListener: AppOpsManager.OnOpNotedCallback() {
+        override fun onNoted(op: SyncNotedAppOp) {
+            android.util.Log.d("DataAccessAuditListener","Sync Private Data Accessed: ${op.op}")
+        }
+
+        override fun onSelfNoted(op: SyncNotedAppOp) {
+            android.util.Log.d("DataAccessAuditListener","Self Private Data accessed: ${op.op}")
+        }
+
+        @RequiresApi(Build.VERSION_CODES.R)
+        override fun onAsyncNoted(asyncOp: AsyncNotedAppOp) {
+            var emoji = when (asyncOp.op) {
+                OPSTR_COARSE_LOCATION -> "\uD83D\uDDFA"
+                OPSTR_CAMERA -> "\uD83D\uDCF8"
+                else -> "?"
+            }
+
+            android.util.Log.d("DataAccessAuditListener", "Async Private Data ($emoji) Accessed:${asyncOp.op}")
+        }
+
+    }
 }
 
 sealed class Screens(val route: String) {
