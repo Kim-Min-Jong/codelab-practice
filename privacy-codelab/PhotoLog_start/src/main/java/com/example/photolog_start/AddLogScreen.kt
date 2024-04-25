@@ -132,19 +132,28 @@ fun AddLogScreen(
     // TODO: Step 3. Add explanation dialog for Camera permission
 
     // TODO: Step 5. Register ActivityResult to request Location permissions
+//    val requestLocationPermissions =
+//        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+//            if (isGranted) {
+//                viewModel.onPermissionChange(ACCESS_COARSE_LOCATION, isGranted)
+//                viewModel.onPermissionChange(ACCESS_FINE_LOCATION, isGranted)
+//                viewModel.fetchLocation()
+//            } else {
+//                coroutineScope.launch {
+//                    snackbarHostState.showSnackbar("Location currently disabled due to denied permission.")
+//                }
+//            }
+//        }
+    // TODO: Step 8. Change activity result to only request Coarse Location
+
+    // 앱에서 위치 액세스를 요청할 때 정확한 위치 대신 대략적인 위치를 선택하여 덜 정확한 위치 데이터를 앱에 공유하도록 명확하게 선택할 수 있음
+    // COARSE LOCATION (대략적인 위치) / FINE LOCATION (가까운 위치)
     val requestLocationPermissions =
         rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 viewModel.onPermissionChange(ACCESS_COARSE_LOCATION, isGranted)
-                viewModel.onPermissionChange(ACCESS_FINE_LOCATION, isGranted)
-                viewModel.fetchLocation()
-            } else {
-                coroutineScope.launch {
-                    snackbarHostState.showSnackbar("Location currently disabled due to denied permission.")
-                }
             }
         }
-    // TODO: Step 8. Change activity result to only request Coarse Location
 
     // TODO: Step 6. Add explanation dialog for Location permissions
     // 권한 설명 상자 띄우기

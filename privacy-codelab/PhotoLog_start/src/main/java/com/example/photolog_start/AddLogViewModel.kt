@@ -110,9 +110,10 @@ class AddLogViewModel(
             Manifest.permission.ACCESS_COARSE_LOCATION -> {
                 uiState = uiState.copy(hasLocationAccess = isGranted)
             }
-            Manifest.permission.ACCESS_FINE_LOCATION -> {
-                uiState = uiState.copy(hasLocationAccess = isGranted)
-            }
+            // 개인 정보를 위해 자세한 위치정보일 때는 업데이트 중지
+//            Manifest.permission.ACCESS_FINE_LOCATION -> {
+//                uiState = uiState.copy(hasLocationAccess = isGranted)
+//            }
             Manifest.permission.CAMERA -> {
                 uiState = uiState.copy(hasCameraAccess = isGranted)
             }
