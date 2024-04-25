@@ -17,6 +17,7 @@
 package com.example.photolog_start
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.Manifest.permission.CAMERA
 import android.app.Activity
 import android.app.DatePickerDialog
@@ -131,10 +132,33 @@ fun AddLogScreen(
     // TODO: Step 3. Add explanation dialog for Camera permission
 
     // TODO: Step 5. Register ActivityResult to request Location permissions
+    val requestLocationPermissions =
+        rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                viewModel.onPermissionChange(ACCESS_COARSE_LOCATION, isGranted)
+                viewModel.onPermissionChange(ACCESS_FINE_LOCATION, isGranted)
+                viewModel.fetchLocation()
+            } else {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Location currently disabled due to denied permission.")
+                }
+            }
+        }
     // TODO: Step 8. Change activity result to only request Coarse Location
 
     // TODO: Step 6. Add explanation dialog for Location permissions
-
+    // 권한 설명 상자 띄우기
+    var showExplanationDialogForLocationPermission by remember { mutableStateOf(false) }
+    if (showExplanationDialogForLocationPermission) {
+        LocationExplanationDialog(
+            onConfirm = {
+                // TODO: Step 10. Change location request to only request COARSE location.
+                requestLocationPermissions.launch(ACCESS_COARSE_LOCATION)
+                showExplanationDialogForLocationPermission = false
+            },
+            onDismiss = { showExplanationDialogForLocationPermission = false },
+        )
+    }
     // TODO: Step 11. Register ActivityResult to launch the Photo Picker
     // region helper functions
 
@@ -242,6 +266,17 @@ fun AddLogScreen(
                     headlineText = { Text("Location") },
                     trailingContent = {
                         // TODO: Step 7. Check, request, and explain Location permissions
+                        // 권한을 확인하고 부여되어있으면 정보가져오기 아니면, 권한 요청
+                        when {
+                            state.hasLocationAccess -> viewModel.fetchLocation()
+                            ActivityCompat.shouldShowRequestPermissionRationale(context as MainActivity,
+                                ACCESS_COARSE_LOCATION) ||
+                                    ActivityCompat.shouldShowRequestPermissionRationale(
+                                        context as MainActivity, ACCESS_FINE_LOCATION) ->
+                                showExplanationDialogForLocationPermission = true
+                            else -> requestLocationPermissions.launch(ACCESS_COARSE_LOCATION)
+                        }
+
                         LocationPicker(state.place) {
                             viewModel.fetchLocation()
                         }
