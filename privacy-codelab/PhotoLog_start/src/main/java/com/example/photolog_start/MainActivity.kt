@@ -13,6 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/*
+ * 앱이 권한을 요청하는 방식을 살펴보고 권한 모델이 최적이 아니면 발생할 수 있는 현상
+ *
+ * 1. 실행 직후 사용자에게는 여러 권한을 부여하도록 요청하는 권한 메시지가 즉시 표시됩니다. 이는 사용자에게 혼란을 야기할 수 있으며 앱에 대한 신뢰를 잃거나 최악의 경우 앱을 제거할 수 있습니다.
+ * 2. 앱은 모든 권한이 부여될 때까지 사용자가 계속 진행하도록 허용하지 않습니다. 사용자는 실행 시 이러한 모든 민감한 정보에 대한 액세스 권한을 부여할 정도로 앱을 신뢰하지 않을 수 있습니다.
+ */
 
 package com.example.photolog_start
 
@@ -48,15 +54,20 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
 
-                    val startNavigation =
-                        if (permissionManager.hasAllPermissions) {
-                            Screens.Home.route
-                        } else {
-                            Screens.Permissions.route
-                        }
+                    // 사용자가 홈페이지로 이동하기 전에 모든 권한을 승인하도록 강제하는 권한 화면 -> 삭제 요망
+//                    val startNavigation =
+//                        if (permissionManager.hasAllPermissions) {
+//                            Screens.Home.route
+//                        } else {
+//                            Screens.Permissions.route
+//                        }
+
+                    // 권한 요청을 시작하지 않아도 앱을 사용할 수 있도록
+                    val startNavigation = Screens.Home.route
 
                     NavHost(navController = navController, startDestination = startNavigation) {
-                        composable(Screens.Permissions.route) { PermissionScreen(navController) }
+                         //권한 화면이 더 이상 필요하지 않으므로 삭제
+//                        composable(Screens.Permissions.route) { PermissionScreen(navController) }
                         composable(Screens.Home.route) { HomeScreen(navController) }
                         composable(Screens.AddLog.route) { AddLogScreen(navController) }
                         composable(Screens.Camera.route) { CameraScreen(navController) }
@@ -78,7 +89,6 @@ class MainActivity : ComponentActivity() {
 }
 
 sealed class Screens(val route: String) {
-    object Permissions : Screens("permissions")
     object Home : Screens("home")
     object AddLog : Screens("add_log")
     object Camera : Screens("camera")
