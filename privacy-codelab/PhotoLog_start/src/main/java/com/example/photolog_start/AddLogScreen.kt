@@ -26,6 +26,7 @@ import android.text.format.DateUtils
 import android.text.format.DateUtils.FORMAT_ABBREV_ALL
 import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.result.contract.ActivityResultContracts.PickMultipleVisualMedia
 import androidx.compose.foundation.clickable
@@ -170,6 +171,11 @@ fun AddLogScreen(
     }
     // TODO: Step 11. Register ActivityResult to launch the Photo Picker
     // region helper functions
+    // 권한 없이 이미지만 가져올 수 있는 런쳐
+    val pickImage = rememberLauncherForActivityResult(
+        PickMultipleVisualMedia(MAX_LOG_PHOTOS_LIMIT),
+        viewModel::onPhotoPickerSelect
+    )
 
     LaunchedEffect(Unit) {
         viewModel.refreshSavedPhotos()
@@ -184,11 +190,6 @@ fun AddLogScreen(
             }
         }
     }
-
-    val pickImage = rememberLauncherForActivityResult(
-        PickMultipleVisualMedia(MAX_LOG_PHOTOS_LIMIT),
-        viewModel::onPhotoPickerSelect
-    )
 
     fun canSaveLog(callback: () -> Unit) {
         if (viewModel.isValid()) {
@@ -307,6 +308,8 @@ fun AddLogScreen(
                                     coroutineScope.launch {
                                         // TODO: Step 12. Replace the line below showing our internal
                                         //  photo picking UI and launch the Android Photo Picker instead
+                                        // 권한 없이 이미지를 가져오는 런처 실행
+                                        pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                                         internalPhotoPickerState.show()
                                     }
                                 }

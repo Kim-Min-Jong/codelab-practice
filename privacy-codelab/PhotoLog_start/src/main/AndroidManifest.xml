@@ -19,13 +19,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.photolog_start">
 
-    <!-- region Storage permissions -->
-    <!--  TODO: Remove permissions as the Photo Picker doesn't need it  -->
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!-- endregion -->
 
     <!-- region Camera permission -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
     <uses-permission android:name="android.permission.CAMERA" />
     <!-- endregion -->
 
