@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?><!--화면 분할을 위한 규칙을 추가-->
-<!--    splitRatio - 기본 활동이 차지하는 작업 창 비율 -->
-<!--    splitMinWidthDp - 두 활동이 동시에 화면에 표시되는 데 필요한 최소 디스플레이 너비 지정-->
-<!--    finishPrimaryWithSecondary - 보조 컨테이너의 모든 활동이 종료될 때 기본 분할 컨테이너의 활동이 종료(never)되는지를 지정-->
-<!--    finishSecondaryWithPrimary - 기본 컨테이너 활동의 모든 활동이 종료될 때 보조 분할 컨테이너의 활동이 종료(always)되는지를 지정-->
-<SplitPairRule xmlns:window="http://schemas.android.com/apk/res-auto"
-    window:finishPrimartWithSecondary="never"
-    window:finishSecondaryWithPrimary="always"
-    window:spiltMinWidthDp="840"
-    window:splitRatio="0.33">
-    <!-- 분리 시 주 보조 액티비티 설정 -->
-    <SplitPairFilter
-        window:primaryActivityName=".ListActivity"
-        window:secondActivityNam=".DetailActivity" />
+<resoucres xmlns:window="http://schemas.android.com/apk/res-auto">
+    <!--    splitRatio - 기본 활동이 차지하는 작업 창 비율 -->
+    <!--    splitMinWidthDp - 두 활동이 동시에 화면에 표시되는 데 필요한 최소 디스플레이 너비 지정-->
+    <!--    finishPrimaryWithSecondary - 보조 컨테이너의 모든 활동이 종료될 때 기본 분할 컨테이너의 활동이 종료(never)되는지를 지정-->
+    <!--    finishSecondaryWithPrimary - 기본 컨테이너 활동의 모든 활동이 종료될 때 보조 분할 컨테이너의 활동이 종료(always)되는지를 지정-->
+    <SplitPairRule
+        window:finishPrimartWithSecondary="never"
+        window:finishSecondaryWithPrimary="always"
+        window:spiltMinWidthDp="840"
+        window:splitRatio="0.33">
+        <!-- 분리 시 주 보조 액티비티 설정 -->
+        <SplitPairFilter
+            window:primaryActivityName=".ListActivity"
+            window:secondActivityNam=".DetailActivity" />
+    </SplitPairRule>
 
     <!-- 자리표시자 화면을 위한 규칙 설정 -->
     <!--    splitRatio - 기본 활동이 차지하는 작업 창 비율(33%)을 지정하고 남은 공간은 자리표시자를 위해 남김-->
@@ -27,7 +29,16 @@
         <!-- 자리표시자와 작업 창 분할을 공유하는 액티비티(ListActivity)을 지정하는 액티비티 필터를 포함-->
         <ActivityFilter window:activityName=".ListActivity" />
     </SplitPlaceholderRule>
-</SplitPairRule>
 
+    <!--액티비티 규칙-->
+    <!--alwaysExpand - 사용 가능한 모든 디스플레이 공간을 채우도록 활동을 확장해야 하는지 지정-->
+    <ActivityRule
+        window:alwaysExpand="true">
+        <!-- 전체 창으로 표시되어야 하는 액티비티를 식별-->
+        <ActivityFilter
+            window:activityName=".SummaryActivity"/>
+    </ActivityRule>
+
+</resoucres>
 
 
