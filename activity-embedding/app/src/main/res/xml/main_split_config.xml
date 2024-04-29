@@ -12,4 +12,22 @@
     <SplitPairFilter
         window:primaryActivityName=".ListActivity"
         window:secondActivityNam=".DetailActivity" />
+
+    <!-- 자리표시자 화면을 위한 규칙 설정 -->
+    <!--    splitRatio - 기본 활동이 차지하는 작업 창 비율(33%)을 지정하고 남은 공간은 자리표시자를 위해 남김-->
+    <!--    splitMinWidthDp - 자리표시자가 기본 활동과 함께 화면에 표시되는 데 필요한 최소 디스플레이 너비(840)를 지정-->
+    <!--    finishPrimaryWithPlaceholder - 자리표시자가 종료될 때 기본 분할 컨테이너의 활동이 종료(always)되는지를 지정-->
+    <!--    stickyPlaceholder: 디스플레이가 창 두 개의 디스플레이에서 단일 창 디스플레이로 크기가 축소될 때(예: 폴더블 기기가 접힐 때) 자리표시자를 화면에 상단 활동으로 유지(false)해야 하는지-->
+    <SplitPlaceholderRule
+        window:finishPrimaryWithPlaceholder="always"
+        window:placeholderActivityName=".PlaceholderActivity"
+        window:splitMinWidthDp="840"
+        window:splitRatio="0.33"
+        window:stickyPlaceholder="false">
+        <!-- 자리표시자와 작업 창 분할을 공유하는 액티비티(ListActivity)을 지정하는 액티비티 필터를 포함-->
+        <ActivityFilter window:activityName=".ListActivity" />
+    </SplitPlaceholderRule>
 </SplitPairRule>
+
+
+
