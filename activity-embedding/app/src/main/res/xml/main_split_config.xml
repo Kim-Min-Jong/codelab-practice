@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?><!--화면 분할을 위한 규칙을 추가-->
+<!--    splitRatio - 기본 활동이 차지하는 작업 창 비율 -->
+<!--    splitMinWidthDp - 두 활동이 동시에 화면에 표시되는 데 필요한 최소 디스플레이 너비 지정-->
+<!--    finishPrimaryWithSecondary - 보조 컨테이너의 모든 활동이 종료될 때 기본 분할 컨테이너의 활동이 종료(never)되는지를 지정-->
+<!--    finishSecondaryWithPrimary - 기본 컨테이너 활동의 모든 활동이 종료될 때 보조 분할 컨테이너의 활동이 종료(always)되는지를 지정-->
+<SplitPairRule xmlns:window="http://schemas.android.com/apk/res-auto"
+    window:finishPrimartWithSecondary="never"
+    window:finishSecondaryWithPrimary="always"
+    window:spiltMinWidthDp="840"
+    window:splitRatio="0.33">
+    <!-- 분리 시 주 보조 액티비티 설정 -->
+    <SplitPairFilter
+        window:primaryActivityName=".ListActivity"
+        window:secondActivityNam=".DetailActivity" />
+</SplitPairRule>
