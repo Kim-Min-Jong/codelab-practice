@@ -61,4 +61,7 @@ dependencies {
 
     // 앱 내 멀티 윈도우 모드(activity-embedding)를 위한 라이브러리
     implementation 'androidx.window:window:1.2.0'
+
+    // WindowManager가 규칙을 파싱하고 규칙을 시스템에 사용 가능하도록 하는 라이브러리
+    implementation 'androidx.startup:startup-runtime:1.1.1'
 }
