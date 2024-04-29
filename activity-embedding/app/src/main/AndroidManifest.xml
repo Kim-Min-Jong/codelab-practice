@@ -11,6 +11,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Activity_Embedding"
+        android:name=".SampleApplication"
         tools:targetApi="32">
         <activity
             android:name=".PlaceHolderActivity"
