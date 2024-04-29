@@ -38,6 +38,19 @@
             android:name=".SummaryActivity"
             android:exported="false"
             android:label="" />
+
+        <!--InitializationProvider가 SplitInitializer를 초기화하면 이 요소가 XML 구성 파일(main_split_config.xml)을 파싱-->
+        <!--main_split_config.xml)을 파싱하고 RuleController에 규칙을 추가하는 RuleController 메서드를 호출 -->
+        <provider android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!--InitializationProvider가 앱의 onCreate() 메서드가 실행되기 전에 SplitInitializer를 검색하고 초기화-->
+            <!-- Make SplitInitializer discoverable by InitializationProvider. -->
+            <meta-data android:name="${applicationId}.SplitInitializer"
+                android:value="androidx.startup" />
+        </provider>
+
     </application>
 
 </manifest>
