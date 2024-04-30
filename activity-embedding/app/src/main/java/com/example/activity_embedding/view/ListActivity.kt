@@ -18,9 +18,14 @@ package com.example.activity_embedding.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import androidx.window.embedding.SplitAttributes
+import androidx.window.embedding.SplitController
 import com.example.activity_embedding.util.ItemAdapter
 import com.example.activity_embedding.R
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigationrail.NavigationRailView
 
 /**
  * The list portion of a list-detail layout.
@@ -34,10 +39,25 @@ class ListActivity : AppCompatActivity() {
         val listRecyclerView: RecyclerView = findViewById(R.id.listRecyclerView)
         val arraySize = 10
         listRecyclerView.adapter = ItemAdapter(
-            Array(arraySize) {
-                    i -> if (i == arraySize - 1) "Summary"
-                         else "Item ${(i + 1)}"
+            Array(arraySize) { i ->
+                if (i == arraySize - 1) "Summary"
+                else "Item ${(i + 1)}"
             }
         )
     }
+
+    // 탐색 메뉴 <-> 탐색 레일 간 전환을 처리 하는 메소드
+    fun setWiderScreenNavigation(useNavRail: Boolean) {
+        val navRail: NavigationRailView = findViewById(R.id.navigationRailView)
+        val bottomNav: BottomNavigationView = findViewById(R.id.bottomNavigationView)
+
+        if (useNavRail) {
+            navRail.isVisible = true
+            bottomNav.isVisible = false
+        } else {
+            navRail.isVisible = false
+            bottomNav.isVisible = true
+        }
+    }
+
 }
