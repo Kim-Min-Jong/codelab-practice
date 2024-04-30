@@ -1,8 +1,9 @@
-package com.example.activity_embedding
+package com.example.activity_embedding.util
 
 import android.content.Context
 import androidx.startup.Initializer
 import androidx.window.embedding.RuleController
+import com.example.activity_embedding.R
 
 // 규칙에 따른 화면 분할을 도와 주는 클래스
 class SplitInitializer: Initializer<RuleController> {
