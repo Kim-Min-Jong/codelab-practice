@@ -60,4 +60,27 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
+    // 탐색 메뉴가 생길 시 Split 속성 값에 대해 재정의
+    /*
+    다음 코드에서 액티비티가 기본 제약 조건이 충족되는지,
+    즉 너비가 840dp보다 크고 최소 너비가 600dp보다 큰지 확인
+    조건이 충족되면 액티비티가 이중 창 레이아웃에 삽입되고 앱은 하단 탐색 메뉴가 아닌 탐색 레일을 사용
+    충족되지 않으면 액티비티가 하단 탐색 메뉴와 함께 전체 화면으로 표시
+     */
+    fun setSplitAttributesCalculator() {
+        SplitController.getInstance(this).setSplitAttributesCalculator { params ->
+            // 기본 값이 만족되있을 경우 -> 일반적인 경우
+            if (params.areDefaultConstraintsSatisfied) {
+                setWiderScreenNavigation(true)
+                return@setSplitAttributesCalculator params.defaultSplitAttributes
+            } else {
+                setWiderScreenNavigation(false)
+                // Split 속성을 EXPAND로 바꿔 확장 시킴
+                SplitAttributes.Builder()
+                    .setSplitType(SplitAttributes.SplitType.SPLIT_TYPE_EXPAND)
+                    .build()
+            }
+
+        }
+    }
 }
