@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.example.activity_embedding
+package com.example.activity_embedding.util
 
 import android.content.Intent
 import android.view.LayoutInflater
@@ -22,6 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.activity_embedding.R
+import com.example.activity_embedding.view.DetailActivity
+import com.example.activity_embedding.view.SummaryActivity
 
 /**
  * Adapter for the list of items in the primary container of the activity

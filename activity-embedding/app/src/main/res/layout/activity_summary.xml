@@ -22,7 +22,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".SummaryActivity">
+    tools:context=".view.SummaryActivity">
 
   <TextView
       android:id="@+id/textViewSummaryDetail"

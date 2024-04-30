@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-package com.example.activity_embedding
+package com.example.activity_embedding.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.activity_embedding.util.ItemAdapter
+import com.example.activity_embedding.R
 
 /**
  * The list portion of a list-detail layout.

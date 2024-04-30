@@ -11,10 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Activity_Embedding"
-        android:name=".SampleApplication"
+        android:name=".util.SampleApplication"
         tools:targetApi="32">
         <activity
-            android:name=".PlaceHolderActivity"
+            android:name=".view.PlaceHolderActivity"
             android:exported="false"
             android:label=""/>
         <!-- activity-embedding 사용을 위한 속성 추가 -->
@@ -23,7 +23,7 @@
             android:value="true" />
 
         <activity
-            android:name=".ListActivity"
+            android:name=".view.ListActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,11 +32,11 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name=".view.DetailActivity"
             android:exported="false"
             android:label="" />
         <activity
-            android:name=".SummaryActivity"
+            android:name=".view.SummaryActivity"
             android:exported="false"
             android:label="" />
 

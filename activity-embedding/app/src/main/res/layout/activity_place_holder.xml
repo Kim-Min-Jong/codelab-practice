@@ -6,7 +6,7 @@
     android:background="@color/gray"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlaceHolderActivity">
+    tools:context=".view.PlaceHolderActivity">
 
     <TextView
         android:id="@+id/textViewPlaceholder"

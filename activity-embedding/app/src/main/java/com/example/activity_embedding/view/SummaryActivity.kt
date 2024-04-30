@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.example.activity_embedding
+package com.example.activity_embedding.view
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.activity_embedding.R
 
 /**
  * The detail portion of a list-detail layout.
