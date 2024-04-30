@@ -80,12 +80,28 @@ class SplitManager {
                 .setFinishPrimaryWithPlaceholder(SplitRule.FinishBehavior.ALWAYS)
                 .build()
 
+            // -----------------------------------------------
+            // 액티비티 규칙 로직
+
+            val summaryActivityFilter = ActivityFilter(
+                ComponentName(context, SummaryActivity::class.java),
+                null
+            )
+
+            // 분할을 제외한 액티비티를 식별해 규칙을 적용할 시기를 결정하는 액티비티 필터
+            val summaryActivityFilterSet = setOf(summaryActivityFilter)
+
+            val activityRule = ActivityRule.Builder(summaryActivityFilterSet)
+                // 사용 가능한 모든 디스플레이 공간을 채우도록 활동을 확장해야 하는지 지정합
+                .setAlwaysExpand(true)
+                .build()
 
 
             // 룰을 컨트롤할 컨트롤러에 규칙을 추가
             val ruleController = RuleController.getInstance(context).apply {
                 addRule(splitPairRule)
                 addRule(splitPlaceholderRule)
+                addRule(activityRule)
             }
         }
     }
