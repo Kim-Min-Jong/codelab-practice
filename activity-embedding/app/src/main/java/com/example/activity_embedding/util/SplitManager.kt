@@ -2,13 +2,19 @@ package com.example.activity_embedding.util
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import androidx.window.embedding.ActivityFilter
+import androidx.window.embedding.ActivityRule
 import androidx.window.embedding.RuleController
 import androidx.window.embedding.SplitAttributes
 import androidx.window.embedding.SplitPairFilter
 import androidx.window.embedding.SplitPairRule
+import androidx.window.embedding.SplitPlaceholderRule
 import androidx.window.embedding.SplitRule
 import com.example.activity_embedding.view.DetailActivity
 import com.example.activity_embedding.view.ListActivity
+import com.example.activity_embedding.view.PlaceHolderActivity
+import com.example.activity_embedding.view.SummaryActivity
 
 // ListActivity에서 호출할 객체
 class SplitManager {
@@ -47,10 +53,40 @@ class SplitManager {
                 .setClearTop(false)
                 .build()
 
+
+            // -----------------------------------------------
+            // 자리표시자 규칙 로직
+
+            val placeholderActivityFilter = ActivityFilter(
+                ComponentName(context, ListActivity::class.java),
+                null
+            )
+
+            val placeholderActivityFilterSet = setOf(placeholderActivityFilter)
+
+            // 자리표시자 규칙 생성
+            val splitPlaceholderRule = SplitPlaceholderRule.Builder(
+                // 액티비티 필토 지정
+                placeholderActivityFilterSet,
+                // 자리표시자 액티비티 실행을 지정
+                Intent(context, PlaceHolderActivity::class.java)
+            )
+                // 규칙에 레이아웃 속성을 적용
+                .setDefaultSplitAttributes(splitAttributes)
+                // 분할을 허용하는 최소 디스플레이 너비
+                .setMinWidthDp(840)
+                // 분할을 허용하기 위해 기기 방향과 관계없이 두 디스플레이 크기 중 더 작은 값이 취해야 할 최솟값
+                .setMinSmallestWidthDp(600)
+                .setFinishPrimaryWithPlaceholder(SplitRule.FinishBehavior.ALWAYS)
+                .build()
+
+
+
+            // 룰을 컨트롤할 컨트롤러에 규칙을 추가
             val ruleController = RuleController.getInstance(context).apply {
                 addRule(splitPairRule)
+                addRule(splitPlaceholderRule)
             }
-
         }
     }
 
