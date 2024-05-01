@@ -35,6 +35,7 @@ class BlurWorker(
 
         // 이미지 블러 처리에 관해 알리는 Notification 실행 (사용자 알림)
         makeStatusNotification("Blurring image", appContext)
+        sleep()
 
         return try {
             // 블러 처리할 사진

@@ -27,6 +27,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.example.background.workers.BlurWorker
+import com.example.background.workers.CleanUpWorker
+import com.example.background.workers.SaveImageToFileWorker
 
 
 class BlurViewModel(application: Application) : ViewModel() {
@@ -51,12 +53,26 @@ class BlurViewModel(application: Application) : ViewModel() {
         // OneTimeWorkRequest - 한 번만 실행 할 WorkRequest
         // PeriodicWorkRequest - 일정 주기를 반복할 WorkRequest
 
+        // 기존엔 1개의 Worker만 등록했지만 체이닝을 통해 여러개를 등록할 수 있음
+        var continuation = workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker::class.java))
+
         val blurRequest = OneTimeWorkRequestBuilder<BlurWorker>()
             // 입력 데이터를 추가해 WorkRequest 생성
             .setInputData(createInputDataForUri())
             .build()
-        // 여기선 메소드 호출시에만 실행할 것이므로 OneTime 사용
-        workManager.enqueue(blurRequest)
+
+        continuation = continuation.then(blurRequest)
+
+        val save = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java).build()
+
+        continuation = continuation.then(save)
+
+        // 순서를 지키고 enqueue를 통해 등록
+        continuation.enqueue()
+
+//        // 여기선 메소드 호출시에만 실행할 것이므로 OneTime 사용
+//        workManager.enqueue(blurRequest)
+
     }
 
     // WorkManager를 통한 데이터 교환을 위한 메소드
