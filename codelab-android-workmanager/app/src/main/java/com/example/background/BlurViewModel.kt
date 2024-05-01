@@ -56,12 +56,15 @@ class BlurViewModel(application: Application) : ViewModel() {
         // 기존엔 1개의 Worker만 등록했지만 체이닝을 통해 여러개를 등록할 수 있음
         var continuation = workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker::class.java))
 
-        val blurRequest = OneTimeWorkRequestBuilder<BlurWorker>()
-            // 입력 데이터를 추가해 WorkRequest 생성
-            .setInputData(createInputDataForUri())
-            .build()
+        // blurLevel에 따라 추가 체이닝
+        for (i in 0 until blurLevel) {
+            val blurBuilder = OneTimeWorkRequestBuilder<BlurWorker>()
 
-        continuation = continuation.then(blurRequest)
+            if (i == 0) {
+                blurBuilder.setInputData(createInputDataForUri())
+            }
+            continuation = continuation.then(blurBuilder.build())
+        }
 
         val save = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java).build()
 
