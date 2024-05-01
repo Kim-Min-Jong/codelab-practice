@@ -2,9 +2,13 @@ package com.example.background.workers
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.text.TextUtils
 import android.util.Log
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import com.example.background.KEY_IMAGE_URI
 import com.example.background.R
 
 /*
@@ -20,20 +24,35 @@ import com.example.background.R
 class BlurWorker(
     context: Context,
     params: WorkerParameters
-): Worker(context, params) /* Worker를 상속해서 Worker 클래스 생성*/ {
+) : Worker(context, params) /* Worker를 상속해서 Worker 클래스 생성*/ {
 
     // Worker가 실제 실행하는 메소드 - 작업을 정의
     override fun doWork(): Result {
         val appContext = applicationContext
+
+        // 입력된 데이터 가져오기
+        val resourceUri = inputData.getString(KEY_IMAGE_URI)
 
         // 이미지 블러 처리에 관해 알리는 Notification 실행 (사용자 알림)
         makeStatusNotification("Blurring image", appContext)
 
         return try {
             // 블러 처리할 사진
-            val picture = BitmapFactory.decodeResource(
-                appContext.resources,
-                R.drawable.android_cupcake
+//            val picture = BitmapFactory.decodeResource(
+//                appContext.resources,
+//                R.drawable.android_cupcake
+//            )
+
+            // uri가 없을 때 에러 처리
+            if (TextUtils.isEmpty(resourceUri)) {
+                Log.e(TAG, "Invalid input uri")
+                throw IllegalArgumentException("Invalid input uri")
+            }
+
+            // 입력된 데이터로부터 비트맵 생성
+            val resolver = appContext.contentResolver
+            val picture = BitmapFactory.decodeStream(
+                resolver.openInputStream(Uri.parse(resourceUri))
             )
 
             // 블러 처리
@@ -45,8 +64,10 @@ class BlurWorker(
             // 블러 처리가 완료되었다는 Notification 실행 (URI 노출)
             makeStatusNotification("Output is $outputUri", appContext)
 
-            // 성공 처리를 반환
-            Result.success()
+            // 성공 처리를 반환 (받은 데이터를 함께 반환)
+            val outputData = workDataOf(KEY_IMAGE_URI to outputUri.toString())
+            Result.success(outputData)
+            
         } catch (t: Throwable) {
             Log.e(TAG, "Error applying blur")
             // 실패시 실패 처리를 반환
