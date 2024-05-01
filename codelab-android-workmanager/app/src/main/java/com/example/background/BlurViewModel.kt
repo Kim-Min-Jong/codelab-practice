@@ -22,12 +22,19 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
+import com.example.background.workers.BlurWorker
 
 
 class BlurViewModel(application: Application) : ViewModel() {
 
     internal var imageUri: Uri? = null
     internal var outputUri: Uri? = null
+
+    // WorkerManager 선언
+    private val workManager = WorkManager.getInstance(application)
+
 
     init {
         imageUri = getImageUri(application.applicationContext)
@@ -36,7 +43,14 @@ class BlurViewModel(application: Application) : ViewModel() {
      * Create the WorkRequest to apply the blur and save the resulting image
      * @param blurLevel The amount to blur the image
      */
-    internal fun applyBlur(blurLevel: Int) {}
+    internal fun applyBlur(blurLevel: Int) {
+        // WorkerRequest를 생성 (두 가지 유형이 존재)
+        // OneTimeWorkRequest - 한 번만 실행 할 WorkRequest
+        // PeriodicWorkRequest - 일정 주기를 반복할 WorkRequest
+
+        // 여기선 메소드 호출시에만 실행할 것이므로 OneTime 사용
+        workManager.enqueue(OneTimeWorkRequest.from(BlurWorker::class.java))
+    }
 
     private fun uriOrNull(uriString: String?): Uri? {
         return if (!uriString.isNullOrEmpty()) {
