@@ -22,6 +22,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import com.example.background.workers.BlurWorker
@@ -50,6 +51,18 @@ class BlurViewModel(application: Application) : ViewModel() {
 
         // 여기선 메소드 호출시에만 실행할 것이므로 OneTime 사용
         workManager.enqueue(OneTimeWorkRequest.from(BlurWorker::class.java))
+    }
+
+    // WorkManager를 통한 데이터 교환을 위한 메소드
+    private fun createInputDataForUri(): Data {
+        // Data Builder 객체 생성
+        val builder = Data.Builder()
+        // imageUri에 대한 Data를 생성
+        imageUri?.let {
+            builder.putString(KEY_IMAGE_URI, it.toString())
+        }
+        // Data 객체를 반환
+        return builder.build()
     }
 
     private fun uriOrNull(uriString: String?): Uri? {
