@@ -23,6 +23,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.Data
+import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
@@ -54,7 +55,20 @@ class BlurViewModel(application: Application) : ViewModel() {
         // PeriodicWorkRequest - 일정 주기를 반복할 WorkRequest
 
         // 기존엔 1개의 Worker만 등록했지만 체이닝을 통해 여러개를 등록할 수 있음
-        var continuation = workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker::class.java))
+//        var continuation = workManager.beginWith(OneTimeWorkRequest.from(CleanUpWorker::class.java))
+
+        // 고유 작업 체인
+        // 작업 체인을 한 번에 하나씩만 실행해야 하는 경우가 있음 (ex. 로컬 데이터와 서버와 동기화하는 작업 체인 - 첫 동기화 후 새 동기화 진행)
+        // 이럴때는 beginWith 대신 beginUniqueWith를 사용하고 고유 값을 통해 작업 요청을 가능
+        // 정책이 있어서 WorkManager의 처리 방식을 변경 가능
+        // REPLACE - 중지 후 다시 실행
+        // APPEND - 추가
+        var continuation = workManager.beginUniqueWork(
+            IMAGE_MANIPULATION_WORK_NAME,
+            ExistingWorkPolicy.REPLACE,
+            OneTimeWorkRequest.from(CleanUpWorker::class.java)
+        )
+
 
         // blurLevel에 따라 추가 체이닝
         for (i in 0 until blurLevel) {
