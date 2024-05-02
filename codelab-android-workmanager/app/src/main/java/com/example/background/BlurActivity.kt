@@ -37,6 +37,20 @@ class BlurActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.goButton.setOnClickListener { viewModel.applyBlur(blurLevel) }
+
+        // WorkInfo 상태를 보고 UI조작
+        viewModel.outputWorkInfos.observe(this) { listOfWorkInfo ->
+            if (listOfWorkInfo.isNullOrEmpty()) return@observe
+
+            // WorkInfo를 가져옴
+            val workInfo = listOfWorkInfo[2]
+            // 상태를 확인하고 그에 따라 Ui를 조작
+            if (workInfo.state.isFinished) {
+                showWorkFinished()
+            } else {
+                showWorkInProgress()
+            }
+        }
     }
 
     /**
