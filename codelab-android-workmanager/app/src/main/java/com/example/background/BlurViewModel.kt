@@ -23,6 +23,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Constraints
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
@@ -88,9 +89,17 @@ class BlurViewModel(application: Application) : ViewModel() {
             continuation = continuation.then(blurBuilder.build())
         }
 
+        // 작업 제한 조건 추가 (Constraint)
+        val constraint = Constraints.Builder()
+            // 기기가 충전 중일 때만 작업을 할 수 있도록 제한
+            .setRequiresCharging(true)
+            .build()
+
         val save = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java)
             // 태그 추가를 하면서 태그를 통해 WorkInfo를 찾을 수 있게함
             .addTag(TAG_OUTPUT)
+            // setConstraints 메소드를 통해 작업의 제한을 추가
+            .setConstraints(constraint)
             .build()
 
         continuation = continuation.then(save)
