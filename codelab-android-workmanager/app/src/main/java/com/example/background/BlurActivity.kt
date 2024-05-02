@@ -16,6 +16,7 @@
 
 package com.example.background
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -37,6 +38,17 @@ class BlurActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.goButton.setOnClickListener { viewModel.applyBlur(blurLevel) }
+
+        // 블러 처리된 이미지 파일 보는 버튼 이벤트 리스너
+        binding.seeFileButton.setOnClickListener {
+            viewModel.outputUri?.let { currentUri ->
+                // 이미지 파일을 보여줄 Intent 생성 (브라우저)
+                val actionView = Intent(Intent.ACTION_VIEW, currentUri)
+                actionView.resolveActivity(packageManager)?.run {
+                    startActivity(actionView)
+                }
+            }
+        }
 
         // WorkInfo 상태를 보고 UI조작
         viewModel.outputWorkInfos.observe(this) { listOfWorkInfo ->
