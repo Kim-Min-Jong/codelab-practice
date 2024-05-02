@@ -21,6 +21,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.example.background.databinding.ActivityBlurBinding
 
 class BlurActivity : AppCompatActivity() {
@@ -59,6 +60,18 @@ class BlurActivity : AppCompatActivity() {
             // 상태를 확인하고 그에 따라 Ui를 조작
             if (workInfo.state.isFinished) {
                 showWorkFinished()
+
+                // 이미지파일을 가져오기
+                val outputImageUri = workInfo.outputData.getString(KEY_IMAGE_URI)
+
+                // URI가 있다면 올바르게 저장된 거시니 츨력 버튼을 표시하고 setOutputUri를 호출
+                if (outputImageUri.isNullOrEmpty().not()) {
+                    viewModel.setOutputUri(outputImageUri)
+                    binding.seeFileButton.isVisible = true
+                } else {
+                    showWorkInProgress()
+                }
+
             } else {
                 showWorkInProgress()
             }
