@@ -103,6 +103,11 @@ class BlurViewModel(application: Application) : ViewModel() {
 
     }
 
+    internal fun cancelWork() {
+        // 태그를 전달해서 해당 태그 작업(고유 작업)을 취소
+        workManager.cancelUniqueWork(IMAGE_MANIPULATION_WORK_NAME)
+    }
+
     // WorkManager를 통한 데이터 교환을 위한 메소드
     private fun createInputDataForUri(): Data {
         // Data Builder 객체 생성

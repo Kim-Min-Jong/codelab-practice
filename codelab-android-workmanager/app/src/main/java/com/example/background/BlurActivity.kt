@@ -39,7 +39,10 @@ class BlurActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.goButton.setOnClickListener { viewModel.applyBlur(blurLevel) }
-
+        // 작업 취소 버튼 이벤트
+        binding.cancelButton.setOnClickListener {
+            viewModel.cancelWork()
+        }
         // 블러 처리된 이미지 파일 보는 버튼 이벤트 리스너
         binding.seeFileButton.setOnClickListener {
             viewModel.outputUri?.let { currentUri ->
