@@ -20,12 +20,14 @@ import android.app.Application
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.work.Data
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.example.background.workers.BlurWorker
 import com.example.background.workers.CleanUpWorker
@@ -42,9 +44,13 @@ class BlurViewModel(application: Application) : ViewModel() {
 
     // WorkInfo - LiveData를 가져와서 WorkRequest의 상태를 가져울 수 있음
     // WorkRequest의 상태를 담고 있는 세부 객체 (상태 및 데이터)
+    internal val outputWorkInfos: LiveData<List<WorkInfo>>
+
 
     init {
         imageUri = getImageUri(application.applicationContext)
+        // 태그를 통해 WorkInfo 라이브데이터를 가져옴
+        outputWorkInfos = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT)
     }
 
     /**
