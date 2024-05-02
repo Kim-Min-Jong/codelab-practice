@@ -40,6 +40,8 @@ class BlurViewModel(application: Application) : ViewModel() {
     // WorkerManager 선언
     private val workManager = WorkManager.getInstance(application)
 
+    // WorkInfo - LiveData를 가져와서 WorkRequest의 상태를 가져울 수 있음
+    // WorkRequest의 상태를 담고 있는 세부 객체 (상태 및 데이터)
 
     init {
         imageUri = getImageUri(application.applicationContext)
@@ -80,7 +82,10 @@ class BlurViewModel(application: Application) : ViewModel() {
             continuation = continuation.then(blurBuilder.build())
         }
 
-        val save = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java).build()
+        val save = OneTimeWorkRequest.Builder(SaveImageToFileWorker::class.java)
+            // 태그 추가를 하면서 태그를 통해 WorkInfo를 찾을 수 있게함
+            .addTag(TAG_OUTPUT)
+            .build()
 
         continuation = continuation.then(save)
 
