@@ -3,13 +3,19 @@ package com.pr.dragdrop
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.pr.dragdrop.ui.theme.DragdropTheme
 
 /*
@@ -42,9 +48,33 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
+                    Column {
+                        DragImage(url = getString(R.string.source_url))
+                        DropTargetImage(url = getString(R.string.target_url))
+                    }
                 }
             }
         }
+    }
+
+    // 드래그가 될 이미지
+    @OptIn(ExperimentalGlideComposeApi::class)
+    @Composable
+    fun DragImage(url: String) {
+        GlideImage(
+            model = url,
+            contentDescription = "Dragged Image"
+        )
+    }
+
+    // 드롭 타겟이 될 이미지
+    @OptIn(ExperimentalGlideComposeApi::class)
+    @Composable
+    fun DropTargetImage(url: String) {
+        val urlState by remember { mutableStateOf(url) }
+        GlideImage(
+            model = urlState,
+            contentDescription = "Dropped Image"
+        )
     }
 }
