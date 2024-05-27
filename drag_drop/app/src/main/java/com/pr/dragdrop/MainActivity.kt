@@ -24,6 +24,9 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.pr.dragdrop.ui.theme.DragdropTheme
@@ -100,6 +103,10 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
     @Composable
     fun DropTargetImage(url: String) {
+        // 드롭 될 때 시각적인 효과를 보여주기 위한 색 변수
+        var tintColor by remember {
+            mutableStateOf(Color(0xffE5E4E2))
+        }
         var urlState by remember { mutableStateOf(url) }
         val dndTarget = remember {
             object : DragAndDropTarget {
@@ -115,8 +122,26 @@ class MainActivity : ComponentActivity() {
                     urlState = draggedData.toString()
                     return true
                 }
+
+                // 드롭 될 때 시각적인 효과를 위해 라이프사이클 별 색 변경
+                override fun onEntered(event: DragAndDropEvent) {
+                    super.onEntered(event)
+                    tintColor = Color(0xff00ff00)
+                }
+
+                override fun onExited(event: DragAndDropEvent) {
+                    super.onExited(event)
+                    tintColor = Color(0xffE5E4E2)
+                }
+
+                override fun onEnded(event: DragAndDropEvent) {
+                    super.onEnded(event)
+                    tintColor = Color(0xffE5E4E2)
+                }
             }
         }
+
+
         GlideImage(
             model = urlState,
             contentDescription = "Dropped Image",
@@ -130,6 +155,11 @@ class MainActivity : ComponentActivity() {
                 },
                 // 지정된 드래그 앤 드롭 세션의 이벤트를 수신하는 DragAndDropTarget
                 target = dndTarget
+            ),
+            // 이미지에 색상을 추가
+            colorFilter = ColorFilter.tint(
+                color = tintColor,
+                blendMode = BlendMode.Modulate
             )
         )
     }
