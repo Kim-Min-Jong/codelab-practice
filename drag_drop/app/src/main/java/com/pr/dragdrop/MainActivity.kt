@@ -1,5 +1,6 @@
 package com.pr.dragdrop
 
+import android.content.ClipData
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -7,13 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.pr.dragdrop.ui.theme.DragdropTheme
@@ -63,8 +62,26 @@ class MainActivity : ComponentActivity() {
     fun DragImage(url: String) {
         GlideImage(
             model = url,
-            contentDescription = "Dragged Image"
-        )
+            contentDescription = "Dragged Image",
+            // 적용되는 모든 요소의 드래그 앤 드롭 기능을 사용 설정
+            modifier = Modifier.dragAndDropSource {
+                // 드래그 동작인 길게 누르기를 감지
+                detectTapGestures(
+                    // 드래그되는 데이터의 전송을 시작
+                    onLongPress = {
+                        // 동작 완료 시 전송될 데이터로
+                        // transferData를 사용하여 드래그 앤 드롭 세션을 시작
+                        startTransfer(
+                            // 1. ClipData: 전송될 실제 데이터
+                            // 2. flags: 래그 앤 드롭 작업을 제어하는 플래그
+                            // 3. localState: 동일한 활동에서 드래그할 때 세션의 로컬 상태
+                            DragAndDropTransferData(
+                                ClipData.newPlainText("image uri", url)
+                            )
+                        )
+                    }
+                )
+            }
     }
 
     // 드롭 타겟이 될 이미지
