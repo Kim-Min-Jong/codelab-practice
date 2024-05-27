@@ -17,11 +17,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.DragAndDropTransferData
 import androidx.compose.ui.draganddrop.mimeTypes
+import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.pr.dragdrop.ui.theme.DragdropTheme
@@ -98,11 +100,20 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
     @Composable
     fun DropTargetImage(url: String) {
-        val urlState by remember { mutableStateOf(url) }
+        var urlState by remember { mutableStateOf(url) }
         val dndTarget = remember {
             object : DragAndDropTarget {
+                // 다양한 메소드를 오버라이드 할 수 있는데 onDrop은 필수
+                // 이미지가 드롭 됐을 때 실행 될 콜백
                 override fun onDrop(event: DragAndDropEvent): Boolean {
-                    TODO("Not yet implemented")
+                    val draggedData = event.toAndroidDragEvent()
+                        .clipData
+                        .getItemAt(0)
+                        .text
+
+                    // 변수 재할당
+                    urlState = draggedData.toString()
+                    return true
                 }
             }
         }
