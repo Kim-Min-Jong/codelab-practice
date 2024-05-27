@@ -1,9 +1,14 @@
 package com.pr.dragdrop
 
 import android.content.ClipData
+import android.content.ClipDescription
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.draganddrop.dragAndDropSource
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -13,6 +18,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.DragAndDropTransferData
+import androidx.compose.ui.draganddrop.mimeTypes
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.pr.dragdrop.ui.theme.DragdropTheme
@@ -57,7 +66,7 @@ class MainActivity : ComponentActivity() {
     }
 
     // 드래그가 될 이미지
-    @OptIn(ExperimentalGlideComposeApi::class)
+    @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
     @Composable
     fun DragImage(url: String) {
         GlideImage(
@@ -82,16 +91,35 @@ class MainActivity : ComponentActivity() {
                     }
                 )
             }
+        )
     }
 
     // 드롭 타겟이 될 이미지
-    @OptIn(ExperimentalGlideComposeApi::class)
+    @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
     @Composable
     fun DropTargetImage(url: String) {
         val urlState by remember { mutableStateOf(url) }
+        val dndTarget = remember {
+            object : DragAndDropTarget {
+                override fun onDrop(event: DragAndDropEvent): Boolean {
+                    TODO("Not yet implemented")
+                }
+            }
+        }
         GlideImage(
             model = urlState,
-            contentDescription = "Dropped Image"
+            contentDescription = "Dropped Image",
+            // 데이터를 드래그할 수 있도록 하는 Modifier
+            modifier = Modifier.dragAndDropTarget(
+                // 컴포저블이 세션을 시작한 DragAndDropEvent를 검사하여 지정된 드래그 앤 드롭 세션으로부터 수신할지 결정
+                shouldStartDragAndDrop = { event ->
+                    // 드래그 되는 항목 중 하나 이상이 일반 텍스트일 때 드롭 작업을 허용
+                    event.mimeTypes()
+                        .contains(ClipDescription.MIMETYPE_TEXT_PLAIN)
+                },
+                // 지정된 드래그 앤 드롭 세션의 이벤트를 수신하는 DragAndDropTarget
+                target = dndTarget
+            )
         )
     }
 }
