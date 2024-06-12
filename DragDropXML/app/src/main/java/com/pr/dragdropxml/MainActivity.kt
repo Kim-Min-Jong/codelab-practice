@@ -3,7 +3,10 @@ package com.pr.dragdropxml
 import android.content.ClipData
 import android.content.ClipDescription
 import android.os.Bundle
+import android.util.Log
+import android.view.DragEvent
 import android.view.View
+import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -52,11 +55,11 @@ class MainActivity : AppCompatActivity() {
                 .load(getString(R.string.target_url))
                 .into(ivTarget)
 
-            startDragAndDrop(ivSource)
+            startDrag(ivSource)
         }
     }
 
-    private fun startDragAndDrop(draggableView: View) = with(binding) {
+    private fun startDrag(draggableView: View) = with(binding) {
         draggableView.setOnLongClickListener { v ->
             // 드래그 로직을 작성
 
@@ -88,7 +91,67 @@ class MainActivity : AppCompatActivity() {
 
             true
         }
+    }
 
+    // 드롭될 이미지 처리
+    private fun setUpDrop(dropTarget: View) {
+        dropTarget.setOnDragListener { view, dragEvent ->
+            // 드롭 될 로직
 
+            // dragEvent - 단계별 작업이 존재
+            // ACTION_DRAG_STARTED: 드래그 앤 드롭 작업의 시작을 알림
+            // ACTION_DRAG_LOCATION: 사용자가 타겟 드롭 영역의 경계 안쪽이 아닌 들어온 상태에서 드래그를 해제했음을 나타냄
+            // ACTION_DRAG_ENTERED: 드래그된 뷰가 타겟 드롭 뷰의 경계 안쪽에 있음을 나타냄
+            // ACTION_DROP: 사용자가 타겟 드롭 영역에서 드래그를 해제했음을 나타냄
+            // ACTION_DRAG_ENDED: 드래그 앤 드롭 작업이 완료되었음을 나타냄
+            // ACTION_DRAG_EXITED: 드래그 앤 드롭 작업이 종료되었음을 나타냄
+
+            when(dragEvent.action) {
+                // 수신데이터가 올바른 지 확인
+                DragEvent.ACTION_DRAG_STARTED -> {
+                    if (dragEvent.clipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN)) {
+                        (view as? ImageView)?.alpha = 0.5f
+                        view.invalidate()
+                        true
+                    } else {
+                        false
+                    }
+                }
+
+                // 드롭 된 데이터를 어떻게 할 지 처리
+                DragEvent.ACTION_DROP -> {
+                    // 드롭된 객체을 가져옴
+                    val item = dragEvent.clipData.getItemAt(0)
+                    val dragData = item.text
+                    // 객체에서 이미지를 뽑아 출력
+                    Glide.with(this).load(dragData)
+                        .into(view as ImageView)
+                    (view as? ImageView)?.alpha = 1.0f
+                    true
+                }
+
+                // 드래그가 시작 될 때 시각적 효과 추가 - 이미지 투명도
+                DragEvent.ACTION_DRAG_ENTERED -> {
+                    (view as? ImageView)?.alpha = 0.3F
+                    view.invalidate()
+                    true
+                }
+
+                // 드롭 뷰의 밖으로 드래그 할 때의 시각 효과
+                DragEvent.ACTION_DRAG_EXITED -> {
+                    (view as? ImageView)?.alpha = 0.5F
+                    view.invalidate()
+                    true
+                }
+
+                // 끝났을 떄의 시각적 효과
+                DragEvent.ACTION_DRAG_ENDED -> {
+                    (view as? ImageView)?.alpha = 1.0F
+                    true
+                }
+
+                else -> true
+            }
+        }
     }
 }
