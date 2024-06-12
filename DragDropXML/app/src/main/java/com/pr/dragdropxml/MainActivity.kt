@@ -1,9 +1,12 @@
 package com.pr.dragdropxml
 
+import android.content.ClipData
+import android.content.ClipDescription
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.startDragAndDrop
 import androidx.core.view.WindowInsetsCompat
 import com.bumptech.glide.Glide
 import com.pr.dragdropxml.databinding.ActivityMainBinding
@@ -48,5 +51,27 @@ class MainActivity : AppCompatActivity() {
                 .load(getString(R.string.target_url))
                 .into(ivTarget)
         }
+
+        startDragAndDrop()
+    }
+
+    private fun startDragAndDrop() = with(binding) {
+        ivSource.setOnLongClickListener { v ->
+            // 드래그 로직을 작성
+
+            // 드래그할 데이터 (ClipData 준비)
+            // 데이터는 간단한 텍스트에서 동영상에 이르기까지 어떤 유형이든 될 수 있음
+            // 이 데이터는 ClipData 객체에 캡슐화됨
+            // ClipData 객체에 하나 이상의 복잡한 ClipItem이 있음 (캡슐화 됨)
+            // ClipDescription을 통해 mimeType을 지정 가능
+            val label = "Dragged Image Url"
+            val clipItem = ClipData.Item(v.tag as? CharSequence)
+            val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
+            val draggedData = ClipData(label, mimeTypes, clipItem)
+
+            true
+        }
+
+
     }
 }
