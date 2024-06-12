@@ -3,6 +3,7 @@ package com.pr.dragdropxml
 import android.content.ClipData
 import android.content.ClipDescription
 import android.os.Bundle
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -50,13 +51,13 @@ class MainActivity : AppCompatActivity() {
             Glide.with(this@MainActivity).asBitmap()
                 .load(getString(R.string.target_url))
                 .into(ivTarget)
-        }
 
-        startDragAndDrop()
+            startDragAndDrop(ivSource)
+        }
     }
 
-    private fun startDragAndDrop() = with(binding) {
-        ivSource.setOnLongClickListener { v ->
+    private fun startDragAndDrop(draggableView: View) = with(binding) {
+        draggableView.setOnLongClickListener { v ->
             // 드래그 로직을 작성
 
             // 드래그할 데이터 (ClipData 준비)
@@ -68,6 +69,22 @@ class MainActivity : AppCompatActivity() {
             val clipItem = ClipData.Item(v.tag as? CharSequence)
             val mimeTypes = arrayOf(ClipDescription.MIMETYPE_TEXT_PLAIN)
             val draggedData = ClipData(label, mimeTypes, clipItem)
+
+            // 드래그, 드롭 시작
+            // startDragAndDrop(data, shadowBuilder, myLocalState, flag) 메소드 사용
+            // 1. 데이터: ClipData. 형식으로 드래그되는 데이터
+            // 2. shadowBuilder: DragShadowBuilder를 사용하여 뷰의 그림자 빌드
+            // 3. myLocalState: 드래그 앤 드롭 작업에 관한 로컬 데이터가 포함된 객체
+            // 4. flag: 드래그 앤 드롭 작업을 제어하는 플래그
+
+            // 이 메소드가 호출 되면 View.DragShadowBuilder 기준으로 드래그 섀도우가 생김
+            // 시스템에 드래그 섀도우가 있으면 OnDragListener 인터페이스를 뷰로 전송하여 드래그 드롭 작업이 시작
+            v.startDragAndDrop(
+                draggedData,
+                View.DragShadowBuilder(v),
+                null,
+                0
+            )
 
             true
         }
