@@ -5,6 +5,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.bumptech.glide.Glide
+import com.pr.dragdropxml.databinding.ActivityMainBinding
+
 /*
     드래그 앤 드롭 프로세스 (4단계)
     1. 시작됨: 시스템이 사용자의 드래그 동작에 응답하여 드래그 앤 드롭 작업을 시작
@@ -23,9 +26,27 @@ import androidx.core.view.WindowInsetsCompat
  */
 
 class MainActivity : AppCompatActivity() {
+
+    // view binding
+    val binding by lazy {
+        ActivityMainBinding.inflate(layoutInflater)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_main)
+        setContentView(binding.root)
+
+        with(binding) {
+            // 초기 텍스트 및 이미지 세팅
+            tvGreeting.text = getString(R.string.greeting)
+
+            Glide.with(this@MainActivity).asBitmap()
+                .load(getString(R.string.source_url))
+                .into(ivSource)
+
+            Glide.with(this@MainActivity).asBitmap()
+                .load(getString(R.string.target_url))
+                .into(ivTarget)
+        }
     }
 }
