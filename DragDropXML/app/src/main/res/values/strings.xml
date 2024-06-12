@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Drag&amp;Drop XML</string>
+    <string name="drag_image">Drag Image</string>
+    <string name="drop_image">drop image</string>
+    <string name="greeting">Drag and Drop</string>
+    <string name="target_url">https://services.google.com/fh/files/misc/qq2.jpeg</string>
+    <string name="source_url">https://services.google.com/fh/files/misc/qq10.jpeg</string>
 </resources>
