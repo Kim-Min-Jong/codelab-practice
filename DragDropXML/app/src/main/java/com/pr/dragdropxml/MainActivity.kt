@@ -86,7 +86,11 @@ class MainActivity : AppCompatActivity() {
                 draggedData,
                 View.DragShadowBuilder(v),
                 null,
-                0
+                // 추가 플래그 구성
+                // 멀티 윈도우에서도 가능하게 할 수도 있음
+                // FLAG_GLOBAL - 드래그가 창 경계를 넘을 수 있음
+                // FLAG_GLOBAL_URI_READ - 드래그 수신자가 content URI를 읽을 수 있음
+                View.DRAG_FLAG_GLOBAL or View.DRAG_FLAG_GLOBAL_URI_READ
             )
 
             true
@@ -120,6 +124,8 @@ class MainActivity : AppCompatActivity() {
 
                 // 드롭 된 데이터를 어떻게 할 지 처리
                 DragEvent.ACTION_DROP -> {
+                    // 다른 앱에서 드롭된 데이터를 읽으려면 읽기 권한이 필요
+                    val dropPermission = requestDragAndDropPermissions(dragEvent)
                     // 드롭된 객체을 가져옴
                     val item = dragEvent.clipData.getItemAt(0)
                     val dragData = item.text
@@ -127,6 +133,8 @@ class MainActivity : AppCompatActivity() {
                     Glide.with(this).load(dragData)
                         .into(view as ImageView)
                     (view as? ImageView)?.alpha = 1.0f
+                    // 완료되면 권한 해제
+                    dropPermission.release()
                     true
                 }
 
