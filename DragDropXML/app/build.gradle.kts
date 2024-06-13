@@ -53,4 +53,7 @@ dependencies {
     // glide
     implementation(libs.gilde)
     annotationProcessor(libs.glide.compiler)
+
+    // drag & drop library
+    implementation(libs.draganddrop)
 }
