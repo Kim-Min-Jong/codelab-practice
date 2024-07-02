@@ -3,7 +3,9 @@ package com.pr.camerax
 import android.os.Build
 import android.Manifest
 import android.content.pm.PackageManager
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.ImageCapture
@@ -49,6 +51,11 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        // 사진, 동영상 버튼 리스너 등록
+        with(binding) {
+            imageCaptureButton.setOnClickListener { takePhoto() }
+            videoCaptureButton.setOnClickListener { captureVideo() }
+        }
     }
 
     // all function을 통해 모든 권한을 확인
@@ -57,6 +64,29 @@ class MainActivity : AppCompatActivity() {
             baseContext,
             it
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    // 권한 확인 후 콜백
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        // 요청 코드가 올바른지 확인
+        if (requestCode == REQUEST_CODE_PERMISSIONS) {
+            // 그 후 ,모든 권한이 부여되었는지 학인
+            if (allPermissionGranted()) {
+                startCamera()
+            } else {
+                // 안되있다면 토스트 메세지
+                Toast.makeText(
+                    this,
+                    "Permissions not granted by the user.",
+                    Toast.LENGTH_SHORT).show()
+                finish()
+            }
+        }
     }
 
 
