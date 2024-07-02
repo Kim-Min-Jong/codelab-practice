@@ -2,15 +2,18 @@ package com.pr.camerax
 
 import android.os.Build
 import android.Manifest
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.Recorder
@@ -19,6 +22,8 @@ import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.pr.camerax.databinding.ActivityMainBinding
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.util.concurrent.ExecutorService
 
 typealias LumaListener = (luma: Double) -> Unit
@@ -96,7 +101,47 @@ class MainActivity : AppCompatActivity() {
 
 
     // TODO
-    private fun takePhoto() {}
+    private fun takePhoto() {
+        // imageCapture 객체
+        // 객체가 null이면 자동 종료 되도록
+        val imageCapture = imageCapture ?: return
+
+        // 사진 정보를 담을 MediaStore 생성
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.KOREA)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
+            }
+        }
+
+        // 출력될 파일 및 메타데이터의 옵션을 생성
+        val outputOptions = ImageCapture.OutputFileOptions.Builder(
+            contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues
+        ).build()
+
+        // 이미지 (사진) 캡처 리스너 등록
+        imageCapture.takePicture(
+            outputOptions,
+            ContextCompat.getMainExecutor(this),
+            // 이미지가 저장될 떄의 콜백
+            object: ImageCapture.OnImageSavedCallback {
+                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
+                    val msg = "Photo capture succeeded: ${outputFileResults.savedUri}"
+                    Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+                    Log.d(TAG, msg)
+                }
+
+                override fun onError(exception: ImageCaptureException) {
+                    Log.e(TAG, "Photo capture failed: ${exception.message}", exception)
+                }
+            }
+        )
+    }
 
     private fun captureVideo() {}
 
@@ -117,6 +162,10 @@ class MainActivity : AppCompatActivity() {
                     .also {
                         it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
                     }
+
+                // 이미지 캡쳐를 위한 변수 초기화
+                imageCapture = ImageCapture.Builder().build()
+
                 // 전면 후면 선택 (후면을 디폴트로)
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
