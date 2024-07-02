@@ -5,10 +5,14 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.icu.lang.UCharacter.GraphemeClusterBreak.T
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
@@ -83,7 +87,8 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(
                     this,
                     "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
+                    Toast.LENGTH_SHORT
+                ).show()
                 finish()
             }
         }
@@ -95,14 +100,50 @@ class MainActivity : AppCompatActivity() {
 
     private fun captureVideo() {}
 
-    private fun startCamera() {}
+    // CameraX Preview를 통해 카메라 화면 보여주기
+    private fun startCamera() {
+        // ProcessCameraProvider 인스턴스
+        // 카메라의 수명 주기를 수명 주기 소유자와 바인딩하는 데 사용
+        // CameraX가 수명 주기를 인식하므로 카메라를 열고 닫는 작업이 필요하지 않게됨
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
+
+        cameraProviderFuture.addListener(
+            {
+                //  카메라의 수명 주기를 애플리케이션 프로세스 내의 LifecycleOwner에 바인딩하는 데 사용
+                val cameraProvider = cameraProviderFuture.get()
+                // 프리뷰 생성
+                val preview = Preview.Builder()
+                    .build()
+                    .also {
+                        it.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+                    }
+                // 전면 후면 선택 (후면을 디폴트로)
+                val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+
+                try {
+                    // 카메라 연결하기 전 모든 카메라 객체를 해제
+                    cameraProvider.unbindAll()
+                    // 다시 카메라 연결
+                    cameraProvider.bindToLifecycle(
+                        this,
+                        cameraSelector,
+                        preview
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "$e")
+                }
+            },
+            // 실행기 등록
+            ContextCompat.getMainExecutor(this)
+        )
+    }
 
     companion object {
         private const val TAG = "CameraXApp"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =
-            mutableListOf (
+            mutableListOf(
                 Manifest.permission.CAMERA,
                 Manifest.permission.RECORD_AUDIO
             ).apply {
