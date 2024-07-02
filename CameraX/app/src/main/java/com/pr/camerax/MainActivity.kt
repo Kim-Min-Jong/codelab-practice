@@ -16,11 +16,16 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.video.MediaStoreOutputOptions
+import androidx.camera.video.Quality
+import androidx.camera.video.QualitySelector
 import androidx.camera.video.Recorder
 import androidx.camera.video.Recording
 import androidx.camera.video.VideoCapture
+import androidx.camera.video.VideoRecordEvent
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.PermissionChecker
 import com.pr.camerax.databinding.ActivityMainBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -129,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             outputOptions,
             ContextCompat.getMainExecutor(this),
             // 이미지가 저장될 떄의 콜백
-            object: ImageCapture.OnImageSavedCallback {
+            object : ImageCapture.OnImageSavedCallback {
                 override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${outputFileResults.savedUri}"
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
@@ -143,7 +148,92 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun captureVideo() {}
+    private fun captureVideo() {
+        // 비디오 캡처 객체 생성 없으면 종료
+        val videoCapture = this.videoCapture ?: return
+        binding.videoCaptureButton.isEnabled = false
+
+        // 지금 레코딩 중인지 (객체가 있는지)
+        val curRecording = recording
+        // 녹화중인 활성 녹화가 있다면
+        if (curRecording != null) {
+            // 모두 해제하고 종료
+            curRecording.stop()
+            recording = null
+            return
+        }
+
+        // 녹화 파일, 메타데이터 정보 생성
+        val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
+            .format(System.currentTimeMillis())
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            put(MediaStore.MediaColumns.MIME_TYPE, "video/mp4")
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                put(MediaStore.Video.Media.RELATIVE_PATH, "Movies/CameraX-Video")
+            }
+        }
+
+        // 출력될 파일 및 메타데이터의 옵션을 생성
+        val mediaStoreOutputOptions = MediaStoreOutputOptions.Builder(
+            contentResolver,
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        )
+            .setContentValues(contentValues)
+            .build()
+
+        // 레코딩 객체 초기화
+        // 출력 옵션을 VideoCapture<Recorder>로 구성하고 오디오 녹음을 서정
+        recording = videoCapture.output.prepareRecording(
+            this,
+            mediaStoreOutputOptions
+        ).apply {
+            if (PermissionChecker.checkSelfPermission(this@MainActivity,
+                    Manifest.permission.RECORD_AUDIO) ==
+                PermissionChecker.PERMISSION_GRANTED)
+            {
+                // 오디오 설정
+                withAudioEnabled()
+            }
+
+        }
+            // 새 녹음을 시작하고 record event를 등록
+            .start(ContextCompat.getMainExecutor(this)) { recordEvent ->
+            with (binding) {
+                when(recordEvent) {
+                    // 카메라에서 요청 녹화를 시작 할 때
+                    is VideoRecordEvent.Start -> {
+                        videoCaptureButton.apply {
+                            text = getString(R.string.stop_capture)
+                            isEnabled = true
+                        }
+                    }
+                    // 활성 녹화가 완료 될 때
+                    is VideoRecordEvent.Finalize -> {
+                        // 에러가 없다면
+                        if (!recordEvent.hasError()) {
+                            // 정상 메세지 출력
+                            val msg = "Video capture succeeded: " +
+                                    "${recordEvent.outputResults.outputUri}"
+                            Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT)
+                                .show()
+                            Log.d(TAG, msg)
+                        } else {
+                            // 오류가 있을 떈 객체를 닫고 삭제
+                            recording?.close()
+                            recording = null
+                            Log.e(TAG, "Video capture ends with error: " +
+                                    "${recordEvent.error}")
+                        }
+                        videoCaptureButton.apply {
+                            text = getString(R.string.start_capture)
+                            isEnabled = true
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     // CameraX Preview를 통해 카메라 화면 보여주기
     private fun startCamera() {
@@ -165,6 +255,13 @@ class MainActivity : AppCompatActivity() {
 
                 // 이미지 캡쳐를 위한 변수 초기화
                 imageCapture = ImageCapture.Builder().build()
+
+                // 비디오 캡쳐를 위한 변수 초기화
+                val recorder = Recorder.Builder()
+                    .setQualitySelector(QualitySelector.from(Quality.HIGHEST))
+                    .build()
+
+                videoCapture = VideoCapture.withOutput(recorder)
 
                 // 전면 후면 선택 (후면을 디폴트로)
                 val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
