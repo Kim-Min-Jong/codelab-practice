@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,6 +72,21 @@ fun RaceTrackerApp() {
 
     // 레이스가 시작 되었는지
     var raceInProgress by remember { mutableStateOf(false) }
+
+    // 정지함수를 안전하게 호출하려면 LaunchedEffect를 사용
+    // 코루틴은 LaunchedEffect()가 컴포지션을 종료하면 취소
+    // 앱에서 사용자가 Reset/Pause 버튼을 클릭하면 LaunchedEffect()가 컴포지션에서 삭제되고 기본 코루틴이 취소
+
+    // 키 값 설정을 통해 플레이어 객체가 다른 인스턴스로 교체되는 경우 아래 코루틴을 취소하고 다시 실행
+    if (raceInProgress) {
+        LaunchedEffect(key1 = playerOne, key2 = playerTwo) {
+            playerOne.run()
+            playerTwo.run()
+            // 레이스 완료 후 진행을 멈춤
+            raceInProgress = false
+        }
+    }
+
     // 호이스팅을 통한 상태 전달
     // 레이스 진행률 반영
     RaceTrackerScreen(
