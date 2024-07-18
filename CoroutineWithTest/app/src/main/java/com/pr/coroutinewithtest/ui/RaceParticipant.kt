@@ -3,6 +3,7 @@ package com.pr.coroutinewithtest.ui
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 
 class RaceParticipant(
     val name: String,
@@ -29,6 +30,15 @@ class RaceParticipant(
      */
     fun reset() {
         currentProgress = 0
+    }
+
+    // 진행률을 올리는 메소드
+    suspend fun run() {
+        // 100이 되기 전까지 반복 (딜레이를 주며)
+        while (currentProgress <= maxProgress) {
+            delay(progressDelayMillis)
+            currentProgress += progressIncrement
+        }
     }
 }
 
