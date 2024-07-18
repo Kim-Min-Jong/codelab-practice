@@ -53,6 +53,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.pr.coroutinewithtest.R
 import com.pr.coroutinewithtest.ui.RaceParticipant
 import com.pr.coroutinewithtest.ui.progressFactor
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun RaceTrackerApp() {
@@ -80,8 +82,19 @@ fun RaceTrackerApp() {
     // 키 값 설정을 통해 플레이어 객체가 다른 인스턴스로 교체되는 경우 아래 코루틴을 취소하고 다시 실행
     if (raceInProgress) {
         LaunchedEffect(key1 = playerOne, key2 = playerTwo) {
-            playerOne.run()
-            playerTwo.run()
+            // 다른 스코프로 감싸주지 않으면
+            // 아래 줄의 raceInProgress가 같은 계층의 코드이므로 launch가 반환될 때
+            // raceInProgress = false가 실행되어, 경주를 시작하지 않는다.
+            // 그렇기어 새로운 범위를 만들어 이 범위를 완료 후, 경주 상태를 멈춘다.
+            coroutineScope {
+                // launch 메소드를 통해 코루틴 속의 코루틴을 만들어 구조화된 동시 실행을 적용한다.
+                launch {
+                    playerOne.run()
+                }
+                launch {
+                    playerTwo.run()
+                }
+            }
             // 레이스 완료 후 진행을 멈춤
             raceInProgress = false
         }
