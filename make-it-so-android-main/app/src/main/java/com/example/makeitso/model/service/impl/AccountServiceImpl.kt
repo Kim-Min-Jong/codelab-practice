@@ -58,9 +58,12 @@ class AccountServiceImpl @Inject constructor(private val auth: FirebaseAuth) : A
   }
 
   override suspend fun linkAccount(email: String, password: String) {
-    // email 계정 연결
-    val credential = EmailAuthProvider.getCredential(email, password)
-    auth.currentUser!!.linkWithCredential(credential)
+    // 코드 수행 속도 측정
+    trace(LINK_ACCOUNT_TRACE) {
+      // email 계정 연결
+      val credential = EmailAuthProvider.getCredential(email, password)
+      auth.currentUser!!.linkWithCredential(credential)
+    }
   }
 
   override suspend fun deleteAccount() {

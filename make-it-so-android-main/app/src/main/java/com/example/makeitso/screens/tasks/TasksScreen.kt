@@ -117,7 +117,8 @@ fun TasksScreenPreview() {
       onSettingsClick = { },
       onTaskCheckChange = { },
       onTaskActionClick = { _, _, _ -> },
-      openScreen = { }
+      openScreen = { },
+      tasks = remember { mutableStateOf(emptyList()) }
     )
   }
 }
