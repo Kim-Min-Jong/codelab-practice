@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.makeitso.R.drawable as AppIcon
 import com.example.makeitso.R.string as AppText
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.makeitso.common.composable.ActionToolbar
 import com.example.makeitso.common.ext.smallSpacer
 import com.example.makeitso.common.ext.toolbarActions
@@ -42,12 +43,15 @@ fun TasksScreen(
   openScreen: (String) -> Unit,
   viewModel: TasksViewModel = hiltViewModel()
 ) {
+  val tasks = viewModel.tasks.collectAsStateWithLifecycle(emptyList())
+
   TasksScreenContent(
     onAddClick = viewModel::onAddClick,
     onSettingsClick = viewModel::onSettingsClick,
     onTaskCheckChange = viewModel::onTaskCheckChange,
     onTaskActionClick = viewModel::onTaskActionClick,
-    openScreen = openScreen
+    openScreen = openScreen,
+    tasks = tasks
   )
 
   LaunchedEffect(viewModel) { viewModel.loadTaskOptions() }
@@ -62,7 +66,8 @@ fun TasksScreenContent(
   onSettingsClick: ((String) -> Unit) -> Unit,
   onTaskCheckChange: (Task) -> Unit,
   onTaskActionClick: ((String) -> Unit, Task, String) -> Unit,
-  openScreen: (String) -> Unit
+  openScreen: (String) -> Unit,
+  tasks: State<List<Task>>
 ) {
   Scaffold(
     floatingActionButton = {
@@ -76,7 +81,9 @@ fun TasksScreenContent(
       }
     }
   ) {
-    Column(modifier = Modifier.fillMaxWidth().fillMaxHeight()) {
+    Column(modifier = Modifier
+      .fillMaxWidth()
+      .fillMaxHeight()) {
       ActionToolbar(
         title = AppText.tasks,
         modifier = Modifier.toolbarActions(),
@@ -87,7 +94,7 @@ fun TasksScreenContent(
       Spacer(modifier = Modifier.smallSpacer())
 
       LazyColumn {
-        items(emptyList<Task>(), key = { it.id }) { taskItem ->
+        items(tasks.value, key = { it.id }) { taskItem ->
           TaskItem(
             task = taskItem,
             options = listOf(),

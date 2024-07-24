@@ -17,6 +17,7 @@ limitations under the License.
 package com.example.makeitso.screens.tasks
 
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.makeitso.EDIT_TASK_SCREEN
 import com.example.makeitso.SETTINGS_SCREEN
 import com.example.makeitso.TASK_ID
@@ -37,10 +38,10 @@ class TasksViewModel @Inject constructor(
 ) : MakeItSoViewModel(logService) {
   val options = mutableStateOf<List<String>>(listOf())
 
-  val tasks = emptyFlow<List<Task>>()
+  val tasks = storageService.tasks
 
   fun loadTaskOptions() {
-    //TODO
+    //TOD
   }
 
   fun onTaskCheckChange(task: Task) {
