@@ -72,7 +72,9 @@ class SignUpViewModel @Inject constructor(
     }
 
     launchCatching {
-      //TODO
+      // 인증 시도
+      accountService.linkAccount(email, password)
+      openAndPopUp(SETTINGS_SCREEN, SIGN_UP_SCREEN)
     }
   }
 }

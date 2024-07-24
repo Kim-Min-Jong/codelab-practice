@@ -33,8 +33,10 @@ class SettingsViewModel @Inject constructor(
   private val accountService: AccountService,
   private val storageService: StorageService
 ) : MakeItSoViewModel(logService) {
-  val uiState = SettingsUiState(isAnonymousAccount = true)
-
+  // 사용자 인증 상태를 파이어베이스를 통해 확인해서 업데이트
+  val uiState = accountService.currentUser.map {
+    SettingsUiState(it.isAnonymous)
+  }
   fun onLoginClick(openScreen: (String) -> Unit) = openScreen(LOGIN_SCREEN)
 
   fun onSignUpClick(openScreen: (String) -> Unit) = openScreen(SIGN_UP_SCREEN)
