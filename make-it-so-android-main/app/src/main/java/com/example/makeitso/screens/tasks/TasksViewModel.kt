@@ -41,7 +41,10 @@ class TasksViewModel @Inject constructor(
   val tasks = storageService.tasks
 
   fun loadTaskOptions() {
-    //TOD
+    // 수정 옵션을 추가할 수 있는 지 가져옴
+    val hasEditOption = configurationService.isShowTaskEditButtonConfig
+    // 옵션을 설정
+    options.value = TaskActionOption.getOptions(hasEditOption)
   }
 
   fun onTaskCheckChange(task: Task) {
