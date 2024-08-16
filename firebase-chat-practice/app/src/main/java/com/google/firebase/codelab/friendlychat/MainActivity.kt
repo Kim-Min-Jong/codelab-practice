@@ -15,6 +15,7 @@
  */
 package com.google.firebase.codelab.friendlychat
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.view.Menu
@@ -23,6 +24,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.*
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import com.google.firebase.codelab.friendlychat.BuildConfig
 import com.google.firebase.codelab.friendlychat.databinding.ActivityMainBinding
 import com.google.firebase.storage.StorageReference
@@ -35,7 +39,8 @@ class MainActivity : AppCompatActivity() {
         uri?.let { onImageSelected(it) }
     }
 
-    // TODO: implement Firebase instance variables
+    // 파이어베이스 인스턴스 변수
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,8 +50,13 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Initialize Firebase Auth and check if the user is signed in
-        // TODO: implement
+        // 파이어베이스 어스 연결 및 사용자 확인 후 확인이 안되면 페이지 진입
+        auth = Firebase.auth
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, SignInActivity::class.java))
+            finish()
+            return
+        }
 
         // Initialize Realtime Database and FirebaseRecyclerAdapter
         // TODO: implement
@@ -66,8 +76,12 @@ class MainActivity : AppCompatActivity() {
 
     public override fun onStart() {
         super.onStart()
-        // Check if user is signed in.
-        // TODO: implement
+        // onStart에서도 사용자 확인 - 화면 다시 돌아왔을 떄 확인을 위함
+        if (auth.currentUser == null) {
+            startActivity(Intent(this, SignInActivity::class.java))
+            finish()
+            return
+        }
     }
 
     public override fun onPause() {
