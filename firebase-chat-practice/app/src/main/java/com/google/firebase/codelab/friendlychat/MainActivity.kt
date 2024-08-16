@@ -18,6 +18,7 @@ package com.google.firebase.codelab.friendlychat
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -32,9 +33,11 @@ import com.google.firebase.auth.auth
 import com.google.firebase.codelab.friendlychat.BuildConfig
 import com.google.firebase.codelab.friendlychat.databinding.ActivityMainBinding
 import com.google.firebase.codelab.friendlychat.model.FriendlyMessage
+import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
 import com.google.firebase.storage.StorageReference
+import com.google.firebase.storage.storage
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -167,12 +170,61 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onImageSelected(uri: Uri) {
-        // TODO: implement
+        // 이미지가 포함된 메세지를 보낼 때 이미지를 선택하는 로직
+        val user = auth.currentUser
+        // 임시이미지를 포함한 메세지
+        val tmpMessage = FriendlyMessage(null, getUserName(), getPhotoUrl(), LOADING_IMAGE_URL)
+        
+        db.reference
+            .child(MESSAGES_CHILD)
+            .push()
+            .setValue(
+                tmpMessage,
+                DatabaseReference.CompletionListener { databaseError, databaseReference ->
+                    if (databaseError != null) {
+                       // 오류 발생
+                        Log.w(
+                            TAG, "Unable to write message to database.",
+                            databaseError.toException()
+                        )
+                        return@CompletionListener
+                    }
+                    // 데이터 베이스를 찾고 올리는 작업
+                    val key = databaseReference.key
+                    val storageReference = Firebase.storage
+                        .getReference(user!!.uid)
+                        .child(key!!)
+                        .child(uri.lastPathSegment!!)
+                    putImageInStorage(storageReference, uri, key)
+                }
+            )
     }
 
     private fun putImageInStorage(storageReference: StorageReference, uri: Uri, key: String?) {
         // Upload the image to Cloud Storage
-        // TODO: implement
+        // 실제로 db에 올리는 작업
+        storageReference.putFile(uri).addOnSuccessListener(this) { taskSnapShot ->
+            // 작업 성공했을 때
+            // 다운로드 uri를 가져옴
+            taskSnapShot.metadata!!.reference!!.downloadUrl
+                    // 성공하면
+                .addOnSuccessListener { uri ->
+                    // 이미지가 포함된 메세지
+                    val friendlyMessage =
+                        FriendlyMessage(null, getUserName(), getPhotoUrl(), uri.toString())
+                    // db에 입력
+                    db.reference
+                        .child(MESSAGES_CHILD)
+                        .child(key!!)
+                        .setValue(friendlyMessage)
+                }
+        }.addOnFailureListener { e ->
+            Log.w(
+                TAG,
+                "Image upload task was unsuccessful.",
+                e
+            )
+        }
     }
 
     // 로그아웃 메소드
