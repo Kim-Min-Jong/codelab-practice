@@ -126,8 +126,11 @@ class MainActivity : AppCompatActivity() {
         // TODO: implement
     }
 
+    // 로그아웃 메소드
     private fun signOut() {
-        // TODO: implement
+        AuthUI.getInstance().signOut(this)
+        startActivity(Intent(this, SignInActivity::class.java))
+        finish()
     }
 
     companion object {
