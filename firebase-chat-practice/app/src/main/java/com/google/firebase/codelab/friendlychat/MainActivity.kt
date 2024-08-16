@@ -84,6 +84,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // 사용자의 프로필 이미지 가져오기
+    private fun getPhotoUrl(): String? = auth.currentUser?.photoUrl?.toString()
+    // 사용자 이름 가져오기
+    private fun getUserName(): String? = if (auth.currentUser != null) {
+        auth.currentUser?.displayName
+    } else {
+        ANONYMOUS
+    }
+
     public override fun onPause() {
         super.onPause()
     }
