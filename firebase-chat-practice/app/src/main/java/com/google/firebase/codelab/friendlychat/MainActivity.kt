@@ -21,14 +21,19 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.AuthUI.IdpConfig.*
+import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.codelab.friendlychat.BuildConfig
 import com.google.firebase.codelab.friendlychat.databinding.ActivityMainBinding
+import com.google.firebase.codelab.friendlychat.model.FriendlyMessage
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.database
 import com.google.firebase.storage.StorageReference
 
 class MainActivity : AppCompatActivity() {
@@ -41,6 +46,10 @@ class MainActivity : AppCompatActivity() {
 
     // 파이어베이스 인스턴스 변수
     private lateinit var auth: FirebaseAuth
+    private lateinit var db: FirebaseDatabase
+
+    // 메세지 리사이클러뷰 어댑터 변수
+    private lateinit var rAdapter: FriendlyMessageAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,8 +67,31 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
-        // Initialize Realtime Database and FirebaseRecyclerAdapter
-        // TODO: implement
+        // 파이어베이스 디비 및 파이어베이스 UI 리사이클러뷰 어댑터 초기화
+        db = Firebase.database
+        val messsageRef = db.reference.child(MESSAGES_CHILD)
+
+        // 파이어베이스에 들어갈 옵션을 정의
+        val option = FirebaseRecyclerOptions.Builder<FriendlyMessage>()
+            .setQuery(messsageRef, FriendlyMessage::class.java)
+            .build()
+        rAdapter = FriendlyMessageAdapter(option, getUserName())
+
+        with(binding) {
+            progressBar.isVisible = false
+            manager = LinearLayoutManager(this@MainActivity)
+            manager.stackFromEnd = true
+            messageRecyclerView.apply {
+                layoutManager = manager
+                adapter = rAdapter
+            }
+            // 새로운 메세지가 도착했을 떄, 스크롤을 내리기 위해 데이터를 확인하는 옵저버 등록
+            rAdapter.registerAdapterDataObserver(
+                MyScrollToBottomObserver(messageRecyclerView, rAdapter, manager)
+            )
+        }
+
+
 
         // Disable the send button when there's no text in the input field
         // See MyButtonObserver for details
@@ -93,12 +125,16 @@ class MainActivity : AppCompatActivity() {
         ANONYMOUS
     }
 
+
+    // 생명주기마다 firebase db의 업데이트를 확인
     public override fun onPause() {
+        rAdapter.stopListening()
         super.onPause()
     }
 
     public override fun onResume() {
         super.onResume()
+        rAdapter.startListening()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
