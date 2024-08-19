@@ -26,6 +26,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
     lint {
         // TODO(thatfiredev): Remove this once
