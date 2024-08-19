@@ -187,7 +187,33 @@ class MainFragment : Fragment(),
     }
 
     override fun onFilter(filters: Filters) {
-        // TODO(developer): Construct new query
+        // 필터링을 통한 쿼리 재구성
+        var query : Query = firestore.collection("restaurants")
+
+        // 동등한지 확인하는 필터
+        if (filters.hasCategory()) {
+            query = query.whereEqualTo(Restaurant.FIELD_CATEGORY, filters.category)
+        }
+
+        // 동등한지 확인하는 필터
+        if (filters.hasCity()) {
+            query = query.whereEqualTo(Restaurant.FIELD_CITY, filters.city)
+        }
+
+        // 동등한지 확인하는 필터
+        if (filters.hasPrice()) {
+            query = query.whereEqualTo(Restaurant.FIELD_PRICE, filters.price)
+        }
+
+        // 정렬
+        if (filters.hasSortBy()) {
+            query = query.orderBy(filters.sortBy.toString(), filters.sortDirection)
+        }
+
+        // 개수 제한
+        query = query.limit(LIMIT.toLong())
+
+        adapter?.setQuery(query)
 
         // Set header
         binding.textCurrentSearch.text = HtmlCompat.fromHtml(
