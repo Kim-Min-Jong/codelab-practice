@@ -25,6 +25,7 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.example.fireeats.databinding.FragmentMainBinding
 import com.google.firebase.example.fireeats.adapter.RestaurantAdapter
 import com.google.firebase.example.fireeats.model.Restaurant
+import com.google.firebase.example.fireeats.util.RestaurantUtil
 import com.google.firebase.example.fireeats.viewmodel.MainActivityViewModel
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
@@ -207,7 +208,16 @@ class MainFragment : Fragment(),
     }
 
     private fun onAddItemsClicked() {
-        // TODO(developer): Add random restaurants
+        // 임의의 데이터 추가
+
+        // 레스토랑 컬렉션 찾아오기
+        val restaurantRef = firestore.collection("restaurants")
+
+        repeat(10) {
+            val randomRestaurant = RestaurantUtil.getRandom(requireContext())
+
+            restaurantRef.add(randomRestaurant)
+        }
         showTodoToast()
     }
 
