@@ -27,6 +27,7 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.firestore.toObject
 import com.google.firebase.ktx.Firebase
 
 class RestaurantDetailFragment : Fragment(),
@@ -162,9 +163,36 @@ class RestaurantDetailFragment : Fragment(),
                 }
     }
 
+    // 점수를 추가하는 메소드
     private fun addRating(restaurantRef: DocumentReference, rating: Rating): Task<Void> {
-        // TODO(developer): Implement
-        return Tasks.forException(Exception("not yet implemented"))
+
+        // 점수를 입력할 새로운 컬랙션 생성
+        val ratingRef = restaurantRef.collection("ratings").document()
+
+        // 트랜잭션을 통해 여러개의 데이터를 업데이트함 (무결성 유지)
+        return firestore.runTransaction { transaction ->
+            val restaurant = transaction.get(restaurantRef).toObject(Restaurant::class.java)
+                ?: throw Exception("not found at ${restaurantRef.path}")
+
+            // 점수 계산
+            val newNumRatings = restaurant.numRatings + 1
+
+            // 평균 점수 계산
+            val oldRatingTotal = restaurant.avgRating * restaurant.numRatings
+            val newAvgRating = (oldRatingTotal + rating.rating) / newNumRatings
+
+            // 정보 삽입
+            restaurant.numRatings = newNumRatings
+            restaurant.avgRating = newAvgRating
+
+            // 파이어스토어 입력
+            transaction.set(restaurantRef, restaurant)
+            transaction.set(ratingRef, rating)
+
+            null
+        }
+
+
     }
 
     private fun hideKeyboard() {
