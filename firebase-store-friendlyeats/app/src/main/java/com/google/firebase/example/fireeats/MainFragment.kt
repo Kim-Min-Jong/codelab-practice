@@ -63,6 +63,14 @@ class MainFragment : Fragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 프래그먼트 시작 시 데이터 가져오기
+        firestore = Firebase.firestore
+
+        // firestore에서 가져올 데이터
+        query = firestore.collection("restaurant")
+            .orderBy("avgRating", Query.Direction.DESCENDING)
+            .limit(LIMIT.toLong())
+
         // View model
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
