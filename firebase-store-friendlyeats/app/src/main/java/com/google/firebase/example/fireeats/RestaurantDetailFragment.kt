@@ -113,7 +113,7 @@ class RestaurantDetailFragment : Fragment(),
         }
 
         snapshot?.let {
-            val restaurant = snapshot.toObject<Restaurant>()
+            val restaurant = snapshot.toObject(Restaurant::class.java)
             if (restaurant != null) {
                 onRestaurantLoaded(restaurant)
             }
