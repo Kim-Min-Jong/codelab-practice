@@ -18,8 +18,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:layoutDescription="@xml/step3">
-
+    app:layoutDescription="@xml/step3"
+    app:motionDebug="SHOW_PATH">
+    <!--    애니메이션의 경로를 그려주는 디버깅-->
 
     <ImageView
         android:id="@+id/background"
