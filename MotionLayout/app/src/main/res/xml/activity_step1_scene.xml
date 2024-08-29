@@ -9,6 +9,9 @@
         motion:constraintSetStart="@id/start"
         motion:duration="1500">
         <KeyFrameSet></KeyFrameSet>
+<!--        클릭시 액션을 실행-->
+        <OnClick motion:targetId="@+id/red_star"
+            motion:clickAction="toggle" />
     </Transition>
 
     <!--    시작 제약 조건-->
