@@ -21,7 +21,6 @@
     android:id="@+id/recycler_view"
     android:padding="16dp"
     android:clipToPadding="true"
-    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    tools:context=".MainActivity">
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager">
 
 </androidx.recyclerview.widget.RecyclerView>

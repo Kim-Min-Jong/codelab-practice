@@ -20,8 +20,8 @@ import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.LiveData
+import com.pr.motionlayout_practice.R
 
-import kotlinx.android.synthetic.main.activity_step1.*
 
 class Step5Activity : AppCompatActivity() {
 

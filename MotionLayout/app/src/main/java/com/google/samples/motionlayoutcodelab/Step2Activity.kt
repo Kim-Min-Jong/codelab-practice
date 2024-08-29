@@ -19,8 +19,7 @@ import android.os.Bundle
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity;
-
-import kotlinx.android.synthetic.main.activity_step1.*
+import com.pr.motionlayout_practice.R
 
 class Step2Activity : AppCompatActivity() {
 
