@@ -28,7 +28,10 @@ import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.pr.motionlayout_practice.R
 import kotlin.reflect.KClass
+
+
 
 data class Step(
     val number: String,
