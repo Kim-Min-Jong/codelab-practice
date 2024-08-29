@@ -26,23 +26,25 @@
             motion:clickAction="toggle"
             motion:targetId="@id/moon" />
 
+        <!-- framePosition의 위치에 따라 좌표가 이동하므로 이걸 확인하며 복잡한 경로 설계 가능 -->
         <KeyFrameSet>
+            <KeyPosition
+                motion:framePosition="25"
+                motion:keyPositionType="parentRelative"
+                motion:motionTarget="@id/moon"
+                motion:percentX="0.1"
+                motion:percentY="0.6" />
             <KeyPosition
                 motion:framePosition="50"
                 motion:keyPositionType="parentRelative"
                 motion:motionTarget="@id/moon"
                 motion:percentY="0.5" />
             <KeyPosition
-                motion:framePosition="25"
-                motion:keyPositionType="parentRelative"
-                motion:motionTarget="@id/moon"
-                motion:percentY="0.6" />
-            <KeyPosition
                 motion:framePosition="75"
                 motion:keyPositionType="parentRelative"
                 motion:motionTarget="@id/moon"
+                motion:percentX="0.1"
                 motion:percentY="0.6" />
-
         </KeyFrameSet>
     </Transition>
 
