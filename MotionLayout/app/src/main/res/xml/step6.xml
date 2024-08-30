@@ -66,7 +66,31 @@
             />
 
             <!-- TODO Add Custom attributes here -->
-
+            <KeyAttribute
+                motion:motionTarget="@id/moon"
+                motion:framePosition="0">
+<!--                사용자 지정 속성을 나타냄-->
+                <CustomAttribute
+                    motion:attributeName="colorFilter"
+                    motion:customColorValue="#FFFFFF"
+                    />
+            </KeyAttribute>
+            <KeyAttribute
+                motion:framePosition="50"
+                motion:motionTarget="@id/moon">
+                <CustomAttribute
+                    motion:attributeName="colorFilter"
+                    motion:customColorValue="#FFB612"
+                    />
+            </KeyAttribute>
+            <KeyAttribute
+                motion:framePosition="100"
+                motion:motionTarget="@id/moon">
+                <CustomAttribute
+                    motion:attributeName="colorFilter"
+                    motion:customColorValue="#FFFFFF"
+                    />
+            </KeyAttribute>
         </KeyFrameSet>
     </Transition>
 
