@@ -35,7 +35,17 @@ class Step8Activity : AppCompatActivity() {
     }
 
     private fun coordinateMotion() {
-        // TODO: set progress of MotionLayout based on an AppBarLayout.OnOffsetChangedListener
+        val appBarLayout = findViewById<AppBarLayout>(R.id.appbar_layout)
+        val motionLayout = findViewById<MotionLayout>(R.id.motion_layout)
 
+        // 스크롤 시 호출되는 리스너
+        val listener = AppBarLayout.OnOffsetChangedListener { _, verticalOffset ->
+            // 스크롤 정도에 따라
+            val seekPosition = -verticalOffset / appBarLayout.totalScrollRange.toFloat()
+            // 모션 레이아웃의 진행정도를 수정
+            motionLayout.progress = seekPosition
+        }
+
+        appBarLayout.addOnOffsetChangedListener(listener)
     }
 }
