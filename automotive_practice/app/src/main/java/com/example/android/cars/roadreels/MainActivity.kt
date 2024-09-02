@@ -18,15 +18,25 @@ package com.example.android.cars.roadreels
 
 import android.os.Build
 import android.os.Bundle
+import android.view.WindowInsetsController
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.android.cars.roadreels.ui.theme.RoadReelsTheme
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat.OnControllableInsetsChangedListener
+
 
 
 class MainActivity : ComponentActivity() {
+    private lateinit var onControllableInsetsChangedListener: OnControllableInsetsChangedListener
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,8 +51,23 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            RoadReelsTheme {
-                RoadReelsApp(calculateWindowSizeClass(this))
+            // 변경사항을 수신 대기하도록 OnControllableInsetsChangedListener를 설정
+            var controllableInsetsTypeMask by remember { mutableStateOf(DEFAULT_CONTROLLABLE_INSETS) }
+
+            onControllableInsetsChangedListener = OnControllableInsetsChangedListener { _, typeMask ->
+                if (controllableInsetsTypeMask != typeMask) {
+                    controllableInsetsTypeMask = typeMask
+                }
+            }
+
+            WindowCompat.getInsetsController(window, window.decorView)
+                .addOnControllableInsetsChangedListener(onControllableInsetsChangedListener)
+
+            // 테마와 앱 컴포저블을 포함하고 값을 LocalControllableInsets에 결합하는 최상위 수준 CompositionLocalProvider를 추가
+            CompositionLocalProvider(value = LocalControllableInsets provides controllableInsetsTypeMask) {
+                RoadReelsTheme {
+                    RoadReelsApp(calculateWindowSizeClass(this))
+                }
             }
         }
     }

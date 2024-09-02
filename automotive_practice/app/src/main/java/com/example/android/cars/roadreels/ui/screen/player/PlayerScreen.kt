@@ -20,7 +20,13 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -39,6 +46,7 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.android.cars.roadreels.LocalControllableInsets
 import com.example.android.cars.roadreels.SupportedOrientation
 import com.example.android.cars.roadreels.supportedOrientations
 import kotlinx.coroutines.delay
@@ -135,7 +143,8 @@ fun PlayerScreen(
         // 요청된 방향을 설정하도록 호출,
         //모바일 기기의 멀티 윈도우 모드에서도 앱이 이와 비슷한 문제에 직면할 수 있으므로 이 경우에도 방향이 동적으로 설정되지 않도록 하는 검사를 포함
         if (context.supportedOrientations().contains(SupportedOrientation.LandScape)
-            && !context.isInMultiWindowMode) {
+            && !context.isInMultiWindowMode
+        ) {
             context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
         }
 
@@ -174,7 +183,31 @@ fun PlayerScreen(
     Box(
         modifier = modifier
             .fillMaxSize()
+    )
+
+
+    //플레이어에서 현재 값을 읽고 이를 사용하여 패딩에 사용할 인셋을 확인
+    val controllableInsetsTypeMask = LocalControllableInsets.current
+
+    var windowInsetsForPadding = WindowInsets(0.dp)
+    if (controllableInsetsTypeMask.and(WindowInsetsCompat.Type.statusBars()) == 0) {
+        windowInsetsForPadding = windowInsetsForPadding.union(WindowInsets.statusBars)
+    }
+    if (controllableInsetsTypeMask.and(WindowInsetsCompat.Type.navigationBars()) == 0) {
+        windowInsetsForPadding = windowInsetsForPadding.union(WindowInsets.navigationBars)
+    }
+
+    // 앞에서 적용한 변경사항은 앱이 깜박이는 루프에 진입하거나 레터박스가 발생하지 않도록 하지만 시스템 표시줄은 항상 숨길 수 있다는 문제 발생
+    // 자동차를 사용하는 사용자는 휴대전화나 태블릿을 사용할 때와 다른 요구사항을 갖기 때문에 OEM은 화면에서 항상 실내 온도 조절기와 같은 차량 컨트롤에 액세스할 수 있도록 앱이 시스템 표시줄을 숨기지 못하도록 할 수 있음
+    // 그렇기 떄문에 시스템 바가 없으면 앱 탐색이 불가해 계속 보여줘야함
+
+    Box(
+        modifier =
+        Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(WindowInsets.systemBars)
     ) {
+
         PlayerView(
             player,
             modifier = Modifier
