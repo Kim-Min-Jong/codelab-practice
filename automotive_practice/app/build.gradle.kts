@@ -21,12 +21,30 @@ plugins {
 
 android {
     namespace = "com.example.android.cars.roadreels"
-    compileSdk = 34
+    compileSdk = 33
+
+    // automotive를 위한 폼팩터 버천 추가
+    flavorDimensions += "formFactor"
+    productFlavors {
+        // 모바일 버전
+        create("mobile") {
+            isDefault = true
+            // 한가지의 팩터만 등록
+            dimension = "formFactor"
+        }
+        // automotive 버전
+        create("automotive") {
+            dimension = "formFactor"
+            // 버전 이름 추가
+            versionNameSuffix = "-automotive"
+        }
+    }
+
 
     defaultConfig {
         applicationId = "com.example.android.cars.roadreels"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
