@@ -42,6 +42,8 @@ import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
@@ -84,6 +86,15 @@ fun PlayerScreen(
     val player = remember(context) { ExoPlayer.Builder(context).build() }
     var isShowingControls by remember { mutableStateOf(true) }
     var playerState by remember(player) { mutableStateOf(player.toPlayerState()) }
+
+    // 수명 주기에 따른 플레이어 재생상태 컨트롤
+    LifecycleEventEffect(Lifecycle.Event.ON_PAUSE) {
+        player.pause()
+    }
+    LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+        player.play()
+    }
+
 
     DisposableEffect(player) {
         val listener = object : Player.Listener {
