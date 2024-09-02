@@ -16,6 +16,8 @@
 
 package com.example.android.cars.roadreels
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.view.Window
 import android.view.WindowManager
 
@@ -28,4 +30,26 @@ fun Window.updateAttributes(block: WindowManager.LayoutParams.() -> Unit) {
     layoutParams.copyFrom(this.attributes)
     layoutParams.apply(block)
     this.attributes = layoutParams
+}
+
+
+enum class SupportedOrientation {
+    LandScape,
+    Portrait
+}
+
+// 화면 방향 검사
+// 세로 모드로 되지 않도록
+// PackageManager를 통해 검사
+fun Context.supportedOrientations(): List<SupportedOrientation> {
+    return when (Pair(
+        packageManager.hasSystemFeature(PackageManager.FEATURE_SCREEN_LANDSCAPE),
+        packageManager.hasSystemFeature(PackageManager.FEATURE_SCREEN_PORTRAIT),
+    )) {
+        // LandScape 일때
+        Pair(true, false) -> listOf(SupportedOrientation.LandScape)
+        // Portrait 일때
+        Pair(false, true) -> listOf(SupportedOrientation.Portrait)
+        else -> listOf(SupportedOrientation.LandScape, SupportedOrientation.Portrait)
+    }
 }

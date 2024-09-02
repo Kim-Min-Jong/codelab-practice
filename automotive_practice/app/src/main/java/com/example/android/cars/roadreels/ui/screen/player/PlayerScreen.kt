@@ -39,6 +39,8 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.android.cars.roadreels.SupportedOrientation
+import com.example.android.cars.roadreels.supportedOrientations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -130,6 +132,12 @@ fun PlayerScreen(
 
     LaunchedEffect(Unit) {
         context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        // 요청된 방향을 설정하도록 호출,
+        //모바일 기기의 멀티 윈도우 모드에서도 앱이 이와 비슷한 문제에 직면할 수 있으므로 이 경우에도 방향이 동적으로 설정되지 않도록 하는 검사를 포함
+        if (context.supportedOrientations().contains(SupportedOrientation.LandScape)
+            && !context.isInMultiWindowMode) {
+            context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+        }
 
         windowInsetsController.hide(WindowInsetsCompat.Type.systemBars())
         windowInsetsController.systemBarsBehavior =
