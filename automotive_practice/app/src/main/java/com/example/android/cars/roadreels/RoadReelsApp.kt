@@ -21,8 +21,12 @@ import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -62,7 +66,18 @@ fun RoadReelsApp(
                 )
             } else if (route?.startsWith(Screen.Detail.name) == true) {
                 CenterAlignedTopAppBar(
-                    title = { Text(stringResource(R.string.bbb_title)) }
+                    title = { Text(stringResource(R.string.bbb_title)) },
+                    // Android Automotive OS 에뮬레이터에서 앱을 실행하는 동안 세부정보 화면에서 기본 화면으로 또는 플레이어 화면에서 세부정보 화면으로 돌아갈 수 없다. (automotive 요구사항)
+                    // 그렇기에 뒤로 탐색을 설정하려면 특정 화면에 강제로 머물러 있지 않고 자유롭게 탐색할 수 있도록 UI에 탐색 어포던스를 제공해야한다.
+                    navigationIcon = {
+                        // 아이콘을 통한 뒤로가기 지원
+                        IconButton(onClick = { navController.popBackStack() }) {
+                            Icon(
+                                Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    }
                 )
             }
         },

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.twotone.Close
 import androidx.compose.material.icons.twotone.PauseCircle
 import androidx.compose.material.icons.twotone.PlayCircle
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ fun PlayerControls(
     playerState: PlayerState,
     onPlayPause: () -> Unit,
     onSeek: (seekToMillis: Long) -> Unit,
+    onClose: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -67,7 +69,8 @@ fun PlayerControls(
                     .fillMaxWidth()
                     .padding(dimensionResource(R.dimen.screen_edge_padding))
                     .align(Alignment.TopCenter),
-                title = playerState.mediaMetadata.title?.toString()
+                title = playerState.mediaMetadata.title?.toString(),
+                onClose = onClose
             )
 
             CenterControls(
@@ -92,8 +95,24 @@ fun PlayerControls(
 
 
 @Composable
-fun TopControls(title: String?, modifier: Modifier = Modifier) {
+fun TopControls(
+    title: String?,
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier) {
     Box(modifier) {
+        // 플레이어 화면에서도 뒤로가기(탐색) 버튼을 추가
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.TopStart),
+            onClick = onClose
+        ) {
+            Icon(
+                Icons.TwoTone.Close,
+                contentDescription = "Close player",
+                tint = Color.White
+            )
+        }
+
         if (title != null) {
             Text(
                 title,

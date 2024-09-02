@@ -60,10 +60,11 @@ fun RoadReelsNavHost(
         }
         composable(
             route = Screen.Player.name,
-            enterTransition = { EnterTransition.None  },
+            enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None }
         ) {
-            PlayerScreen()
+            // 상태 호이스팅
+            PlayerScreen(onClose = { navController.popBackStack() })
         }
     }
 }

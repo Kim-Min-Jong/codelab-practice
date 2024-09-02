@@ -64,7 +64,10 @@ fun Player.toPlayerState(): PlayerState {
 }
 
 @Composable
-fun PlayerScreen(modifier: Modifier = Modifier) {
+fun PlayerScreen(
+    onClose: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val context = LocalContext.current as Activity
     val coroutineScope = rememberCoroutineScope()
 
@@ -118,7 +121,12 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
         player.playWhenReady = true
     }
 
-    val windowInsetsController = remember(context) { WindowCompat.getInsetsController(context.window, context.window.decorView) }
+    val windowInsetsController = remember(context) {
+        WindowCompat.getInsetsController(
+            context.window,
+            context.window.decorView
+        )
+    }
 
     LaunchedEffect(Unit) {
         context.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
@@ -172,7 +180,8 @@ fun PlayerScreen(modifier: Modifier = Modifier) {
             visible = isShowingControls,
             playerState = playerState,
             onPlayPause = { if (playerState.isPlaying) player.pause() else player.play() },
-            onSeek = { player.seekTo(it) }
+            onSeek = { player.seekTo(it) },
+            onClose = onClose
         )
     }
 }
