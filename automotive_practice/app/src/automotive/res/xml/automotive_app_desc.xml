@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<automotiveApp xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+<!--    자동차용 Android 컨텍스트에서 앱의 카테고리를 선언하는 데 사용-->
+    <uses
+        name="video"
+        tools:ignore="InvalidUsesTagAttribute" />
+</automotiveApp>

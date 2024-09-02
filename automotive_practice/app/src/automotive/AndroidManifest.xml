@@ -12,4 +12,9 @@
     <uses-feature
         android:name="android.hardware.screen.landscape"
         android:required="false" />
+    <application>
+        <meta-data
+            android:name="com.android.automotive"
+            android:resource="@xml/automotive_app_desc"/>
+    </application>
 </manifest>
