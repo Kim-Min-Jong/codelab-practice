@@ -1,0 +1,15 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- automovite용 매니페스트 요구사항 추가-->
+    <uses-feature
+        android:name="android.hardware.type.automotive"
+        android:required="true"/> <!-- automotive 기능이 있는 기기(자동차)에만 앱을 배포하는 데 사용 -->
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.screen.portrait"
+        android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+</manifest>
