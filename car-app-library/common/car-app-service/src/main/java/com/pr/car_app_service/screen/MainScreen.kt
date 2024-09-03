@@ -48,7 +48,7 @@ class MainScreen(carContext: CarContext) : Screen(carContext) {
                                     Spannable.SPAN_INCLUSIVE_INCLUSIVE
                                 )
                             }
-                        ).setOnClickListener { TODO() }
+                        ).setOnClickListener { screenManager.push(DetailScreen(carContext, it.id)) }
                         // 메타데이터 설정은 선택적이지만 제공되는 지도에 자동적으로 아이템의 위치를 보여줌으로 필요
                         .setMetadata(
                             Metadata.Builder()
