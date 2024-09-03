@@ -5,6 +5,7 @@ import androidx.car.app.CarAppService
 import androidx.car.app.Screen
 import androidx.car.app.Session
 import androidx.car.app.validation.HostValidator
+import com.pr.car_app_service.screen.MainScreen
 
 // CarAppService는 Service의 하위 클래스 (서비스처럼 동작)
 class PlaceCarAppService: CarAppService() {
