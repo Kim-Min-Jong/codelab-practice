@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--앱이 자동차 기능을 갖는다는 선언 xml-->
+<automotiveApp xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses name="template"/>
+</automotiveApp>
