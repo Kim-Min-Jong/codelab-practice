@@ -42,6 +42,7 @@ dependencies {
 
     implementation(project(":common:car-app-service"))
     implementation("androidx.car.app:app:1.4.0")
+    implementation("androidx.car.app:app-automotive:1.4.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
