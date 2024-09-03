@@ -21,12 +21,12 @@ plugins {
 
 android {
     namespace 'com.example.android.cars.places'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.example.android.cars.places"
-        minSdk 23
-        targetSdk 33
+        minSdk 24
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 

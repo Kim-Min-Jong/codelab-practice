@@ -35,7 +35,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
+    implementation("androidx.appcompat:appcompat:1.6.0")
     implementation("com.google.android.material:material:1.12.0")
 
     // car app library 코어 클래스 모듈 (app-projected, app-testing, app-automotive)
