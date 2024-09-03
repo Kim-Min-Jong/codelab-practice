@@ -1,6 +1,8 @@
 package com.pr.car_app_service
 
+import android.content.Intent
 import androidx.car.app.CarAppService
+import androidx.car.app.Screen
 import androidx.car.app.Session
 import androidx.car.app.validation.HostValidator
 
@@ -18,5 +20,12 @@ class PlaceCarAppService: CarAppService() {
     // 라이프사이클을 갖고있음
     override fun onCreateSession(): Session {
         return PlacesSession()
+    }
+}
+
+class PlacesSession(): Session() {
+    override fun onCreateScreen(intent: Intent): Screen {
+        // 화면을 보여줄 스크린 반환
+        return MainScreen(carContext)
     }
 }
