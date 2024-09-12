@@ -66,6 +66,21 @@ public class GlobalActionBarService extends AccessibilityService {
         inflater.inflate(R.layout.action_bar, mLayout);
 
         wm.addView(mLayout, lp);
+
+        // 전원 버튼 기능 추가
+        configurePowerButton();
+    }
+
+    // 전원 버튼 구성
+    private void configurePowerButton() {
+        Button powerButton = (Button) mLayout.findViewById(R.id.power);
+        powerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 전원 대화상자를 사용자에게 표시
+                performGlobalAction(GLOBAL_ACTION_POWER_DIALOG);
+            }
+        });
     }
 
     @Override
