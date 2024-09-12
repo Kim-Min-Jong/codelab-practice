@@ -73,6 +73,8 @@ public class GlobalActionBarService extends AccessibilityService {
         configureVolumeButton();
         // 스크롤 버튼 기능 추가
         configureScrollButton();
+        // 스와이프 버튼 기능 추가
+        configureSwipeButton();
     }
 
     // 전원 버튼 구성
@@ -112,7 +114,7 @@ public class GlobalActionBarService extends AccessibilityService {
         Deque<AccessibilityNodeInfo> deque = new ArrayDeque<>();
         deque.add(root);
 
-        while(!deque.isEmpty()) {
+        while (!deque.isEmpty()) {
             AccessibilityNodeInfo node = deque.removeFirst();
 
             if (node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD)) {
@@ -140,6 +142,25 @@ public class GlobalActionBarService extends AccessibilityService {
         });
     }
 
+    private void configureSwipeButton() {
+        Button swipeButton = (Button) mLayout.findViewById(R.id.swipe);
+        swipeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 스와이프 경로를 지정할 객체
+                Path swipePath = new Path();
+                // 경로 지정
+                swipePath.moveTo(1000, 1000);
+                swipePath.lineTo(100, 1000);
+                // 스와이프 제스처(애니메이션)
+                GestureDescription.Builder gestureBuilder = new GestureDescription.Builder();
+                // 0~500ms 동안 스와이프 제스처 실행
+                gestureBuilder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 500));
+                // 제스처 등록 -> 사용자 대신 스와이프 동작 전달
+                dispatchGesture(gestureBuilder.build(), null, null);
+            }
+        });
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
