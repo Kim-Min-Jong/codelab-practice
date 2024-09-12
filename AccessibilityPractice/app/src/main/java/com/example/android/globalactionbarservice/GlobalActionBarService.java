@@ -69,6 +69,8 @@ public class GlobalActionBarService extends AccessibilityService {
 
         // 전원 버튼 기능 추가
         configurePowerButton();
+        // 볼륨 버튼 기능 추가
+        configureVolumeButton();
     }
 
     // 전원 버튼 구성
@@ -79,6 +81,22 @@ public class GlobalActionBarService extends AccessibilityService {
             public void onClick(View view) {
                 // 전원 대화상자를 사용자에게 표시
                 performGlobalAction(GLOBAL_ACTION_POWER_DIALOG);
+            }
+        });
+    }
+
+    // 볼륨 버튼 구성
+    private void configureVolumeButton() {
+        Button volumeUpButton = (Button) mLayout.findViewById(R.id.volume_up);
+        volumeUpButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+                audioManager.adjustStreamVolume(
+                        AudioManager.STREAM_MUSIC,
+                        AudioManager.ADJUST_RAISE,
+                        AudioManager.FLAG_SHOW_UI
+                );
             }
         });
     }
