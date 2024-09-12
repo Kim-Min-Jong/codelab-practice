@@ -71,6 +71,8 @@ public class GlobalActionBarService extends AccessibilityService {
         configurePowerButton();
         // 볼륨 버튼 기능 추가
         configureVolumeButton();
+        // 스크롤 버튼 기능 추가
+        configureScrollButton();
     }
 
     // 전원 버튼 구성
@@ -100,6 +102,44 @@ public class GlobalActionBarService extends AccessibilityService {
             }
         });
     }
+
+    // 스크롤 가능한 노드를 찾음
+    private AccessibilityNodeInfo findScrollableNode(AccessibilityNodeInfo root) {
+        // 접근성 서비스는 화면 실제뷰에 액세스 불가능
+        // AccessibilityNodeInfo로 구성된 트리형태를 반영하는 것 뿐
+        // 정보(뷰의 위치, 메타데이터, 작업) 등을 찾아내기 위해 트리를 순회하는 작업을 실행
+        // 스크롤 가능한 노드를 찾을 때 까지
+        Deque<AccessibilityNodeInfo> deque = new ArrayDeque<>();
+        deque.add(root);
+
+        while(!deque.isEmpty()) {
+            AccessibilityNodeInfo node = deque.removeFirst();
+
+            if (node.getActionList().contains(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD)) {
+                return node;
+            }
+            for (int i = 0; i < node.getChildCount(); i++) {
+                deque.addLast(node.getChild(i));
+            }
+        }
+        return null;
+    }
+
+    // 사용자 대신 스크롤 작업을 실행
+    private void configureScrollButton() {
+        Button scrollButton = (Button) mLayout.findViewById(R.id.scroll);
+        scrollButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AccessibilityNodeInfo scrollable = findScrollableNode(getRootInActiveWindow());
+                // 스크롤 가능한 노드가 있으면 스크롤을 실행
+                if (scrollable != null) {
+                    scrollable.performAction(AccessibilityNodeInfo.AccessibilityAction.ACTION_SCROLL_FORWARD.getId());
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
