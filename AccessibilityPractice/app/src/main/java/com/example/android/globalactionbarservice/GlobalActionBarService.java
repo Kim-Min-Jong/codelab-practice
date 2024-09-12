@@ -22,6 +22,7 @@ import android.media.AudioManager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityNodeInfo;
@@ -32,9 +33,44 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class GlobalActionBarService extends AccessibilityService {
+    // 작업 모음의 레이아웃을 저장할 변수
+    FrameLayout mLayout;
+
+    // 서비스가 연결될 떄의 콜백
+    @Override
+    protected void onServiceConnected() {
+        // 래이아웃을 확장하고 작업 모음을 추가
+
+        // wm 선언
+        WindowManager wm = (WindowManager) getSystemService(WINDOW_SERVICE);
+        // 레이아웃 초기화
+        mLayout = new FrameLayout(this);
+
+        // 레이아웃 파라미터 객체 선언
+        WindowManager.LayoutParams lp = new WindowManager.LayoutParams();
+
+        // 파라미터 조정
+
+        // 별다른 권한 처리 없이 기존 컨텐츠 위에 접근성 레이아웃을 그릴 수 있음
+        lp.type = WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY;
+        lp.format = PixelFormat.TRANSLUCENT;
+        lp.flags |= WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        lp.width = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.height = WindowManager.LayoutParams.WRAP_CONTENT;
+        lp.gravity = Gravity.TOP;
+
+        // 레이아웃을 그릴 inflater
+        LayoutInflater inflater = LayoutInflater.from(this);
+
+        // frameLayout에 action bar를 그림
+        inflater.inflate(R.layout.action_bar, mLayout);
+
+        wm.addView(mLayout, lp);
+    }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+
 
     }
 
