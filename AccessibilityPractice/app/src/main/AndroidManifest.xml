@@ -20,9 +20,14 @@
         <service
                 android:name=".GlobalActionBarService"
                 android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" android:exported="true">
+            <!-- 접그넝 서비스에 바인딩 할 수 있는 권한 -->
+
+            <!-- Accessibility Service 인텐트 필터 선언 -->
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService"/>
             </intent-filter>
+
+            <!-- 생성 중인 서비스의 메타데이터가 포함된 파일의 위치 -->
             <meta-data
                     android:name="android.accessibilityservice"
                     android:resource="@xml/global_action_bar_service"/>
