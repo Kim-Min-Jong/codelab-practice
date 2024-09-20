@@ -16,6 +16,7 @@
 
 package com.example.reply.ui
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowSize
+import androidx.compose.material3.adaptive.layout.AnimatedPane
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
 import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
 import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
@@ -147,27 +149,38 @@ fun ReplyAppContent(
     // 표시할 창과 이 창에 표시되어야 하는 컨텐츠를 제어하는 탐색기
     val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
 
+    // 뒤로가기 탐색
+    BackHandler(navigator.canNavigateBack()) {
+        navigator.navigateBack()
+    }
+
     // 윈도우 사이즈에 따라 영역을 두개로 나누는 scaffold
     ListDetailPaneScaffold(
         directive = navigator.scaffoldDirective,
         value = navigator.scaffoldValue,
         // 리스트 형식
         listPane = {
-            ReplyListPane(
-                replyHomeUIState = replyHomeUIState,
-                onEmailClick = { email ->
-                    onEmailClick(email)
-                    // 두 창이 모두 표시될 때 잘 작동하지만 창에 창 하나만 표시할 공간이 있는 경우 항목을 탭해도 아무 일도 발생하지 않는 것처럼 보임
-                    // 선택한 이메일이 업데이트되더라도 ListDetailPaneScaffold가 이러한 구성의 목록 창에 포커스를 유지하기 때문
-                    // 이를 수정하기 위해 디테일로 가는 탐색명령을 명시
-                    navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, email.id)
-                }
-            )
+            // 창 전환시 효과
+            AnimatedPane {
+                ReplyListPane(
+                    replyHomeUIState = replyHomeUIState,
+                    onEmailClick = { email ->
+                        onEmailClick(email)
+                        // 두 창이 모두 표시될 때 잘 작동하지만 창에 창 하나만 표시할 공간이 있는 경우 항목을 탭해도 아무 일도 발생하지 않는 것처럼 보임
+                        // 선택한 이메일이 업데이트되더라도 ListDetailPaneScaffold가 이러한 구성의 목록 창에 포커스를 유지하기 때문
+                        // 이를 수정하기 위해 디테일로 가는 탐색명령을 명시
+                        navigator.navigateTo(ListDetailPaneScaffoldRole.Detail, email.id)
+                    }
+                )
+            }
         },
         // 자세하 형식
         detailPane = {
-            if (replyHomeUIState.selectedEmail != null) {
-                ReplyDetailPane(replyHomeUIState.selectedEmail)
+            // 창 전환시 효과
+            AnimatedPane {
+                if (replyHomeUIState.selectedEmail != null) {
+                    ReplyDetailPane(replyHomeUIState.selectedEmail)
+                }
             }
         }
     )
