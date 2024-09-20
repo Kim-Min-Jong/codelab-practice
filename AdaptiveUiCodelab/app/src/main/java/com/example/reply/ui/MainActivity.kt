@@ -20,8 +20,16 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.reply.data.local.LocalEmailsDataProvider
@@ -37,6 +45,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             ReplyTheme {
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                // 현재 원도우 정보 확인
+                val adaptiveInfo = currentWindowAdaptiveInfo()
+                val sizeClassText =
+                    "${adaptiveInfo.windowSizeClass.windowWidthSizeClass}\n" +
+                            "${adaptiveInfo.windowSizeClass.windowHeightSizeClass}"
+
+                Text(
+                    text = sizeClassText,
+                    color = Color.Magenta,
+                    modifier = Modifier.padding(
+                        WindowInsets.safeDrawing.asPaddingValues()
+                    )
+                )
+
                 ReplyApp(
                     replyHomeUIState = uiState,
                     onEmailClick = viewModel::setSelectedEmail
