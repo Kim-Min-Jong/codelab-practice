@@ -32,7 +32,7 @@ androidx-window = { module = "androidx.window:window", version.ref = "window" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 androidx-material3-adpative = { module = "androidx.compose.material3.adaptive:adaptive", version.ref = "material3Adpative"}
-androidx-material3-adpative-navigation-suite = { module = "androidx.compose.material3.adaptive:material3-adaptive-navigation-suite", version.ref = "material3AdpativeNavSuite"}
+androidx-material3-adpative-navigation-suite = { module = "androidx.compose.material3:material3-adaptive-navigation-suite", version.ref = "material3AdpativeNavSuite"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
