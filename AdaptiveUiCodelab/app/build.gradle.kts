@@ -84,6 +84,7 @@ dependencies {
     implementation(libs.androidx.window)
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.androidx.material3.adpative)
+    implementation(libs.androidx.material3.adpative.navigation.suite)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
