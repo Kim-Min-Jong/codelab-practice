@@ -26,8 +26,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.adaptive.currentWindowSize
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
@@ -134,14 +137,32 @@ private fun ReplyNavigationWrapperUI(
     }
 }
 
+@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun ReplyAppContent(
     replyHomeUIState: ReplyHomeUIState,
     onEmailClick: (Email) -> Unit,
 ) {
-    // You will implement an adaptive two-pane layout here.
-    ReplyListPane(
-        replyHomeUIState = replyHomeUIState,
-        onEmailClick = onEmailClick,
+    // 표시할 창과 이 창에 표시되어야 하는 컨텐츠를 제어하는 탐색기
+    val navigator = rememberListDetailPaneScaffoldNavigator<Long>()
+
+    // 윈도우 사이즈에 따라 영역을 두개로 나누는 scaffold
+    ListDetailPaneScaffold(
+        directive = navigator.scaffoldDirective,
+        value = navigator.scaffoldValue,
+        // 리스트 형식
+        listPane = {
+            ReplyListPane(
+                replyHomeUIState = replyHomeUIState,
+                onEmailClick = onEmailClick,
+            )
+        },
+        // 자세하 형식
+        detailPane = {
+            ReplyDetailPane(replyHomeUIState.emails.first())
+        }
     )
+
+    // You will implement an adaptive two-pane layout here.
+
 }
