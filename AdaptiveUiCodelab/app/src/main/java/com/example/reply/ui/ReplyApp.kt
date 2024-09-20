@@ -159,7 +159,9 @@ fun ReplyAppContent(
         },
         // 자세하 형식
         detailPane = {
-            ReplyDetailPane(replyHomeUIState.emails.first())
+            if (replyHomeUIState.selectedEmail != null) {
+                ReplyDetailPane(replyHomeUIState.selectedEmail)
+            }
         }
     )
 
