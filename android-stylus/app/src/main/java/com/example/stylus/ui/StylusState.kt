@@ -7,7 +7,7 @@ data class StylusState (
     val pressure: Float = 0f,
     // 방향 (외부로의)
     val orientation: Float = 0f,
-    // 방향 (내부로의)
+    // 기울기
     val tilt: Float = 0f,
     // 렌더링된 선을 drawPath 메서드를 사용하여 저장
     val path: Path = Path(),
