@@ -15,10 +15,31 @@
 */
 package com.example.stylus
 
+import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
+import com.example.stylus.data.DrawPoint
+import com.example.stylus.data.DrawPointType
 
 
 class StylusViewModel : ViewModel() {
+
+    private var currentPath = mutableListOf<DrawPoint>()
+
+    // 그릴 경로 만들기
+    private fun createPath(): Path {
+        val path = Path()
+
+        for (point in currentPath) {
+            // 선의 시작점인지 이전위치가 있는지 확인 START - 시작점
+            if (point.type == DrawPointType.START) {
+                path.moveTo(point.x, point.y)
+            } else {
+                path.lineTo(point.x, point.y)
+            }
+        }
+
+        return path
+    }
 
     private fun cancelLastStroke() {
     }
