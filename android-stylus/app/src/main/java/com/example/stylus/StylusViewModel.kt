@@ -15,6 +15,7 @@
 */
 package com.example.stylus
 
+import android.view.MotionEvent
 import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
 import com.example.stylus.data.DrawPoint
@@ -39,6 +40,35 @@ class StylusViewModel : ViewModel() {
         }
 
         return path
+    }
+
+    fun processMotionEvent(motionEvent: MotionEvent): Boolean {
+        // Motion Event
+        when (motionEvent.actionMasked) {
+            // 포인터가 화면을 터치
+            // MotionEvent 객체에서 보고한 위치에서 선이 시작
+            MotionEvent.ACTION_DOWN -> {
+                currentPath.add(
+                    DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.START)
+                )
+            }
+            // 포인터가 화면에서 이동, 선이 그려짐
+            MotionEvent.ACTION_MOVE -> {
+                currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+            }
+            // 포인터가 화면 터치를 중지, 선이 끝남
+            MotionEvent.ACTION_UP -> {
+                currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+            }
+            // 원치 않는 터치가 감지, 마지막 획을 취소
+            MotionEvent.ACTION_CANCEL -> {
+                // Unwanted touch detected.
+                cancelLastStroke()
+            }
+            else -> return false
+        }
+
+        return true
     }
 
     private fun cancelLastStroke() {
