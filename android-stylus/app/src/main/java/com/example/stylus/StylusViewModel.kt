@@ -20,11 +20,27 @@ import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
 import com.example.stylus.data.DrawPoint
 import com.example.stylus.data.DrawPointType
+import com.example.stylus.ui.StylusState
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 
 
 class StylusViewModel : ViewModel() {
 
     private var currentPath = mutableListOf<DrawPoint>()
+
+    // 데이터
+    private var _stylusState = MutableStateFlow(StylusState())
+    val stylusState: StateFlow<StylusState>
+        get() = _stylusState
+
+    // 새로운 상태를 받아 렌더링 업데이트
+    private fun requestRendering(state: StylusState) {
+        _stylusState.update {
+            return@update state
+        }
+    }
 
     // 그릴 경로 만들기
     private fun createPath(): Path {
@@ -67,6 +83,16 @@ class StylusViewModel : ViewModel() {
             }
             else -> return false
         }
+
+        // 모션이벤트 완료후 렌더링 요청 시작
+        requestRendering(
+            StylusState(
+                tilt = motionEvent.getAxisValue(MotionEvent.AXIS_TILT),
+                pressure = motionEvent.pressure,
+                orientation = motionEvent.orientation,
+                path = createPath()
+            )
+        )
 
         return true
     }
