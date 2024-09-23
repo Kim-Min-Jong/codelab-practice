@@ -15,6 +15,7 @@
 */
 package com.example.stylus
 
+import android.os.Build
 import android.view.MotionEvent
 import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
@@ -73,8 +74,16 @@ class StylusViewModel : ViewModel() {
                 currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
             }
             // 포인터가 화면 터치를 중지, 선이 끝남
-            MotionEvent.ACTION_UP -> {
-                currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+            MotionEvent.ACTION_POINTER_UP, MotionEvent.ACTION_UP -> {
+                // 취소된 동작인지 확인
+                val canceled = Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        (motionEvent.flags and MotionEvent.FLAG_CANCELED) == MotionEvent.FLAG_CANCELED
+
+                if (canceled) {
+                    cancelLastStroke()
+                } else {
+                    currentPath.add(DrawPoint(motionEvent.x, motionEvent.y, DrawPointType.LINE))
+                }
             }
             // 원치 않는 터치가 감지, 마지막 획을 취소
             MotionEvent.ACTION_CANCEL -> {
@@ -97,7 +106,16 @@ class StylusViewModel : ViewModel() {
         return true
     }
 
+    // 원치 않는 터치 감지 시 마지막을 취소함
     private fun cancelLastStroke() {
+        val lastIndex = currentPath.findLastIndex {
+            it.type == DrawPointType.START
+        }
+
+        if (lastIndex > 0) {
+            // 마지막을 뺸 리스트를 다시 반환
+            currentPath = currentPath.subList(0, lastIndex - 1)
+        }
     }
 }
 
