@@ -30,17 +30,23 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.example.stylus.ui.theme.StylusTheme
 import androidx.compose.ui.draw.clipToBounds
+import com.example.stylus.ui.StylusState
 
 class MainActivity : ComponentActivity() {
 
     private val viewModel: StylusViewModel by viewModels()
     private val strokeStyle = Stroke(10F)
+    private var stylusState: StylusState by mutableStateOf(StylusState())
 
     @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
