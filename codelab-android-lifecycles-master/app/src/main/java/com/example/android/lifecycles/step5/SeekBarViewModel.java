@@ -25,4 +25,8 @@ import androidx.lifecycle.ViewModel;
 public class SeekBarViewModel extends ViewModel {
 
     public MutableLiveData<Integer> seekbarValue = new MutableLiveData<>();
+
+    public void changeSeekValue(int progress) {
+        seekbarValue.setValue(progress);
+    }
 }
