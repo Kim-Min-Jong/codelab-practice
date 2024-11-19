@@ -8,8 +8,11 @@ import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.Spinner
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
+import com.google.mlkit.vision.text.TextRecognition
 import java.util.PriorityQueue
 
 class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -75,6 +78,51 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun runTextRecognition() {
+        // 분석할 이미지
+        val image = InputImage.fromBitmap(mSelectedImage!!, 0)
+        // 텍스트 분석기
+        val recognizer = TextRecognition.getClient()
+        mTextButton?.isEnabled = false
+
+        // 분석시작
+        recognizer.process(image)
+            // 성공 리스너
+            .addOnSuccessListener {
+                mTextButton?.isEnabled = true
+                processTextRecognition(it)
+            }
+            // 실패 리스너
+            .addOnFailureListener{
+                mTextButton?.isEnabled = true
+                it.printStackTrace()
+            }
+    }
+
+    // 텍스트 인식 응답 처리
+    private fun processTextRecognition(text: Text) {
+        // 인식된 텍스트 뭉치
+        val blocks = text.textBlocks
+
+        if (blocks.size == 0) {
+            Toast.makeText(this@MainActivity, "No text found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // 화면 초기화
+        mGraphicOverlay?.clear()
+
+        // 최종 값을 그래픽으로 출력
+        for (i in 0 until blocks.size) {
+           val lines = blocks[i].lines
+           for (j in 0 until lines.size) {
+               val elements = lines[j].elements
+               for (k in 0 until elements.size) {
+                   val textGraphic = TextGraphic(mGraphicOverlay, elements[k])
+                    mGraphicOverlay?.add(textGraphic)
+               }
+           }
+        }
+
 
     }
 
