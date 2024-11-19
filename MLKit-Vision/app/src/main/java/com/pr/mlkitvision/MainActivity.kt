@@ -11,6 +11,9 @@ import android.widget.Spinner
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.face.Face
+import com.google.mlkit.vision.face.FaceDetection
+import com.google.mlkit.vision.face.FaceDetectorOptions
 import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import java.util.PriorityQueue
@@ -74,7 +77,44 @@ class MainActivity : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private fun runFaceContourDetection() {
+        // 분석할 이미지
+        val image = InputImage.fromBitmap(mSelectedImage!!, 0)
 
+        // 얼굴 윤곽 탐지 옵션
+        val options = FaceDetectorOptions.Builder()
+            .setPerformanceMode(FaceDetectorOptions.PERFORMANCE_MODE_FAST)
+            .setContourMode(FaceDetectorOptions.CONTOUR_MODE_ALL)
+            .build()
+
+        mFaceButton?.isEnabled = false
+        // 얼굴 탐지기
+        val detector = FaceDetection.getClient(options)
+        detector.process(image)
+            .addOnSuccessListener {
+                mFaceButton?.isEnabled = true
+                processFaceContourDetectionResult(it)
+            }
+            .addOnFailureListener {
+                mFaceButton?.isEnabled = true
+                it.printStackTrace()
+
+            }
+    }
+
+    // 얼굴 윤곽 감지 응답 처리
+    private fun processFaceContourDetectionResult(faces: List<Face>) {
+        if (faces.isEmpty()) {
+            Toast.makeText(this@MainActivity, "No face found", Toast.LENGTH_SHORT).show()
+            return
+        }
+        mGraphicOverlay?.clear()
+
+        for (i in 0 until faces.size) {
+            val face = faces[i]
+            val faceGraphic = FaceContourGraphic(mGraphicOverlay)
+            mGraphicOverlay?.add(faceGraphic)
+            faceGraphic.updateFace(face)
+        }
     }
 
     private fun runTextRecognition() {
