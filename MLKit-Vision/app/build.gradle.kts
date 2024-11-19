@@ -45,4 +45,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Face features
+    implementation(libs.face.detection)
+    // Text features
+    implementation(libs.text.recognition)
+
 }
