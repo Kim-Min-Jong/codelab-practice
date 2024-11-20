@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
+import com.google.mlkit.nl.languageid.LanguageIdentification
 import com.pr.mlkit_translation.util.Language
 import com.pr.mlkit_translation.util.ResultOrError
 import com.pr.mlkit_translation.util.SmoothedMutableLiveData
@@ -37,7 +38,9 @@ import com.pr.mlkit_translation.main.MainFragment.Companion.DESIRED_WIDTH_CROP_P
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    // TODO Instantiate LanguageIdentification
+    //  Instantiate LanguageIdentification
+    private val languageIdentifier = LanguageIdentification.getClient()
+
     val targetLang = MutableLiveData<Language>()
     val sourceText = SmoothedMutableLiveData<String>(SMOOTHING_DURATION)
 
@@ -71,13 +74,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     val sourceLang = Transformations.switchMap(sourceText) { text ->
         val result = MutableLiveData<Language>()
-        // TODO  Call the language identification method and assigns the result if it is not
-        //  undefined (“und”)
+        // Call the language identification method and assigns the result if it is not
+        // undefined (“und”)
+        // 식별 실행
+        languageIdentifier.identifyLanguage(text)
+            .addOnSuccessListener { languageCode ->
+                // 정의 되지 않은 경우 식별할수 없다고 알림
+                if (languageCode == "und") {
+                    result.value = Language(languageCode)
+                }
+            }
+
         result
     }
 
     override fun onCleared() {
-        // TODO Shut down ML Kit clients.
+        // Shut down ML Kit clients.
+        languageIdentifier.close()
+        translators.evictAll()
     }
 
     private fun translate(): Task<String> {
