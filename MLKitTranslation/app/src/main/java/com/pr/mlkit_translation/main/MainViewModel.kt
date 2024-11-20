@@ -35,6 +35,7 @@ import com.google.mlkit.nl.translate.Translator
 import com.google.mlkit.nl.translate.TranslatorOptions
 import com.pr.mlkit_translation.main.MainFragment.Companion.DESIRED_HEIGHT_CROP_PERCENT
 import com.pr.mlkit_translation.main.MainFragment.Companion.DESIRED_WIDTH_CROP_PERCENT
+import java.util.logging.Handler
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -99,7 +100,47 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         //  perform the translation.
         //  If the chosen target language model has not been downloaded to the device yet,
         //  call downloadModelIfNeeded() and then proceed with the translation.
-        return Tasks.forResult("") // replace this with your code
+
+        // 각 요소 초기화
+        val text = sourceText.value
+        val source = sourceLang.value
+        val target = targetLang.value
+
+        // 요소 확인후 값이 비거나 잘못된 것 처리
+        if (modelDownloading.value != false || translating.value != false) {
+            return Tasks.forCanceled()
+        }
+        if (source == null || target == null || text == null || text.isEmpty()) {
+            return Tasks.forResult("")
+        }
+
+        // 언어코드 확인 후 잘못된 코드 확인 후 처리
+        val sourceLangCode = TranslateLanguage.fromLanguageTag(source.code)
+        val targetLangCode = TranslateLanguage.fromLanguageTag(target.code)
+        if (sourceLangCode == null || targetLangCode == null) {
+            return Tasks.forCanceled()
+        }
+
+        // translator 설정
+        val options = TranslatorOptions.Builder()
+            .setSourceLanguage(sourceLangCode)
+            .setTargetLanguage(targetLangCode)
+            .build()
+        val translator = translators[options]
+        modelDownloading.setValue(true)
+
+        android.os.Handler().postDelayed({ modelDownloading.setValue(false) }, 15000)
+        // 언어모델이 다운로드 되지 않은 경우 다운로드 후 번역 진행
+        modelDownloadTask = translator.downloadModelIfNeeded().addOnCompleteListener {
+            modelDownloading.setValue(false)
+        }
+        translating.value = true
+        // 성공 시 모델을 통해 번역
+        return modelDownloadTask.onSuccessTask {
+            translator.translate(text)
+        }.addOnCompleteListener {
+            translating.value = false
+        }
     }
 
     // Gets a list of all available translation languages.
