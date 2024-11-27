@@ -1,6 +1,10 @@
 package com.example.compose.rally
 
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.hasParent
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -51,9 +55,20 @@ class TopAppBarTest {
             )
         }
 
+        // onNode를 통해 각 종 노드를 탐색하여 테스트 할 수 있음
         composeTestRule
-            // 탭의 문자를 대문자로 표시
-            .onNodeWithContentDescription(RallyScreen.Accounts.name.uppercase())
+            //
+            .onNode(
+                // 텍스트 요소가 있는지
+                hasText(RallyScreen.Accounts.name.uppercase())
+                        and
+                        // 부모 요소가 있는지
+                        hasParent(
+                            hasContentDescription(RallyScreen.Accounts.name)
+                        ),
+                // 병합되지 않은 노드 트리만을 탐색
+                useUnmergedTree = true
+            )
             // 대문자로 존재하는지 확인
             .assertExists()
     }
