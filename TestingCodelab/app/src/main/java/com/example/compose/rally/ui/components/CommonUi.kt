@@ -86,6 +86,7 @@ private fun BaseRow(
     Row(
         modifier = Modifier
             .height(68.dp)
+            // ContentDesciption 설정을 위한 시멘틱 세팅
             .clearAndSetSemantics {
                 contentDescription =
                     "$title account ending in ${subtitle.takeLast(4)}, current balance $dollarSign$formattedAmount"
