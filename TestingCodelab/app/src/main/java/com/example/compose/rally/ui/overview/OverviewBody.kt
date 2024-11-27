@@ -16,7 +16,9 @@
 
 package com.example.compose.rally.ui.overview
 
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -102,14 +104,20 @@ private fun AlertCard() {
     }
     val animatedElevation = animateDpAsState(
         targetValue = currentTargetElevation,
-        animationSpec = tween(durationMillis = 500),
-        finishedListener = {
-            currentTargetElevation = if (currentTargetElevation > 4.dp) {
-                1.dp
-            } else {
-                8.dp
-            }
-        }
+        // 무한 애니메이션으로 교체
+        animationSpec = infiniteRepeatable(
+            animation =  tween(durationMillis = 500),
+            repeatMode = RepeatMode.Reverse
+        ),
+        // 애니메이션이 완료될때 까지 대기한 다음 다시 실행되는 리스너
+        // 무한 애니메이션으로 교체해야함
+//        finishedListener = {
+//            currentTargetElevation = if (currentTargetElevation > 4.dp) {
+//                1.dp
+//            } else {
+//                8.dp
+//            }
+//        }
     )
     Card(elevation = animatedElevation.value) {
         Column {

@@ -1,5 +1,6 @@
 package com.example.compose.rally
 
+import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasParent
@@ -10,6 +11,7 @@ import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import com.example.compose.rally.ui.components.RallyTopAppBar
+import com.example.compose.rally.ui.overview.OverviewBody
 import org.junit.Rule
 import org.junit.Test
 
@@ -71,5 +73,20 @@ class TopAppBarTest {
             )
             // 대문자로 존재하는지 확인
             .assertExists()
+    }
+
+    @Test
+    fun overviewScreen_alertsDisplayed() {
+        composeTestRule.setContent {
+            OverviewBody()
+        }
+
+        // OverView에서 Alert 부분이 애니메이션이 계속 진행되는지 테스트
+        composeTestRule.onNodeWithText("Alerts")
+            .assertIsDisplayed()
+
+        // --> 실패함, 계속 진행되므로(앱이 유휴 상태가 되지않음)
+        // 테스트(유휴 상태가 되어야 진행)와 동기화 될 방법이 없음
+        // 애니메이션 구조를 변경해야함
     }
 }
