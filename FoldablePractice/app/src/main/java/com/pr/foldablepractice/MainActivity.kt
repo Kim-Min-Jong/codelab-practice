@@ -143,7 +143,6 @@ class MainActivity : AppCompatActivity() {
             set.setVisibility(R.id.folding_feature, View.VISIBLE)
             set.applyTo(constraintLayout)
         }
-        }
     }
 
     private fun getFeatrueBoundsInWindow(
