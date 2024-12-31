@@ -45,4 +45,8 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation(libs.androidx.window)
+    androidTestImplementation(libs.androidx.window.testing)
+    implementation(libs.androidx.lifcycle.runtime)
 }
