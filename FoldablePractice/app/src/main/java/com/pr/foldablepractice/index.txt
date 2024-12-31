@@ -1,0 +1,24 @@
+안드로이드 기기의 유형
+
+단일 화면 폴더블 기기 (화면 하나를 접을 수 있음)
+- 사용자는 multi window 모드를 통해 동시에 같은 화면에서 여러앱을 실행 할 수 있음
+
+듀얼 화면 폴더블 기기(화면 두 개가 힌지로 결합)
+- 이러한 기기도 접을 수 있지만 두 가지 다른 논리 디스플레이 영역이 있음
+
+접는 상태에 따라 다양한 방식으로 콘텐츠를 표시 할 수도 있음
+- Spannning postures, Folded postures...
+
+
+Jetpack WindowManager
+- 애플리케이션 개발자가 새로운 기기 폼 팩터를 지원하도록 돕고 이전 플랫폼 버전과 새 플랫폼 버전에서 모두 다양한 WindowManager 기능을 위한 공통 API 표시 영역을 제공하는 안드로이드 라이브러리
+
+주 기능
+- 유연한 디스플레이의 접는 부분 또는 물리적 디스플레이 패널 두 개 사이의 힌지를 설명하는 FoldingFeature 클래스가 포함되어 있습니다. API를 통해 기기와 관련된 중요한 정보에 액세스할 수 있음
+
+state(): 정의된 상태 목록(FLAT, HALF_OPENED)에서 기기의 현재 상태를 제공합니다.
+isSeparating(): FoldingFeature를 사용자가 논리적으로 분리된 것으로 볼 수 있는 여러 물리적 영역으로 분할하는 것으로 간주해야 하는지 계산합니다.
+occlusionType(): 오클루전 모드를 계산하여 FoldingFeature가 창의 일부를 가리는지 확인합니다.
+orientation(): FoldingFeature 너비가 높이보다 크면 FoldingFeature.Orientation.HORIZONTAL을 반환하고 그렇지 않으면 FoldingFeature.Orientation.VERTICAL을 반환합니다.
+bounds(): 물리적 힌지의 경계와 같이 기기 기능의 경계가 포함된 Rect 인스턴스를 제공합니다.
+WindowInfoTracker 인터페이스를 사용하면 windowLayoutInfo()에 액세스하여 사용 가능한 모든 DisplayFeature가 포함된WindowLayoutInfo의 Flow를 수집할 수 있습니다.
