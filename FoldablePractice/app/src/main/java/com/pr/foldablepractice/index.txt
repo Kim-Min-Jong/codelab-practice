@@ -22,3 +22,16 @@ occlusionType(): 오클루전 모드를 계산하여 FoldingFeature가 창의 �
 orientation(): FoldingFeature 너비가 높이보다 크면 FoldingFeature.Orientation.HORIZONTAL을 반환하고 그렇지 않으면 FoldingFeature.Orientation.VERTICAL을 반환합니다.
 bounds(): 물리적 힌지의 경계와 같이 기기 기능의 경계가 포함된 Rect 인스턴스를 제공합니다.
 WindowInfoTracker 인터페이스를 사용하면 windowLayoutInfo()에 액세스하여 사용 가능한 모든 DisplayFeature가 포함된WindowLayoutInfo의 Flow를 수집할 수 있습니다.
+
+
+Display Feature
+- 디스플레이의 물리적 특징에 대한 설명. 디스플레이 기능은 장치의 디스플레이 패널 안에 있는 고유한 물리적 특성이다.
+이는 앱의 Window 공간에 침입해서(intrude) 시각적 왜곡 또는 터치 불연속성을 생성하거나 일부 영역을 안 보이게 만들기, 화면 공간에 논리적 구분선 또는 분리를 생성할 수 있다
+
+Folding Feature
+FoldingFeature는 아래를 비롯해 폴더블 디스플레이에 대한 정보를 제공하는 DisplayFeature 타입이다
+
+- state : 기기의 접힌 상태 (FLAT 또는 HALF_OPENED)
+- orientation : 접힘 또는 힌지의 방향 (HORIZONTAL 또는 VERTICAL)
+- occlusionType : 접힘 또는 힌지가 디스플레이 일부를 가리는지 여부 (NONE 또는 FULL)
+- isSeparating : 접힘 또는 힌지가 2개의 논리 디스플레이 영역을 생성하는지 여부 (T/F)
