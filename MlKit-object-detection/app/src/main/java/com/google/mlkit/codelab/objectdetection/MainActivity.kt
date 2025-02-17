@@ -38,14 +38,18 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.math.max
 import kotlin.math.min
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 
+// 리스너 직접 상속
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     companion object {
         const val TAG = "MLKit-ODT"
         const val REQUEST_IMAGE_CAPTURE: Int = 1
         private const val MAX_FONT_SIZE = 96F
     }
-
+    // 뷰 객체
     private lateinit var captureImageFab: Button
     private lateinit var inputImageView: ImageView
     private lateinit var imgSampleOne: ImageView
@@ -58,6 +62,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // 뷰 초기화
         captureImageFab = findViewById(R.id.captureImageFab)
         inputImageView = findViewById(R.id.imageView)
         imgSampleOne = findViewById(R.id.imgSampleOne)
@@ -65,6 +70,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         imgSampleThree = findViewById(R.id.imgSampleThree)
         tvPlaceholder = findViewById(R.id.tvPlaceholder)
 
+        // 리스너 등록
         captureImageFab.setOnClickListener(this)
         imgSampleOne.setOnClickListener(this)
         imgSampleTwo.setOnClickListener(this)
@@ -80,6 +86,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
+    // 리스너 로직 작성
+    // 뷰 컴포넌트에 따른 분기 처리
     override fun onClick(v: View?) {
         when (v?.id) {
             R.id.captureImageFab -> {
@@ -104,8 +112,42 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     /**
      * ML Kit Object Detection function. We'll add ML Kit code here in the codelab.
      */
+    // 객체 탐지하는 로직
     private fun runObjectDetection(bitmap: Bitmap) {
+        // 1. input image 만들기
+        val image = InputImage.fromBitmap(bitmap, 0)
 
+        // 2. detection instance 만들기
+        // 3가지 모드가 있음
+        //   1. 감지기 모드 (단일이미지)
+        //   2. 감지 모드(단일 or 복수 객체)
+        //   3. 분류 모드
+        // 여기서는 단일-복수 감지 및 분류를 다룸
+        val option = ObjectDetectorOption.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .enableMultipleObjects()
+            .enableClassification()
+            .build()
+        val objectDetector = ObjectDetection.getClient(options)
+
+        // 3. 감지기에 이미지 제공
+        objectDetector.process(image)
+            .addOnSuccessListener {
+                // 감지에 성공하면 다음과 같은 정보를 제공
+                // 1. 감지된 총 객체수
+                // 2. 감지 된 객체 종류
+                /*
+                    trackingId: 프레임 간 추적에 사용하는 정수 (이 Codelab에서는 사용되지 않음).
+                    boundingBox: 객체의 경계 상자
+                    labels: 감지된 객체의 라벨 목록(분류가 사용 설정된 경우에만 해당)
+                    index (이 라벨의 인덱스)
+                    text('패션 상품', '식품', '홈 상품', '장소', '식물'을 포함한 이 라벨의 텍스트 가져오기)
+                    confidence (0.0~1.0 사이의 부동 소수점 수, 1.0은 100%를 의미함)
+                 */
+                debugPrint(it)
+        }.addOnFailureListener {
+            // 로그 출력
+            }
     }
 
     /**
