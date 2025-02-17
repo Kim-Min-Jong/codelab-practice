@@ -145,6 +145,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                     confidence (0.0~1.0 사이의 부동 소수점 수, 1.0은 100%를 의미함)
                  */
                 debugPrint(it)
+
+                // 감지 결과 표시
+                runOnUiThread {
+                    ivPreview.drawDectectionResults(it)
+                }
         }.addOnFailureListener {
             // 로그 출력
             }
