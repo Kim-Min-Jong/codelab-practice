@@ -17,11 +17,16 @@
 package com.example.android.sports
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
+import android.view.Menu
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.toComposeRect
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
@@ -37,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
+    @RequiresApi(Build.VERSION_CODES.M)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -49,7 +55,22 @@ class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(navController.graph)
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
 
-        binding.navigation.setupWithNavController(navController)
+//        binding.navigation.setupWithNavController(navController)
+
+        // 컴포즈 네비게이션 뷰 삽입
+        val navigationMenuItems = listOf(
+            MenuItem.Home,
+            MenuItem.Favorites,
+            MenuItem.Settings,
+        )
+
+        (binding.navigation as? ComposeView)?.setContent {
+            MaterialTheme {
+                BottomNavigationBar(menuItem = navigationMenuItems) {
+                    navController.navigate(it.destinationId)
+                }
+            }
+        }
     }
 
     override fun onSupportNavigateUp(): Boolean {
