@@ -25,10 +25,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Sports">
+        <!-- fullUser - 사용자가 화면방향을 잠글수 있음. 기기 센서가 방향을 결정 -->
         <activity
             android:name=".MainActivity"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:theme="@style/Theme.Sports.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
