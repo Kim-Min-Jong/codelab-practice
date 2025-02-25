@@ -22,9 +22,12 @@ import android.os.Bundle
 import android.view.Menu
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationRail
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalConfiguration
@@ -66,8 +69,32 @@ class MainActivity : AppCompatActivity() {
 
         (binding.navigation as? ComposeView)?.setContent {
             MaterialTheme {
-                BottomNavigationBar(menuItem = navigationMenuItems) {
-                    navController.navigate(it.destinationId)
+                // Material Design에서는 앱이 상황에 따라 유연하게 구성요소를 선택하는 방식이 좋음
+                // 따라서, 화면 너비에 따라 탐색 구성요소를 달리 해줘야함
+                // WidthSizeClass을 분기 처리하여 각 크기에 맞는 컴포넌트를 제공
+                when (rememberWidthSizeClass()) {
+                    // 작은 너비 600dp 이하
+                    WidthSizeClass.COMPACT -> {
+                        BottomNavigationBar(menuItem = navigationMenuItems) {
+                            navController.navigate(it.destinationId)
+                        }
+                    }
+                    // 보통 너비 - 600 ~ 840dp
+                    WidthSizeClass.MEDIUM -> {
+                        NavRail(menuItem = navigationMenuItems) { menuItems ->
+                            navController.navigate(menuItems.destinationId)
+                        }
+
+                    }
+                    // 넓은 너비 - 840 over
+                    WidthSizeClass.EXPANDED -> {
+                        NavigationDrawer(
+                            menuItem = navigationMenuItems,
+                            modifier = Modifier.width(256.dp)
+                        ) { menuItem ->
+                            navController.navigate(menuItem.destinationId)
+                        }
+                    }
                 }
             }
         }
@@ -76,7 +103,7 @@ class MainActivity : AppCompatActivity() {
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration) ||
-            super.onSupportNavigateUp()
+                super.onSupportNavigateUp()
     }
 }
 

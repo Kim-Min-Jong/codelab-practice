@@ -3,10 +3,14 @@ package com.example.android.sports
 import android.graphics.drawable.Icon
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -22,9 +26,9 @@ fun BottomNavigationBar(
     // 네비게이션 클릭시 불릭 콜백
     onMenuSelected: (MenuItem) -> Unit = {}
 ) {
-    NavigationBar (
+    NavigationBar(
         modifier = modifier
-    ){
+    ) {
         menuItem.forEach { menuItem ->
             NavigationBarItem(
                 selected = false,
@@ -40,3 +44,61 @@ fun BottomNavigationBar(
         }
     }
 }
+
+
+// 탐색 레일 정의
+@Composable
+fun NavRail(
+    menuItem: List<MenuItem>,
+    modifier: Modifier = Modifier,
+    // 네비게이션 클릭시 불릭 콜백
+    onMenuSelected: (MenuItem) -> Unit = {}
+) {
+    NavigationRail(
+        modifier = modifier
+    ) {
+        menuItem.forEach { menuItem ->
+            NavigationRailItem(
+                selected = false,
+                onClick = { onMenuSelected(menuItem) },
+                icon = {
+                    Icon(
+                        painter = painterResource(menuItem.iconId),
+                        contentDescription = null
+                    )
+                },
+                label = { Text(text = stringResource(id = menuItem.labelId)) }
+            )
+        }
+    }
+}
+
+// 지속 탐색 창 정의
+@Composable
+fun NavigationDrawer(
+    menuItem: List<MenuItem>,
+    modifier: Modifier = Modifier,
+    // 네비게이션 클릭시 불릭 콜백
+    onMenuSelected: (MenuItem) -> Unit = {}
+) {
+    Column(
+        modifier = modifier
+    ) {
+        menuItem.forEach { menuItem ->
+            Row {
+                NavigationRailItem(
+                    selected = false,
+                    onClick = { onMenuSelected(menuItem) },
+                    icon = {
+                        Icon(
+                            painter = painterResource(menuItem.iconId),
+                            contentDescription = null
+                        )
+                    },
+                    label = { Text(text = stringResource(id = menuItem.labelId)) }
+                )
+            }
+        }
+    }
+}
+
