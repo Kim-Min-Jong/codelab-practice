@@ -59,9 +59,15 @@ class SportsListFragment : Fragment() {
         val adapter = SportsAdapter {
             // Update the user selected sport as the current sport in the shared viewmodel
             sportsViewModel.updateCurrentSport(it)
-            // Navigate to the details screen
-            val action = SportsListFragmentDirections.actionSportsListFragmentToNewsFragment()
-            this.findNavController().navigate(action)
+//            // Navigate to the details screen
+//            val action = SportsListFragmentDirections.actionSportsListFragmentToNewsFragment()
+//            this.findNavController().navigate(action)
+            // 화면 공간크기를 확인하고 목록창과 세부정보 창이 같이 표시될 공간이 충분하지 않으면
+            // 화면이 세부정보 창으로 완전히 전환되도록
+            if (slidingPaneLayout.isSlideable && slidingPaneLayout.isOpen.not()) {
+                val action = SportsListFragmentDirections.actionSportsListFragmentToNewsFragment()
+                this.findNavController().navigate(action)
+            }
         }
         binding.recyclerView.adapter = adapter
         adapter.submitList(sportsViewModel.sportsData)
